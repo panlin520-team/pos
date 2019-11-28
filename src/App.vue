@@ -9,7 +9,7 @@
         </el-collapse-transition>
       </div>
     </div>
-    <div class="footer" v-if="$route.meta.menubar"></div>
+    <!-- <div class="footer" v-if="$route.meta.menubar"></div> -->
     <router-view v-else="!$route.meta.menubar" />
   </div>
 </template>

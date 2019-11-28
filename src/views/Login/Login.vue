@@ -1,42 +1,20 @@
 <!-- 登录 -->
 <template>
   <div class="loginPage">
-    <!-- 登录 -->
-    <!-- <div class="logo">
-      <img src="http://47.108.29.183:8089/vue/logo.5d1ff05b.png" alt />
-    </div>-->
-     <!-- <div class="loginlogo">
-      <img src="../../assets/images/icon_loginlogo.png" alt />
-    </div>
-   <div class="loginCircle">
-      <img src="../../assets/images/icon_loginCircle.png" alt />
-    </div>
-    <div class="loginhome">
-      <img src="../../assets/images/icon_loginhone.png" alt />
-    </div>
-    <div class="loginmountain">
-      <img src="../../assets/images/icon_loginmountain.png" alt />
-    </div>
-    <div class="mountainone">
-      <img src="../../assets/images/icon_mountain1.png" alt />
-    </div>
-    <div class="mountaintwo">
-      <img src="../../assets/images/icon_mountain2.png" alt />
-    </div> -->
-    <div class="loginBlank">
-      <div class="logintop">系统Post平台</div>
-      <div class="btn inputs" @click="drawer = true">
-        <input type="text" v-model="storeName" placeholder="选择门店" disabled />
+    <div class="loginForm">
+      <div class="title">系统Post平台</div>
+      <div class="label" @click="drawer = true">
+        <input type="text" v-model="storeName" placeholder="选择门店" disabled class="btn-pointer" />
         <span class="el-icon-arrow-right"></span>
       </div>
-      <div class="inputs">
+      <div class="label">
         <input type="text" v-model="userName" placeholder="用户名" />
       </div>
-      <div class="inputs">
+      <div class="label">
         <input type="password" v-model="password" placeholder="密码" />
       </div>
-      <div class="btnGroup">
-        <div class="btn" @click="login">登录</div>
+      <div class="label">
+        <div class="btn-login" @click="login">登录</div>
       </div>
     </div>
     <!-- 门店列表 -->
@@ -67,7 +45,6 @@
 
 <script>
 export default {
-  components: {},
   data() {
     return {
       // 门店名称
@@ -191,115 +168,65 @@ export default {
 .loginPage {
   width: 100%;
   height: 100%;
-  // padding-top: 100px;
-  // text-align: center;
   position: relative;
-  background: url('../../assets/images/icon_icon2.png') no-repeat;
-  // background: linear-gradient(
-  //   225deg,
-  //   rgba(35, 165, 71, 1),
-  //   rgba(102, 197, 108, 1)
-  // );
-  .loginlogo {
-    padding: 35px;
-  }
-  .loginhome {
+  background: url("../../assets/images/icon_icon2.png") no-repeat;
+
+  .loginForm {
+    width: 360px;
+    height: 400px;
+    padding: 5px 30px;
     position: absolute;
-    right: 0;
-    bottom: 0;
-  }
-  .loginCircle {
-    position: absolute;
-    bottom: 280px;
-  }
-  .mountainone {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    img {
-      width: 100%;
-    }
-  }
-  .mountaintwo {
-    width: 100%;
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    img {
-      width: 100%;
-    }
-  }
-  .loginmountain {
-    position: absolute;
-    bottom: 50px;
-    z-index: 100;
-  }
-  .loginBlank {
-    display: inline-block;
-    margin-top: 50px;
-    width: 335px;
-    height: 425px;
-    position: absolute;
-    right: 550px;
-    top: 150px;
-    border-radius: 4px;
-    background: rgba(35, 165, 71, 1);
-    .logintop {
-      height: 85px;
-      font-size: 29px;
-      font-family: SimHei;
-      font-weight: 400;
+    right: 400px;
+    top: 200px;
+    border-radius: 5px;
+    background: #23a547;
+
+    .title {
+      height: 80px;
+      font-size: 26px;
+      font-weight: 700;
       text-align: center;
-      color: rgba(255, 255, 255, 1);
-      line-height: 76px;
+      color: #ffffff;
+      line-height: 80px;
     }
-    .inputs {
+
+    .label {
       position: relative;
-      width: 266px;
       height: 50px;
-      margin-left: 30px;
+      line-height: 50px;
+      margin-bottom: 30px;
       border-radius: 5px;
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #ffffff;
-      border: 1px solid #dcdfe6;
+      overflow: hidden;
+
       input {
+        display: block;
         width: 100%;
-        height: 30px;
-        padding: 0;
-        line-height: 30px;
-        background-color: transparent;
+        height: 50px;
         text-align: center;
 
         &:disabled {
-          color: #333;
-          -webkit-text-fill-color: #333;
+          color: #101010;
+          -webkit-text-fill-color: #101010;
         }
       }
-
-      &.btn input {
-        cursor: pointer;
-      }
-
+      
       span {
         position: absolute;
         top: 15px;
         right: 15px;
         font-size: 20px;
       }
-    }
-    .btnGroup {
-      width: 200px;
-      height: 40px;
-      background: #feb019;
-      border-radius: 6px;
-      margin: 50px auto;
-      line-height: 40px;
-      font-size: 18px;
-      font-family: PingFang SC;
-      font-weight: 600;
-      color: rgba(255, 255, 255, 1);
+
+      .btn-login {
+        font-size: 16px;
+        height: 40px;
+        line-height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        margin: 0 auto;
+        background: #feb019;
+        color: #ffffff;
+      }
     }
   }
 }

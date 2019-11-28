@@ -1,33 +1,18 @@
 <template>
   <div id="app">
-    <div class="header"></div>
+    <div class="header" v-if="$route.meta.menubar"></div>
     <div class="container">
-      <div class="aside"></div>
-      <div class="main"><router-view /></div>
+      <div class="aside" v-if="$route.meta.menubar"></div>
+      <div class="main">
+        <el-collapse-transition>
+          <router-view />
+        </el-collapse-transition>
+      </div>
     </div>
-    <!-- <div class="footer"></div> -->
+    <div class="footer" v-if="$route.meta.menubar"></div>
+    <router-view v-else="!$route.meta.menubar" />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-
-#nav {
-  padding: 30px;
-
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
+<style lang="scss" scoped>
 </style>

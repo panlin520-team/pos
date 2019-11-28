@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
 
 Vue.use(VueRouter)
 
@@ -44,16 +43,6 @@ const Setting = () => import( /* webpackChunkName: "Setting" */ '../views/Settin
 const Login = () => import( /* webpackChunkName: "Login" */ '../views/Login/Login.vue');
 
 const routes = [
-  // 登录
-  {
-    path: '/login',
-    name: "Login",
-    component: Login,
-    meta: {
-      title: '登录'
-    }
-  },
-
   // 收银
   {
     path: '/',
@@ -267,6 +256,16 @@ const routes = [
       title: '设置',
       requiresAuth: true,
       menubar: true
+    }
+  },
+
+  // 登录
+  {
+    path: '/login',
+    name: "Login",
+    component: Login,
+    meta: {
+      title: '登录'
     }
   }
 ]

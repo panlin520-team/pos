@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div class="header" v-if="$route.meta.menubar"></div>
-    <div class="container">
-      <div class="aside" v-if="$route.meta.menubar"></div>
+    <div class="container" v-if="$route.meta.menubar">
+      <div class="aside"></div>
       <div class="main">
         <el-collapse-transition>
           <router-view />

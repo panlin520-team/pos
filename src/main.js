@@ -33,27 +33,27 @@ Vue.config.productionTip = false
 console.log('当前环境',process.env);
 
 // 路由拦截
-router.beforeEach((to, from, next) => {
-  if (to.meta.requiresAuth == true) {
-    if (to.meta.title) {
-      const title = to.meta.title + "-俪凝美聚"
-      document.title = title
-    } else {
-      document.title = "俪凝美聚"
-    }
+// router.beforeEach((to, from, next) => {
+//   if (to.meta.requiresAuth == true) {
+//     if (to.meta.title) {
+//       const title = to.meta.title + "-俪凝美聚"
+//       document.title = title
+//     } else {
+//       document.title = "俪凝美聚"
+//     }
 
-    if (localStorage.getItem('isLogin') == 'false' || localStorage.getItem('isLogin') == '' || localStorage.getItem('isLogin') == null || localStorage.getItem('isLogin') == 'undefined') {
-      next({
-        path: '/login'
-      })
-    } else {
-      next()
-    }
-  } else {
-    next()
-  }
-  next()
-})
+//     if (localStorage.getItem('isLogin') == 'false' || localStorage.getItem('isLogin') == '' || localStorage.getItem('isLogin') == null || localStorage.getItem('isLogin') == 'undefined') {
+//       next({
+//         path: '/login'
+//       })
+//     } else {
+//       next()
+//     }
+//   } else {
+//     next()
+//   }
+//   next()
+// })
 
 new Vue({
   router,

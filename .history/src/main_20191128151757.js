@@ -13,7 +13,7 @@ import echarts from "echarts"
 Vue.prototype.$echarts = echarts
 
 // 自定义组件--弹框
-import PopOver from '@/components/PopOver/index.js'
+import PopOver from '@/components/PopOver/PopOver.js'
 Vue.use(PopOver)
 
 import axios from 'axios';

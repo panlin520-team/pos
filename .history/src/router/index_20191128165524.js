@@ -5,7 +5,7 @@ import Home from '../views/Home.vue'
 Vue.use(VueRouter)
 
 // 收银 
-const Money = () => import( /* webpackChunkName: "Money" */ '@/views/Money/Money.vue');
+const Money = () => import('../views/Money/Money.vue');
 // 预约
 const Appointment = () => import( /* webpackChunkName: "Appointment" */ '../views/Appointment/Appointment.vue');
 // 项目定制

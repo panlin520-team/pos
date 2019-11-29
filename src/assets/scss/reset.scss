@@ -33,8 +33,9 @@ textarea {
 
 input,
 button {
-  outline: none;
+  outline-style: none;
   box-sizing: border-box;
+  border: none;
 }
 
 // 输入框提示文本颜色设置
@@ -154,4 +155,8 @@ div::-webkit-scrollbar {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
+}
+
+.btn-pointer {
+  cursor: pointer;
 }

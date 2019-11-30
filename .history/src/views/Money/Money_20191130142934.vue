@@ -2044,10 +2044,7 @@ export default {
   width: 100%;
   height: 100%;
   .pageMain{
-    .pagination{
-      text-align: right;
-      margin: 20px 50px 0 0;
-    }
+    
   }
   .pageTop {
     width: 100%;

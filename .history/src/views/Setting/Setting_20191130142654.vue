@@ -177,7 +177,7 @@ export default {
     };
   },
   created() {
-    this.fetchStore();
+    // this.fetchStore();
   },
   mounted() {
     //门店定位

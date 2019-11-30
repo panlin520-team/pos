@@ -2046,7 +2046,6 @@ export default {
   .pageMain{
     .pagination{
       text-align: right;
-      margin: 20px 50px 0 0;
     }
   }
   .pageTop {

@@ -656,6 +656,7 @@ export default {
               type: "warning"
             });
           }
+          console.log(this.empSet);
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");
@@ -678,7 +679,7 @@ export default {
   bottom: 0;
   width: 100%;
   height: 200px;
-  // left: 200px;
+  left: 200px;
   .revealVIP {
     position: absolute;
     right: 10px;

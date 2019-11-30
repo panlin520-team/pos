@@ -100,7 +100,7 @@ export default {
     },
     //会员剩余品项
     show_condition() {
-      // this.visible_condition = true;
+      this.visible_condition = true;
     }
   },
   created() {},

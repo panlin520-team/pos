@@ -193,7 +193,7 @@ export default {
       
       var map = new window.AMap.Map("container", {
         resizeEnable: true, //是否监控地图容器尺寸变化
-        zoom: 16, //初始化地图层级
+        zoom: 11, //初始化地图层级
         center: [104.025571,30.676547] //初始化地图中心点
       });
 
@@ -307,6 +307,7 @@ export default {
           }
         })
         .catch(err => {
+          this.$message.error("门店信息修改失败");
         });
     },
     // 获取门店信息

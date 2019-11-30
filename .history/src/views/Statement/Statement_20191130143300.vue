@@ -84,23 +84,23 @@ export default {
   methods: {
     //会员应收统计
     show_Financs(itemcar) {
-      // this.visible_Financs = true;
+      this.visible_Financs = true;
     },
     //品项销售统计
     show_marketnancs() {
-      // this.visible_marketnancs = true;
+      this.visible_marketnancs = true;
     },
     //库存分页
     show_tory(itemcar) {
-      // this.visible_tory = true;
+      this.visible_tory = true;
     },
     //会员分页
     show_member(itemcar) {
-      // this.visible_member = true;
+      this.visible_member = true;
     },
     //会员剩余品项
     show_condition() {
-      // this.visible_condition = true;
+      this.visible_condition = true;
     }
   },
   created() {},

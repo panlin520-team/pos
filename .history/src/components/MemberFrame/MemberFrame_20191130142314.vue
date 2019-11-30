@@ -656,6 +656,7 @@ export default {
               type: "warning"
             });
           }
+          console.log(this.empSet);
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");
@@ -663,6 +664,7 @@ export default {
     }
   },
   created() {
+    console.log(localStorage.getItem("memberName"));
     this.input_name = localStorage.getItem("memberName");
     this.input_number = localStorage.getItem("memberNumber");
     this.grade = localStorage.getItem("grade");
@@ -678,7 +680,7 @@ export default {
   bottom: 0;
   width: 100%;
   height: 200px;
-  // left: 200px;
+  left: 200px;
   .revealVIP {
     position: absolute;
     right: 10px;

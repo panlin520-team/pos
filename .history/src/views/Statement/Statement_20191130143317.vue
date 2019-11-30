@@ -96,11 +96,11 @@ export default {
     },
     //会员分页
     show_member(itemcar) {
-      // this.visible_member = true;
+      this.visible_member = true;
     },
     //会员剩余品项
     show_condition() {
-      // this.visible_condition = true;
+      this.visible_condition = true;
     }
   },
   created() {},

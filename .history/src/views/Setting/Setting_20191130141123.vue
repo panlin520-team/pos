@@ -189,12 +189,10 @@ export default {
     //门店定位
     init: function() {
       // console.log(123);
-      console.log(window.AMap);
-      
-      var map = new window.AMap.Map("container", {
+      var map = new VueAMap.Map("container", {
         resizeEnable: true, //是否监控地图容器尺寸变化
-        zoom: 16, //初始化地图层级
-        center: [104.025571,30.676547] //初始化地图中心点
+        zoom: 11, //初始化地图层级
+        center: [104.07, 30.67] //初始化地图中心点
       });
 
       // var map = new AMap.Map("container", {
@@ -307,6 +305,7 @@ export default {
           }
         })
         .catch(err => {
+          this.$message.error("门店信息修改失败");
         });
     },
     // 获取门店信息
@@ -337,6 +336,7 @@ export default {
           }
         })
         .catch(err => {
+          this.$message.error("门店数据获取失败");
         });
     },
     // 获取经营行业数据
@@ -357,6 +357,7 @@ export default {
           }
         })
         .catch(err => {
+          this.$message.error("经营行业数据获取失败");
         });
     },
     // 显示行业值对应文本

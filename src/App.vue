@@ -48,6 +48,7 @@
         active-text-color="#101010"
         router
         class="aside"
+        v-if="$route.meta.navbar"
       >
         <template v-for="(issue,index) in $router.options.routes">
           <template v-if="issue.name === $store.state.leftNavState">
@@ -59,7 +60,7 @@
           </template>
         </template>
       </el-menu>
-      <div class="main">
+      <div :class="$route.meta.navbar == false ? 'main' : 'main active'">
         <el-collapse-transition>
           <router-view />
         </el-collapse-transition>

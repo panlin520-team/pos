@@ -1845,7 +1845,7 @@ export default {
       padding: 0 18px;
 
       &.active {
-        color: #47bf7c;
+        color: #23A547;
         font-weight: 700;
       }
     }
@@ -2068,7 +2068,7 @@ export default {
             span {
               margin-right: 15px;
               &.discount {
-                color: #47bf7c;
+                color: #23A547;
               }
               &:last-child {
                 margin-right: 0;
@@ -2271,7 +2271,7 @@ export default {
     .btn-settle {
       flex: 1;
       text-align: center;
-      background: #47bf7c;
+      background: #23A547;
       color: #fff;
     }
 
@@ -2332,7 +2332,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #47bf7c;
+      background: #23A547;
       border-radius: 6px;
     }
   }
@@ -2399,7 +2399,7 @@ export default {
             left: 0;
             bottom: 0;
             width: 4px;
-            background: #47bf7c;
+            background: #23A547;
           }
         }
 
@@ -2415,7 +2415,7 @@ export default {
         }
 
         .active {
-          color: #47bf7c;
+          color: #23A547;
         }
       }
     }
@@ -2447,7 +2447,7 @@ export default {
 
           &.active {
             font-weight: 700;
-            color: #47bf7c;
+            color: #23A547;
             &:after {
               content: "";
               position: absolute;
@@ -2457,7 +2457,7 @@ export default {
               width: 24px;
               height: 2px;
               margin: auto;
-              background: #47bf7c;
+              background: #23A547;
             }
           }
         }
@@ -2531,7 +2531,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #47bf7c;
+      background: #23A547;
       border-radius: 6px;
     }
   }
@@ -2730,7 +2730,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #47bf7c;
+      background: #23A547;
       border-radius: 6px;
     }
   }
@@ -2770,7 +2770,7 @@ export default {
       line-height: 42px;
       text-align: center;
       color: #ffffff;
-      background: #47bf7c;
+      background: #23A547;
     }
   }
   .result {
@@ -2893,7 +2893,7 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
-      background: #47bf7c;
+      background: #23A547;
       color: #fff;
       border-radius: 6px;
     }

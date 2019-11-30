@@ -1313,7 +1313,7 @@ export default {
       line-height: 40px;
       text-align: center;
       color: #ffffff;
-      background: #47bf7c;
+      background: #23A547;
     }
   }
   .result {
@@ -1362,7 +1362,7 @@ export default {
         position: relative;
         padding: 0 15px;
         &.select {
-          color: #47bf7c;
+          color: #23A547;
           &:after {
             content: "";
             position: absolute;
@@ -1371,7 +1371,7 @@ export default {
             bottom: 0;
             width: 22px;
             height: 2px;
-            background: #47bf7c;
+            background: #23A547;
             margin: 0 auto;
           }
         }
@@ -1399,7 +1399,7 @@ export default {
           padding: 0 18px;
           height: 44px;
           &.select {
-            color: #47bf7c;
+            color: #23A547;
           }
         }
       }
@@ -1427,7 +1427,7 @@ export default {
           line-height: 30px;
           font-size: 16px;
           color: #ffffff;
-          background: #47bf7c;
+          background: #23A547;
           box-sizing: border-box;
           box-shadow: 0 2px 2px 1px #dddddd;
         }
@@ -1463,7 +1463,7 @@ export default {
           text-align: center;
 
           &.select {
-            color: #47bf7c;
+            color: #23A547;
             &:after {
               content: "";
               position: absolute;
@@ -1471,7 +1471,7 @@ export default {
               bottom: 0;
               width: 100%;
               height: 1px;
-              background: #47bf7c;
+              background: #23A547;
             }
           }
         }
@@ -1505,7 +1505,7 @@ export default {
         height: 60px;
         line-height: 60px;
         text-align: center;
-        color: #47bf7c;
+        color: #23A547;
         border-left: 1px solid #dddddd;
         margin: auto;
       }
@@ -1617,7 +1617,7 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
-      background: #47bf7c;
+      background: #23A547;
       color: #ffffff;
       position: fixed;
       bottom: 0;
@@ -1666,7 +1666,7 @@ export default {
 
 .calendar {
   &.selected {
-    background: #47bf7c;
+    background: #23A547;
   }
 }
 

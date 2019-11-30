@@ -2814,7 +2814,7 @@ export default {
         line-height: 54px;
         text-align: center;
         margin-top: 35px;
-        color: #47bf7c;
+        color: #23A547;
         background-color: #fff;
       }
     }

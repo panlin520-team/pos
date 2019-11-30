@@ -5,7 +5,7 @@
     router
     :unique-opened="true"
     class="el-menu-vertical-demo menubar"
-    active-text-color="#47bf7c"
+    active-text-color="#23A547"
     :style="{'height': (virtualHeight-125)+'px'}"
   >
     <el-menu-item index="/">

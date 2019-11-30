@@ -124,7 +124,10 @@ div::-webkit-scrollbar {
 
   .main {
     flex: 1;
-    padding-left: 200px;
+
+    &.active {
+      padding-left: 200px;
+    }
   }
 }
 

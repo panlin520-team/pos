@@ -271,7 +271,7 @@ export default {
       line-height: 40px;
       text-align: center;
       color: #ffffff;
-      background: #47bf7c;
+      background: #23A547;
       border-radius: 5px;
       margin-left: 5px;
     }

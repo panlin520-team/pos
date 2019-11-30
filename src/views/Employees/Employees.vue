@@ -1029,7 +1029,7 @@ export default {
       .btn-save {
         width: 100px;
         font-size: 16px;
-        color: #47bf7c;
+        color: #23A547;
       }
       .iconfont {
         font-size: 25px;
@@ -1104,7 +1104,7 @@ export default {
     }
 
     .control {
-      color: #47bf7c;
+      color: #23A547;
     }
   }
 }

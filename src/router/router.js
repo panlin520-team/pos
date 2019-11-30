@@ -49,7 +49,8 @@ const routes = [
     meta: {
       title: '收银',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -61,7 +62,8 @@ const routes = [
     meta: {
       title: '预约',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -73,7 +75,8 @@ const routes = [
     meta: {
       title: '项目定制',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -85,7 +88,8 @@ const routes = [
     meta: {
       title: '员工管理',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -97,7 +101,8 @@ const routes = [
     meta: {
       title: '体验卡',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: true
     },
     children: [{
       path: '/expcards',
@@ -107,6 +112,7 @@ const routes = [
         title: '体验卡',
         requiresAuth: true,
         menubar: true,
+        navbar: true
       }
     }, {
       path: '/expcardslist',
@@ -115,7 +121,8 @@ const routes = [
       meta: {
         title: '体验卡列表',
         requiresAuth: true,
-        menubar: true
+        menubar: true,
+        navbar: true
       }
     }]
   },
@@ -128,7 +135,8 @@ const routes = [
     meta: {
       title: '财务',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: true
     },
     children: [{
       // 业绩查询
@@ -138,7 +146,8 @@ const routes = [
       meta: {
         title: '业绩查询',
         requiresAuth: true,
-        menubar: true
+        menubar: true,
+        navbar: true
       }
     }, {
       // 收益查询
@@ -148,7 +157,8 @@ const routes = [
       meta: {
         title: '收益查询',
         requiresAuth: true,
-        menubar: true
+        menubar: true,
+        navbar: true
       }
     }]
   },
@@ -161,7 +171,8 @@ const routes = [
     meta: {
       title: '客户管理',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -173,7 +184,8 @@ const routes = [
     meta: {
       title: '查询',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: true
     },
     children: [
       //即时库存
@@ -184,7 +196,8 @@ const routes = [
         meta: {
           title: '即时库存',
           requiresAuth: true,
-          menubar: true
+          menubar: true,
+          navbar: true
         }
       },
       //其他入库
@@ -195,7 +208,8 @@ const routes = [
         meta: {
           title: '其他入库',
           requiresAuth: true,
-          menubar: true
+          menubar: true,
+          navbar: true
         }
       },
 
@@ -207,7 +221,8 @@ const routes = [
         meta: {
           title: '添加入库采购',
           requiresAuth: true,
-          menubar: true
+          menubar: true,
+          navbar: true
         }
       },
 
@@ -219,7 +234,8 @@ const routes = [
         meta: {
           title: '添加出库采购',
           requiresAuth: true,
-          menubar: true
+          menubar: true,
+          navbar: true
         }
       },
       //报废
@@ -230,7 +246,8 @@ const routes = [
         meta: {
           title: '报废',
           requiresAuth: true,
-          menubar: true
+          menubar: true,
+          navbar: true
         }
       }
     ]
@@ -244,7 +261,8 @@ const routes = [
     meta: {
       title: '报表',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -256,7 +274,8 @@ const routes = [
     meta: {
       title: '水单号',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 
@@ -268,7 +287,8 @@ const routes = [
     meta: {
       title: '设置',
       requiresAuth: true,
-      menubar: true
+      menubar: true,
+      navbar: false
     }
   },
 

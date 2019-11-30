@@ -377,7 +377,7 @@ export default {
       .btn-save {
         width: 100px;
         font-size: 20px;
-        color: #47bf7c;
+        color: #23A547;
       }
       .iconfont {
         font-size: 25px;

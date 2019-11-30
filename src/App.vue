@@ -11,7 +11,7 @@
         @select="handleMenu"
         text-color="#ffffff"
         background-color="#23A547"
-        active-text-color="#ffffff"
+        active-text-color="#ffffff" 
         router
       >
         <el-menu-item index="/">收银</el-menu-item>
@@ -41,7 +41,7 @@
       v-if="$route.meta.menubar"
       :style="{'min-height': (virtualHeight-80)+'px'}"
     >
-      <el-menu
+      <el-menu 
         :default-active="$route.path"
         text-color="#66C56C"
         background-color="#ffffff"

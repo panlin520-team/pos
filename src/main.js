@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router/router.js'
 import store from './store'
-
+import VueAMap from 'vue-amap'
+Vue.use(VueAMap)
 import ElementUI from 'element-ui'
 import '@/assets/scss/element-variables.scss'
 import '@/assets/scss/reset.scss'
@@ -30,7 +31,7 @@ Vue.prototype.$calculate = calculate
 Vue.config.productionTip = false
 
 // 环境配置
-console.log('当前环境',process.env);
+console.log('当前环境', process.env);
 
 // 路由拦截
 // router.beforeEach((to, from, next) => {

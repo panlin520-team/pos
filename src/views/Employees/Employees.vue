@@ -307,14 +307,17 @@
         <div class="btn btn-save" @click="saveGroupDet(groupObject)">保存</div>
       </div>
     </el-dialog>
+    <MemberFrame></MemberFrame>
   </div>
 </template>
 
 <script>
 import InputNumber from "@/components/InputNumber/InputNumber";
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+
 export default {
   name: "Employees",
-  components: { InputNumber },
+  components: { InputNumber,MemberFrame },
   data() {
     return {
       // 数据
@@ -1005,6 +1008,9 @@ export default {
 
 <style lang='scss' scoped>
 .employeesPage {
+  width: 100%;
+  height: 100%;
+  margin-bottom: 220px;
   .pageTop {
     font-size: 20px;
     display: flex;

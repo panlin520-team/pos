@@ -663,14 +663,17 @@
         <div class="btn btn-submit" @click="handleChangeProduct">确认</div>
       </div>
     </pop-over>
+    <MemberFrame></MemberFrame>
   </div>
 </template>
 
 <script>
 import InputNumber from "@/components/InputNumber/InputNumber";
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+
 export default {
   name: "Money",
-  components: { InputNumber },
+  components: { InputNumber, MemberFrame },
   data() {
     return {
       // 数据

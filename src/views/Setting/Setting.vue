@@ -1,4 +1,5 @@
 <!-- 店铺设置 -->
+
 <template>
   <div class="settingPage fluid">
     <div class="pageTop">
@@ -117,13 +118,12 @@
           </div>
         </div>
         <!-- 地图 -->
-        <div class="shopsmap">
+        <!-- <div class="shopsmap">
           <div class="coordinates">地图坐标</div>
-          <!-- <el-amap style="width: 200px;heigth: 200px"></el-amap> -->
           <div id="container" class="coordinatesmap"></div>
-        </div>
+        </div> -->
         <div class="companyIntroduce">
-          <label>简介</label>
+          <label>公司简介</label>
           <div class="conpanyContent">
             反时针美业，成都AAAAA级美容美发企业。在成都已有19年的历史。“时光倒流、绽放魅力”朋友、欢迎您的加盟！我们一定会提供给你足够
             的发展空间和充分展现您个人魅力的舞台！
@@ -134,15 +134,24 @@
         </div>-->
       </div>
     </div>
+    <MemberFrame></MemberFrame>
+
   </div>
+  
 </template>
  <script src="https://webapi.amap.com/maps?v=1.4.15&key=3a0220bd39558a75550c3b0e48727ef8"></script>
-<script>
-// import AMap from "amap";
 
+<script>
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+// var map = new VueAMap.Map("container", {
+//   resizeEnable: true, //是否监控地图容器尺寸变化
+//   zoom: 11, //初始化地图层级
+//   center: [116.397428, 39.90923] //初始化地图中心点
+// });
 export default {
-  name: "XXX",
-  components: {},
+  components: {
+    MemberFrame
+  },
   data() {
     return {
       // 门店名称
@@ -183,7 +192,35 @@ export default {
   watch: {},
   methods: {
     //门店定位
-    init: function() {},
+    init: function() {
+      // console.log(123);
+      // var map = new VueAMap.Map("container", {
+      //   resizeEnable: true, //是否监控地图容器尺寸变化
+      //   zoom: 11, //初始化地图层级
+      //   center: [104.07, 30.67] //初始化地图中心点
+      // });
+
+      // var map = new AMap.Map("container", {
+      //   resizeEnable: true,
+      //   center: [116.397428, 39.90923],
+      //   zoom: 13
+      // });
+      // //实时路况图层
+      // var trafficLayer = new AMap.TileLayer.Traffic({
+      //   zIndex: 10
+      // });
+      // trafficLayer.setMap(map);
+      // var isVisible = true;
+      // function toggle() {
+      //   if (isVisible) {
+      //     trafficLayer.hide();
+      //     isVisible = false;
+      //   } else {
+      //     trafficLayer.show();
+      //     isVisible = true;
+      //   }
+      // }
+    },
     // 修改门店信息
     saveStore() {
       var params = {
@@ -357,6 +394,7 @@ export default {
 .settingPage {
   width: 100%;
   height: 100%;
+  padding-bottom: 200px;
   background-color: #f0f2f5;
   .pageTop {
     font-size: 20px;
@@ -445,7 +483,7 @@ export default {
     border-bottom: 1px solid rgb(206, 198, 198);
     display: flex;
     label {
-      width: 65px;
+      width: 80px;
       height: 100%;
       line-height: 95px;
       font-size: 16px;
@@ -472,6 +510,7 @@ export default {
   background-color: #f0f2f5;
   overflow: hidden;
   padding: 0 15px;
+
   font-size: 16px;
   font-family: PingFang SC;
   font-weight: 400;
@@ -513,6 +552,7 @@ export default {
   overflow: hidden;
   padding: 0 15px;
   font-size: 16px;
+  line-height: 30px;
   font-family: PingFang SC;
   font-weight: 400;
   color: rgba(16, 16, 16, 1);

@@ -1,6 +1,6 @@
 <!-- 客户管理 -->
 <template>
-  <div class="clienthId" :style="{'width': (virtualWidth-100)+'px'}">
+  <div class="clienthId">
     <!-- 客户列表 -->
     <div class="clientSmo" v-show="clienthide == false">
       <div class="clientTitle">
@@ -732,14 +732,17 @@
         </div>
       </div>
     </div>
+    <MemberFrame></MemberFrame>
   </div>
 </template>
 
 <script>
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+
 export default {
   name: "hello",
 
-  components: {},
+  components: { MemberFrame },
   data() {
     var checkAge = (rule, value, callback) => {
       if (value == "") {
@@ -853,7 +856,38 @@ export default {
           name: 1,
           mobile: 18281013228,
           membershipLevelName: 111
-        }
+        },
+        {
+          idCard: 1,
+          name: 1,
+          mobile: 18281013228,
+          membershipLevelName: 111
+        },
+        {
+          idCard: 1,
+          name: 1,
+          mobile: 18281013228,
+          membershipLevelName: 111
+        },
+        {
+          idCard: 1,
+          name: 1,
+          mobile: 18281013228,
+          membershipLevelName: 111
+        },
+        {
+          idCard: 1,
+          name: 1,
+          mobile: 18281013228,
+          membershipLevelName: 111
+        },
+
+        {
+          idCard: 1,
+          name: 1,
+          mobile: 18281013228,
+          membershipLevelName: 111
+        },
       ],
       //标签列表
       privateList: [],
@@ -2374,6 +2408,8 @@ export default {
 /* @import url(); */
 .clienthId {
   width: 100%;
+  height: 100%;
+  margin-bottom: 250px;
   .clientSmo {
     width: 100%;
     height: 100%;
@@ -2415,11 +2451,11 @@ export default {
       box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
       padding: 10px 50px 20px 50px;
       overflow: auto;
+      position: relative;
     }
     .pagination {
-      position: absolute;
-      right: 200px;
-      bottom: -30px;
+      text-align: right;
+      margin-right: 200px;
     }
   }
   .Customer {
@@ -2823,10 +2859,9 @@ export default {
 
 //出入库弹出框
 .storageblock {
-  position: relative;
   .stgblcktop {
     text-align: center;
-    font-size: 16px;
+    font-size: 20px;
   }
   .stgblcktopmain {
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);

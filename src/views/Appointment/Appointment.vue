@@ -492,14 +492,17 @@
         <div class="btn btn-submit" @click="handleChangeService">确认</div>
       </div>
     </pop-over>
+    <MemberFrame></MemberFrame>
   </div>
 </template>
 
 <script>
 import InputNumber from "@/components/InputNumber/InputNumber";
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+
 export default {
   name: "Appointment",
-  components: { InputNumber },
+  components: { InputNumber,MemberFrame },
   data() {
     return {
       // 数据

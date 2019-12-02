@@ -678,7 +678,9 @@ export default {
   bottom: 0;
   width: 100%;
   height: 200px;
-  // left: 200px;
+  left: 0;
+  z-index: 160;
+
   .revealVIP {
     position: absolute;
     right: 10px;

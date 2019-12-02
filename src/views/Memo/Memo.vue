@@ -234,13 +234,15 @@ export default {
       var params = { storeId: localStorage.getItem("storeId") };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result.list) {
-            this.memoList = res.data.result.list;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
+          if (res.data.result) {
+            if (res.data.result.list) {
+              this.memoList = res.data.result.list;
+            } else {
+              this.$message({
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "warning"
+              });
+            }
           }
         },
         error => {

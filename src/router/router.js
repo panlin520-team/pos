@@ -40,6 +40,10 @@ const Setting = () => import( /* webpackChunkName: "Setting" */ '../views/Settin
 // 登录
 const Login = () => import( /* webpackChunkName: "Login" */ '../views/Login/Login.vue');
 
+// PageContent
+const PageContent = () => import( /* webpackChunkName: "Login" */ '../components/PageContent/PageContent.vue');
+
+
 const routes = [
   // 收银
   {
@@ -95,9 +99,9 @@ const routes = [
 
   // 体验卡
   {
-    path: '/expcards',
-    name: 'ExpCards',
-    component: ExpCards,
+    path: '/experience/expcards',
+    name: 'Experience',
+    component: PageContent,
     meta: {
       title: '体验卡',
       requiresAuth: true,
@@ -105,7 +109,7 @@ const routes = [
       navbar: true
     },
     children: [{
-      path: '/expcards',
+      path: '/experience/expcards',
       name: 'ExpCards',
       component: ExpCards,
       meta: {
@@ -114,8 +118,8 @@ const routes = [
         menubar: true,
         navbar: true
       }
-    },{
-      path: '/expcards/expcardslist',
+    }, {
+      path: '/experience/expcardslist',
       name: 'ExpCardsList',
       component: ExpCardsList,
       meta: {
@@ -124,25 +128,14 @@ const routes = [
         menubar: true,
         navbar: true
       }
-    },]
-  },
-  {
-    path: '/expcardslist',
-    name: 'ExpCardsList',
-    component: ExpCardsList,
-    meta: {
-      title: '体验卡列表',
-      requiresAuth: true,
-      menubar: true,
-      navbar: false
-    }
+    }]
   },
 
   // 查询
   {
-    path: '/performance',
-    name: 'Performance',
-    component: Performance,
+    path: '/inquire/performance',
+    name: 'Inquire',
+    component: PageContent,
     meta: {
       title: '财务',
       requiresAuth: true,
@@ -151,7 +144,7 @@ const routes = [
     },
     children: [{
       // 业绩查询
-      path: '/performance',
+      path: '/inquire/performance',
       name: 'Performance',
       component: Performance,
       meta: {
@@ -162,7 +155,7 @@ const routes = [
       }
     }, {
       // 收益查询
-      path: '/income',
+      path: '/inquire/income',
       name: 'Income',
       component: Income,
       meta: {
@@ -189,9 +182,9 @@ const routes = [
 
   // 库存
   {
-    path: '/timelyinvent',
-    name: 'TimelyInvent',
-    component: TimelyInvent,
+    path: '/stock/timelyinvent',
+    name: 'Stock',
+    component: PageContent,
     meta: {
       title: '查询',
       requiresAuth: true,
@@ -201,7 +194,7 @@ const routes = [
     children: [
       //即时库存
       {
-        path: '/timelyinvent',
+        path: '/stock/timelyinvent',
         name: 'TimelyInvent',
         component: TimelyInvent,
         meta: {
@@ -213,7 +206,7 @@ const routes = [
       },
       //其他入库
       {
-        path: '/Otherwarehouse',
+        path: '/stock/Otherwarehouse',
         name: 'OtherWarehouse',
         component: OtherWarehouse,
         meta: {
@@ -226,7 +219,7 @@ const routes = [
 
       //添加入库采购
       {
-        path: '/addpurchase',
+        path: '/stock/addpurchase',
         name: 'AddPurchase',
         component: AddPurchase,
         meta: {
@@ -239,7 +232,7 @@ const routes = [
 
       //添加出库采购
       {
-        path: '/addoutchase',
+        path: '/stock/addoutchase',
         name: 'AddOutChase',
         component: AddOutChase,
         meta: {
@@ -251,7 +244,7 @@ const routes = [
       },
       //报废
       {
-        path: '/outwarehouse',
+        path: '/stock/outwarehouse',
         name: 'OutWarehouse',
         component: OutWarehouse,
         meta: {
@@ -310,6 +303,19 @@ const routes = [
     component: Login,
     meta: {
       title: '登录'
+    }
+  },
+
+  // 404 redirect to home
+  {
+    path: '*',
+    name: '404',
+    component: Money,
+    meta: {
+      title: '收银',
+      requiresAuth: true,
+      menubar: true,
+      navbar: false
     }
   }
 ]

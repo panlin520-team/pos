@@ -1,71 +1,25 @@
 <!-- 菜单 -->
 <template>
   <el-menu
-    :default-active="$route.path"
+    class="el-menu-demo navmenu"
+    mode="horizontal"
+    :default-active="curIndex"
+    text-color="#ffffff"
+    background-color="#23A547"
+    active-text-color="#ffffff"
     router
-    :unique-opened="true"
-    class="el-menu-vertical-demo menubar"
-    active-text-color="#23A547"
-    :style="{'height': (virtualHeight-125)+'px'}"
   >
-    <el-menu-item index="/">
-      <span slot="title">收银台</span>
-    </el-menu-item>
-
-    <el-menu-item index="/appointment">
-      <span slot="title">预约</span>
-    </el-menu-item>
-
-    <el-menu-item index="/project">
-      <span slot="title">定制项目</span>
-    </el-menu-item>
-
-    <el-menu-item index="/employees">
-      <span slot="title">员工</span>
-    </el-menu-item>
-
-    <el-submenu index="3">
-      <template slot="title">
-        <span>体验卡</span>
-      </template>
-      <el-menu-item index="/expCards">体验卡</el-menu-item>
-      <el-menu-item index="/expcarList">体验卡列表</el-menu-item>
-    </el-submenu>
-
-    <el-submenu index="4">
-      <template slot="title">
-        <span>财务</span>
-      </template>
-      <el-menu-item index="/performancequery">业绩</el-menu-item>
-      <el-menu-item index="/incomequery">收益</el-menu-item>
-    </el-submenu>
-
-    <el-menu-item index="/customer">
-      <span slot="title">客户</span>
-    </el-menu-item>
-
-    <el-submenu index="6">
-      <template slot="title">
-        <span>库存</span>
-      </template>
-      <el-menu-item index="/addpurchase">采购入库</el-menu-item>
-      <el-menu-item index="/Otherwarehouse">其他入库</el-menu-item>
-      <el-menu-item index="/timelyinvent">即时库存</el-menu-item>
-      <el-menu-item index="/addoutchase">出库</el-menu-item>
-      <el-menu-item index="/outwarehouse">报废</el-menu-item>
-    </el-submenu>
-
-    <el-menu-item index="/statement">
-      <span slot="title">报表</span>
-    </el-menu-item>
-    
-     <el-menu-item index="/memo">
-      <span slot="title">水单号</span>
-    </el-menu-item>
-
-    <el-menu-item index="/setting">
-      <span slot="title">设置</span>
-    </el-menu-item>
+    <el-menu-item index="/">收银</el-menu-item>
+    <el-menu-item index="/appointment">预约</el-menu-item>
+    <el-menu-item index="/project">项目定制</el-menu-item>
+    <el-menu-item index="/employees">员工管理</el-menu-item>
+    <el-menu-item index="/experience/expcards">体验卡</el-menu-item>
+    <el-menu-item index="/inquire/performance">财务</el-menu-item>
+    <el-menu-item index="/customer">客户管理</el-menu-item>
+    <el-menu-item index="/stock/timelyinvent">库存</el-menu-item>
+    <el-menu-item index="/statement">报表</el-menu-item>
+    <el-menu-item index="/memo">水单号</el-menu-item>
+    <el-menu-item index="/setting">设置</el-menu-item>
   </el-menu>
 </template>
 
@@ -74,25 +28,64 @@ export default {
   name: "MenuBar",
   data() {
     return {
-      // 浏览器可视高度
-      virtualHeight: window.innerHeight
+      // 默认当前路由
+      curIndex: "/"
     };
   },
-  created() {},
+  watch: {
+    $route: "fetchNavData"
+  },
+  created() {
+    this.fetchNavData();
+  },
   destroyed() {},
-  methods: {}
+  methods: {
+    // 主菜单
+    fetchNavData() {
+      var cur_path = this.$route.path;
+      var routers = this.$router.options.routes;
+      var nav_name = "";
+      for (var i = 0; i < routers.length; i++) {
+        var children = routers[i].children;
+        if (children) {
+          for (var j = 0; j < children.length; j++) {
+            if (children[j].path === cur_path) {
+              nav_name = routers[i].name;
+              break;
+            }
+          }
+        }
+      }
+      if (nav_name == "/") {
+        this.curIndex = "/";
+      } else {
+        this.curIndex = cur_path;
+      }
+      this.$store.state.leftNavState = nav_name;
+    }
+  },
+  // 主菜单点击
+  handleMenu(index) {
+    this.curIndex = index;
+  }
 };
 </script>
 
 <style lang='scss' scoped>
-.el-menu {
-  border-right: 0;
-  height: 100%;
-}
+.navmenu {
+  flex: 1;
 
-.menubar {
-  overflow-x: hidden;
-  overflow-y: auto;
-  padding-bottom: 15px;
+  &.el-menu--horizontal {
+    border-bottom: none;
+  }
+
+  .el-menu-item.is-active {
+    background-color: #66c56c !important;
+  }
+
+  .el-menu-item {
+    line-height: 80px;
+    height: 80px;
+  }
 }
 </style>

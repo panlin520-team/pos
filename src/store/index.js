@@ -4,9 +4,17 @@ import Vuex from 'vuex'
 Vue.use(Vuex)
 
 const state = {
-  leftNavState: '/'
+  leftNavState: '/',
+  member: localStorage.getItem('member')
+}
+
+const mutations = {
+  setMember(state, params) {
+    state.member = params;
+  }
 }
 
 export default new Vuex.Store({
-  state
+  state,
+  mutations
 })

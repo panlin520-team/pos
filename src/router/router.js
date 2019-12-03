@@ -61,7 +61,7 @@ const routes = [
   // 预约
   {
     path: '/appointment',
-    name: 'Appointment',
+    name: 'appointment',
     component: Appointment,
     meta: {
       title: '预约',
@@ -99,9 +99,10 @@ const routes = [
 
   // 体验卡
   {
-    path: '/experience/expcards',
-    name: 'Experience',
+    path: '/experienceManage',
+    name: 'experienceManage',
     component: PageContent,
+    redirect: '/experienceManage/expcards',
     meta: {
       title: '体验卡',
       requiresAuth: true,
@@ -109,7 +110,7 @@ const routes = [
       navbar: true
     },
     children: [{
-      path: '/experience/expcards',
+      path: '/experienceManage/expcards',
       name: 'ExpCards',
       component: ExpCards,
       meta: {
@@ -119,7 +120,7 @@ const routes = [
         navbar: true
       }
     }, {
-      path: '/experience/expcardslist',
+      path: '/experienceManage/expcardslist',
       name: 'ExpCardsList',
       component: ExpCardsList,
       meta: {
@@ -133,9 +134,10 @@ const routes = [
 
   // 查询
   {
-    path: '/inquire/performance',
-    name: 'Inquire',
+    path: '/inquireManage',
+    name: 'inquireManage',
     component: PageContent,
+    redirect: '/inquireManage/performance',
     meta: {
       title: '财务',
       requiresAuth: true,
@@ -144,7 +146,7 @@ const routes = [
     },
     children: [{
       // 业绩查询
-      path: '/inquire/performance',
+      path: '/inquireManage/performance',
       name: 'Performance',
       component: Performance,
       meta: {
@@ -155,7 +157,7 @@ const routes = [
       }
     }, {
       // 收益查询
-      path: '/inquire/income',
+      path: '/inquireManage/income',
       name: 'Income',
       component: Income,
       meta: {
@@ -182,9 +184,10 @@ const routes = [
 
   // 库存
   {
-    path: '/stock/timelyinvent',
-    name: 'Stock',
+    path: '/stockManage',
+    name: 'stockManage',
     component: PageContent,
+    redirect: "/stockManage/timelyinvent",
     meta: {
       title: '查询',
       requiresAuth: true,
@@ -194,7 +197,7 @@ const routes = [
     children: [
       //即时库存
       {
-        path: '/stock/timelyinvent',
+        path: '/stockManage/timelyinvent',
         name: 'TimelyInvent',
         component: TimelyInvent,
         meta: {
@@ -206,7 +209,7 @@ const routes = [
       },
       //其他入库
       {
-        path: '/stock/Otherwarehouse',
+        path: '/stockManage/Otherwarehouse',
         name: 'OtherWarehouse',
         component: OtherWarehouse,
         meta: {
@@ -219,7 +222,7 @@ const routes = [
 
       //添加入库采购
       {
-        path: '/stock/addpurchase',
+        path: '/stockManage/addpurchase',
         name: 'AddPurchase',
         component: AddPurchase,
         meta: {
@@ -232,7 +235,7 @@ const routes = [
 
       //添加出库采购
       {
-        path: '/stock/addoutchase',
+        path: '/stockManage/addoutchase',
         name: 'AddOutChase',
         component: AddOutChase,
         meta: {
@@ -244,7 +247,7 @@ const routes = [
       },
       //报废
       {
-        path: '/stock/outwarehouse',
+        path: '/stockManage/outwarehouse',
         name: 'OutWarehouse',
         component: OutWarehouse,
         meta: {

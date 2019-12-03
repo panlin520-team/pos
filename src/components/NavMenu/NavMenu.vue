@@ -61,8 +61,13 @@ export default {
 
 <style lang='scss' scoped>
 .aside {
-  .el-menu-item.is-active {
-    background-color: #66c56c !important;
+  .el-menu-item {
+    height: 40px;
+    line-height: 40px;
+
+    &.is-active {
+      background-color: #66c56c !important;
+    }
   }
 }
 </style>

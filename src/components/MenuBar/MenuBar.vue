@@ -8,15 +8,16 @@
     background-color="#23A547"
     active-text-color="#ffffff"
     router
+    @select="handleMenu"
   >
     <el-menu-item index="/">收银</el-menu-item>
     <el-menu-item index="/appointment">预约</el-menu-item>
     <el-menu-item index="/project">项目定制</el-menu-item>
     <el-menu-item index="/employees">员工管理</el-menu-item>
-    <el-menu-item index="/experience/expcards">体验卡</el-menu-item>
-    <el-menu-item index="/inquire/performance">财务</el-menu-item>
+    <el-menu-item index="/experienceManage">体验卡</el-menu-item>
+    <el-menu-item index="/inquireManage">财务</el-menu-item>
     <el-menu-item index="/customer">客户管理</el-menu-item>
-    <el-menu-item index="/stock/timelyinvent">库存</el-menu-item>
+    <el-menu-item index="/stockManage">库存</el-menu-item>
     <el-menu-item index="/statement">报表</el-menu-item>
     <el-menu-item index="/memo">水单号</el-menu-item>
     <el-menu-item index="/setting">设置</el-menu-item>
@@ -54,19 +55,23 @@ export default {
               break;
             }
           }
+        } else {
+          var splitPath = cur_path.split("/");
+          nav_name = splitPath[1];
         }
       }
-      if (nav_name == "/") {
+      this.$store.state.leftNavState = nav_name;
+      if (nav_name == "") {
         this.curIndex = "/";
       } else {
-        this.curIndex = cur_path;
+        this.curIndex = "/" + this.$store.state.leftNavState;
       }
-      this.$store.state.leftNavState = nav_name;
+    },
+    // 主菜单点击
+    handleMenu(index) {
+      this.$store.state.leftNavState = index;
+      this.curIndex = "/" + this.$store.state.leftNavState;
     }
-  },
-  // 主菜单点击
-  handleMenu(index) {
-    this.curIndex = index;
   }
 };
 </script>

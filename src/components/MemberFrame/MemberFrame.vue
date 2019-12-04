@@ -13,12 +13,13 @@
         <div class="memberBox">
           <div class="content">
             <div class="userPhoto">
-              <img src="../../assets/images/user.png" alt width="110" height="110" />
+              <img src="../../assets/images/user.png" />
+              <div class="clear btn-pointer" @click="clearMember">X</div>
             </div>
             <div class="usermessage">
               <div class="userNamePoto">
-                <label>姓名：</label>
                 <div class="userName-box">
+                  <label>姓名：</label>
                   <el-input v-model="input_name" placeholder="请输入姓名"></el-input>
                   <div class="userName-boxs">
                     <i class="el-icon-search" @click="show_stgbcar"></i>
@@ -51,8 +52,8 @@
                     </el-table>
                   </div>
                 </PopOver>
-                <label>联系电话：</label>
                 <div class="userName-box">
+                  <label>联系电话：</label>
                   <el-input v-model="input_number" placeholder="请输入手机号"></el-input>
                   <div class="userName-boxs">
                     <i class="el-icon-search" @click="show_stgbcar2"></i>
@@ -428,8 +429,45 @@ export default {
       localStorage.setItem("memberNumber", this.input_number);
       localStorage.setItem("membership", this.memberNum);
       localStorage.setItem("grade", this.grade);
+      var params = {
+        // 会员名称
+        userName: res.name,
+        // 会员手机号
+        userMobile: res.mobile,
+        // 会员编号
+        userNumber: res.memberNum,
+        // 会员卡号
+        userCardNum: res.cardNum,
+        // 会员等级
+        userGrade: res.membershipLevelName
+      };
+      localStorage.setItem("member", JSON.stringify(params));
+      this.$store.commit("setMember", JSON.stringify(params));
       this.memberbalance();
       this.visible_care = false;
+    },
+    // 清空会员信息
+    clearMember() {
+      this.$confirm("确认清空会员信息吗", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$store.commit("setMember", null);
+          localStorage.setItem("member", null);
+
+          this.cardNum = null;
+          this.memberNum = null;
+          this.grade = null;
+          this.input_name = null;
+          this.input_number = null;
+          localStorage.setItem("memberName", null);
+          localStorage.setItem("memberNumber", null);
+          localStorage.setItem("membership", null);
+          localStorage.setItem("grade", null);
+        })
+        .catch(() => {});
     },
     //查看体验卡详情
     vipecarLise(res) {
@@ -443,6 +481,7 @@ export default {
     close_details() {
       this.visible_details = false;
     },
+
     //选择员工
 
     close_vipexd() {
@@ -670,7 +709,7 @@ export default {
 
 .floatBox {
   width: 100%;
-  min-width: 1440px;
+  min-width: 1200px;
   height: 200px;
   transition: 1s;
   position: fixed;
@@ -688,30 +727,60 @@ export default {
     width: 100%;
     height: 220px;
     .content {
+      width: 1200px;
       height: 140px;
       display: flex;
-      margin: 0 80px;
+      margin: 0 auto;
       padding-top: 12px;
       justify-content: space-around;
 
       .userPhoto {
-        width: 110px;
-        margin-left: 105px;
-        height: 110px;
+        width: 100px;
+        height: 100px;
         background-color: #eee;
-        border-radius: 8px;
+        border-radius: 5px;
+        position: relative;
+
+        img {
+          width: 100px;
+          height: 100px;
+        }
+
+        .clear {
+          width: 15px;
+          height: 15px;
+          line-height: 15px;
+          border-radius: 4px;
+          font-size: 13px;
+          position: absolute;
+          top: 2px;
+          right: 0;
+          background: #23a547;
+          color: #fff;
+          text-align: center;
+        }
       }
       .usermessage {
         height: 120px;
-        padding: 4px 0 0 15px;
-        margin: 0 0 24px 0px;
+        flex: 1;
+        margin: 0 15px;
         border-bottom: 1px solid #eee;
         .userNamePoto {
           display: flex;
           .userName-box {
+            flex: 1;
             position: relative;
+            display: flex;
+
+            label {
+              width: 80px;
+              margin: 0 5px 0 20px;
+              line-height: 40px;
+              font-size: 16px;
+              font-weight: bold;
+            }
+
             .userName-boxs {
-              // top: 14px;
               right: 0px;
               height: 40px;
               width: 40px;
@@ -733,66 +802,55 @@ export default {
             height: 45px;
           }
           .el-input {
-            width: 250px;
-            height: 45px;
-            // background: rgba(255, 255, 255, 1);
-            // border: 1px solid rgba(220, 220, 220, 0.7);
+            width: 210px;
+            flex: 1;
             border-radius: 4px;
           }
           .el-input:focus {
             border: 1px solid #23a547 !important;
           }
-          label {
-            line-height: 40px;
-            margin-left: 30px;
-            font-size: 16px;
-            font-family: PingFang SC;
-            font-weight: bold;
-            color: rgba(34, 34, 34, 1);
-          }
+
           .gradevip {
-            margin-left: 30px;
-            margin-top: 6px;
-            height: 16px;
-            font-size: 16px;
-            font-family: PingFang SC;
+            width: 140px;
+            height: 40px;
+            line-height: 40px;
+            margin-left: 15px;
             font-weight: bold;
-            color: rgba(34, 34, 34, 1);
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
             span {
               color: #feb019;
-              font-size: 18px;
+              font-size: 15px;
             }
           }
         }
         .remarkVip {
           display: flex;
           margin-top: 10px;
-          margin-left: 28px;
           label {
+            width: 80px;
             line-height: 40px;
             font-size: 16px;
-            font-family: PingFang SC;
+            margin: 0 5px 0 20px;
             font-weight: bold;
-            color: rgba(34, 34, 34, 1);
           }
           .el-input {
-            width: 800px;
-            height: 45px;
+            flex: 1;
+            height: 40px;
             border-radius: 6px;
-            // background: rgba(255, 255, 255, 1);
-            // border: 1px solid rgba(220, 223, 230, 1);
           }
         }
       }
       .experienCard {
         width: 100px;
         height: 40px;
-        margin: 65px 70px 0 0;
       }
     }
     .accountBalance {
+      width: 1200px;
       height: 50px;
-      margin-left: 200px;
+      margin: 0 auto;
       display: flex;
       span {
         width: 100px;

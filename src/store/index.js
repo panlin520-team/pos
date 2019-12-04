@@ -5,12 +5,12 @@ Vue.use(Vuex)
 
 const state = {
   leftNavState: '/',
-  member: localStorage.getItem('member')
+  member: JSON.parse(localStorage.getItem("member"))
 }
 
 const mutations = {
   setMember(state, params) {
-    state.member = params;
+    state.member = JSON.parse(params);
   }
 }
 

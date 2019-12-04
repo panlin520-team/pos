@@ -174,15 +174,9 @@
             <div class="upside">
               <div class="tit">订单</div>
               <div class="customer">
-                <div
-                  class="normal btn-pointer"
-                  v-if="memberValue == false"
-                  @click="memberPopver = true"
-                >选择会员</div>
-                <div class="personal" v-if="memberValue != false">
-                  <div class="name">{{member.orderLink}}</div>
-                  <div class="phone">{{member.mobile}}</div>
-                  <div class="btn-pointer btn-delete" @click="deleteMember"></div>
+                <div class="normal btn-pointer" v-if="this.$store.state.member == null">散客</div>
+                <div class="personal" v-if="this.$store.state.member != null">
+                  <div class="name">{{this.$store.state.member.userName}}</div>
                 </div>
               </div>
             </div>
@@ -371,8 +365,8 @@
       </div>
       <div class="main" slot="main">
         <div class="member">
-          <div class="normal" v-if="memberValue == false">散客</div>
-          <div class="personal" v-if="memberValue == true">
+          <div class="normal" v-if="this.$store.state.member == null">散客</div>
+          <div class="personal" v-if="this.$store.state.member != null">
             会员姓名：
             <span>{{member.orderLink}}</span>
             &nbsp;&nbsp;&nbsp;&nbsp;电话号码：
@@ -1094,14 +1088,14 @@ export default {
         return;
       }
 
-      if (this.memberValue != false) {
+      if (this.$store.state.member != null) {
         params = {
           orderType: 2,
           channel: 2,
           storeId: localStorage.getItem("storeId"),
-          cardNum: this.member.memberNum,
-          orderLink: this.member.orderLink,
-          mobile: this.member.mobile,
+          cardNum: this.$store.state.member.userCardNum,
+          orderLink: this.$store.state.member.userName,
+          mobile: this.$store.state.member.userMobile,
           totalPrice: this.originalPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
@@ -1247,6 +1241,8 @@ export default {
 
     // 打开结算框
     openAccount() {
+      // 显示当前获取到的会员信息
+      console.log(this.$store.state.member);
       if (this.serviceList.length == 0 && this.productList.length == 0) {
         this.$message({
           type: "warning",
@@ -1261,8 +1257,7 @@ export default {
         });
         return;
       }
-      // 若为散客,直接打开结算框
-      if (this.memberValue == false) {
+      if (this.$store.state.member == null) {
         this.accountPopver = true;
         return;
       } else {
@@ -1274,7 +1269,7 @@ export default {
         var url =
           this.$https.accountHost + "/manage/memberUser/listMemberAccount";
         var params = {
-          memberNum: this.member.memberNum,
+          memberNum: this.$store.state.member.userNumber,
           subClassIds: JSON.stringify(subclassIds)
         };
         this.$https.fetchPost(url, params).then(
@@ -1761,8 +1756,8 @@ export default {
     // 清空data必要对象和数组
     emptyData() {
       // 清空会员信息
-      this.memberValue = false;
-      this.member = {};
+      // this.memberValue = false;
+      // this.member = {};
       // 清空订单内项目、产品
       this.serviceList = [];
       this.productList = [];
@@ -2043,8 +2038,8 @@ export default {
 .moneyPage {
   width: 100%;
   height: 100%;
-  .pageMain{
-    .pagination{
+  .pageMain {
+    .pagination {
       text-align: right;
       margin: 20px 50px 0 0;
     }
@@ -2065,7 +2060,7 @@ export default {
         color: #ffffff;
         line-height: 40px;
         text-align: center;
-        background-color: #23A547;
+        background-color: #23a547;
       }
     }
     .title {
@@ -2351,7 +2346,7 @@ export default {
             }
 
             &.guest {
-              background-color: #23A547;
+              background-color: #23a547;
             }
 
             &.turn {
@@ -2487,7 +2482,7 @@ export default {
       padding: 0 18px;
 
       &.active {
-        color: #23A547;
+        color: #23a547;
         font-weight: 700;
       }
     }
@@ -2567,7 +2562,7 @@ export default {
 
     .upside {
       position: relative;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px 6px 0 0;
       height: 80px;
       padding: 15px 10px 0;
@@ -2594,36 +2589,24 @@ export default {
           line-height: 40px;
           border-radius: 6px;
           padding: 0 10px;
-          position: relative;
-          width: 100px;
           text-align: center;
           display: inline-block;
         }
 
         .personal {
-          background: #feb019;
+          width: 120px;
           font-size: 16px;
-          color: #fff;
           height: 40px;
           line-height: 40px;
           border-radius: 6px;
-          padding: 0 30px 0 10px;
-          position: relative;
-          display: flex;
-
-          .name {
-            margin-right: 15px;
-          }
-
-          .btn-delete {
-            position: absolute;
-            top: 7px;
-            right: 0;
-            width: 25px;
-            height: 25px;
-            background: url(../../assets/images/icon-close-round.png) right top /
-              25px no-repeat;
-          }
+          padding: 0 5px;
+          background: #feb019;
+          color: #fff;
+          text-align: center;
+          display: inline-block;
+          overflow: hidden;
+          white-space: nowrap;
+          text-overflow: ellipsis;
         }
       }
     }
@@ -2672,7 +2655,7 @@ export default {
             span {
               margin-right: 15px;
               &.discount {
-                color: #23A547;
+                color: #23a547;
               }
               &:last-child {
                 margin-right: 0;
@@ -2845,7 +2828,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -2885,7 +2868,7 @@ export default {
             left: 0;
             bottom: 0;
             width: 4px;
-            background: #23A547;
+            background: #23a547;
           }
         }
 
@@ -2901,7 +2884,7 @@ export default {
         }
 
         .active {
-          color: #23A547;
+          color: #23a547;
         }
       }
     }
@@ -2933,7 +2916,7 @@ export default {
 
           &.active {
             font-weight: 700;
-            color: #23A547;
+            color: #23a547;
             &:after {
               content: "";
               position: absolute;
@@ -2943,7 +2926,7 @@ export default {
               width: 24px;
               height: 2px;
               margin: auto;
-              background: #23A547;
+              background: #23a547;
             }
           }
         }
@@ -3017,7 +3000,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -3216,7 +3199,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -3254,7 +3237,7 @@ export default {
       line-height: 40px;
       text-align: center;
       color: #ffffff;
-      background: #23A547;
+      background: #23a547;
       margin-left: 3px;
       border-radius: 5px;
     }
@@ -3372,7 +3355,7 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
-      background: #23A547;
+      background: #23a547;
       color: #fff;
       border-radius: 6px;
     }

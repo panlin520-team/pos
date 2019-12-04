@@ -455,17 +455,17 @@ export default {
       })
         .then(() => {
           this.$store.commit("setMember", null);
-          localStorage.setItem("member", null);
+          localStorage.removeItem("member");
 
-          this.cardNum = null;
-          this.memberNum = null;
-          this.grade = null;
-          this.input_name = null;
-          this.input_number = null;
-          localStorage.setItem("memberName", null);
-          localStorage.setItem("memberNumber", null);
-          localStorage.setItem("membership", null);
-          localStorage.setItem("grade", null);
+          this.cardNum = "";
+          this.memberNum = "";
+          this.grade = "";
+          this.input_name = "";
+          this.input_number = "";
+          localStorage.removeItem("memberName");
+          localStorage.removeItem("memberNumber");
+          localStorage.removeItem("membership");
+          localStorage.removeItem("grade");
         })
         .catch(() => {});
     },
@@ -918,9 +918,6 @@ export default {
 .servicePop {
   .top {
     padding: 5px 15px;
-  }
-  .title {
-    // @extend %text-font17;
   }
 
   .main {

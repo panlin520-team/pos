@@ -373,7 +373,7 @@ export default {
       })
         .then(() => {
           this.$router.push({ path: "/login" });
-          localStorage.setItem("isLogin", false);
+          localStorage.setItem("isLogin", 'false');
         })
         .catch(() => {});
     }

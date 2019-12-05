@@ -3,18 +3,22 @@
   <div class="fixed">
     <div class="concealVIP" @click="clickconceal">
       <img
-        :class="[rotate?'fa fa-arrow-down go':'fa fa-arrow-down aa']"
+        :class="[this.$store.state.fold==false ?'fa fa-arrow-down go':'fa fa-arrow-down aa']"
         src="../../assets/images/icon_cbl.png"
         alt
       />
     </div>
     <transition name="fade">
-      <div class="floatBox" v-if="$route.meta.menubar" v-show="show_box">
+      <div class="floatBox" v-if="$route.meta.menubar" v-show="this.$store.state.fold">
         <div class="memberBox">
           <div class="content">
             <div class="userPhoto">
               <img src="../../assets/images/user.png" />
-              <div class="clear btn-pointer" @click="clearMember">X</div>
+              <div
+                v-if="this.$store.state.member != null"
+                @click="clearMember"
+                class="clear btn-pointer"
+              >X</div>
             </div>
             <div class="usermessage">
               <div class="userNamePoto">
@@ -352,14 +356,7 @@ export default {
     },
     //点击显示与隐藏
     clickconceal() {
-      this.show_box = !this.show_box;
-
-      this.rotate = !this.rotate;
-      // if (this.show_box) {
-      //   this.message = "隐藏会员";
-      // } else {
-      //   this.message = "显示会员";
-      // }
+      this.$store.state.fold = !this.$store.state.fold;
     },
     //搜索姓名
     show_stgbcar() {
@@ -434,10 +431,8 @@ export default {
         userName: res.name,
         // 会员手机号
         userMobile: res.mobile,
-        // 会员编号
+        // 会员编号及卡号
         userNumber: res.memberNum,
-        // 会员卡号
-        userCardNum: res.cardNum,
         // 会员等级
         userGrade: res.membershipLevelName
       };

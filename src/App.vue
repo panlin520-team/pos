@@ -7,7 +7,7 @@
       <MenuBar></MenuBar>
       <el-dropdown class="user" @command="handleCommand">
         <span class="el-dropdown-link">
-          {{trueName}}
+          {{this.$store.state.trueName}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
@@ -46,8 +46,6 @@ export default {
     };
   },
   created() {},
-  watch: {},
-  mounted() {},
   methods: {
     // 退出登录
     handleCommand(command) {
@@ -58,7 +56,6 @@ export default {
       })
         .then(() => {
           this.$router.push({ path: "/login" });
-          localStorage.setItem("isLogin", false);
         })
         .catch(() => {});
     }

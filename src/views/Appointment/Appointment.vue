@@ -23,14 +23,14 @@
     </div>
 
     <!-- 营业时间段 -->
-    <div class="adjSection" :style="{'width': (virtualWidth-150)+'px'}">
+    <div class="adjSection" :style="{'width': (virtualWidth)+'px'}">
       <div class="blank"></div>
       <div class="list" ref="scroll" @scroll="handleScroll()">
         <div class="item" v-for="(item,index) in storeTimes" :key="index">{{item}}</div>
       </div>
     </div>
 
-    <div class="mainSection" :style="{'width': (virtualWidth-150)+'px','padding-top': '135px'}">
+        <div class="mainSection" :style="{'width': (virtualWidth)+'px','padding-top': '155px'}">
       <div class="content">
         <div class="empList">
           <div class="empItem" v-for="item in storeEmployeesList" :key="item.beauticianId">
@@ -1579,11 +1579,14 @@ export default {
 
 <style lang='scss' scoped>
 .topSection {
+  position: fixed;
+  top: 80px;
+  left: 0;
+  right: 0;
+  padding: 35px 20px 10px 20px;
+  height: 85px;
+  line-height: 40px;
   display: flex;
-  width: 100%;
-  height: 100px;
-  padding: 30px 50px;
-  border-bottom: 1px solid #dcdcdc;
   .left {
     font-size: 24px;
   }
@@ -1599,10 +1602,9 @@ export default {
 }
 
 .adjSection {
-  // position: fixed;
-  // top: 85px;
-  // left: 150px;
-  margin-top: 50px;
+  position: fixed;
+  top: 185px;
+  left: 0;
   right: 0;
   overflow: hidden;
   white-space: nowrap;

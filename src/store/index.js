@@ -5,12 +5,20 @@ Vue.use(Vuex)
 
 const state = {
   leftNavState: '/',
-  member: JSON.parse(localStorage.getItem("member"))
+  fold: true,
+  member: JSON.parse(localStorage.getItem("member")),
+  trueName: localStorage.getItem('trueName')
 }
 
 const mutations = {
+  setFold(state,bool) {
+    state.fold = bool;
+  },
   setMember(state, params) {
     state.member = JSON.parse(params);
+  },
+  setTrueName(state, name) {
+    state.trueName = name;
   }
 }
 

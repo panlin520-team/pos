@@ -30,7 +30,7 @@
       </div>
     </div>
 
-        <div class="mainSection" :style="{'width': (virtualWidth)+'px','padding-top': '155px'}">
+    <div class="mainSection" :style="{'width': (virtualWidth)+'px','padding-top': '135px'}">
       <div class="content">
         <div class="empList">
           <div class="empItem" v-for="item in storeEmployeesList" :key="item.beauticianId">
@@ -124,19 +124,11 @@
             <div class="upside">
               <label>预约信息</label>
               <div class="switch">
-                <div
-                  class="name btn-pointer"
-                  :class="memberValue == false ? 'active' : ''"
-                  @click="switchMember"
-                >散客</div>
-                <div
-                  class="name btn-pointer"
-                  :class="memberValue == true ? 'active' : ''"
-                  @click="switchMember"
-                >会员</div>
+                <div class="name" :class="this.$store.state.member == null ? 'active' : ''">散客</div>
+                <div class="name" :class="this.$store.state.member != null ? 'active' : ''">会员</div>
               </div>
             </div>
-            <div class="customer" v-if="memberValue == false">
+            <div class="customer" v-if="this.$store.state.member == null">
               <div class="label">
                 <label>顾客电话</label>
                 <el-input placeholder="联系电话" v-model="member.mobile" clearable class="info"></el-input>
@@ -146,14 +138,24 @@
                 <el-input placeholder="顾客姓名" v-model="member.orderLink" clearable class="info"></el-input>
               </div>
             </div>
-            <div class="customer" v-if="memberValue == true">
+            <div class="customer" v-if="this.$store.state.member != null">
               <div class="label">
                 <label>会员电话</label>
-                <el-input placeholder="联系电话" v-model="member.mobile" clearable class="info"></el-input>
+                <el-input
+                  placeholder="联系电话"
+                  v-model="this.$store.state.member.userMobile"
+                  class="info"
+                  disabled
+                ></el-input>
               </div>
               <div class="label">
                 <label>会员姓名</label>
-                <el-input placeholder="顾客姓名" v-model="member.orderLink" clearable class="info"></el-input>
+                <el-input
+                  placeholder="顾客姓名"
+                  v-model="this.$store.state.member.userName"
+                  class="info"
+                  disabled
+                ></el-input>
               </div>
             </div>
             <div class="orderList scrollY" :style="{'height': (virtualHeight-329)+'px'}">
@@ -263,7 +265,7 @@
           v-if="appointmentOrder.appointmentStatus==1"
           @click="payAppointment(appointmentInfo)"
         >开单</div>
-        <div class="btn-settled btn-pointer" v-if="appointmentOrder.appointmentStatus==2">已支付</div>
+        <div class="btn-settled" v-if="appointmentOrder.appointmentStatus==2">已支付</div>
       </div>
     </pop-over>
 
@@ -502,7 +504,7 @@ import MemberFrame from "@/components/MemberFrame/MemberFrame";
 
 export default {
   name: "Appointment",
-  components: { InputNumber,MemberFrame },
+  components: { InputNumber, MemberFrame },
   data() {
     return {
       // 数据
@@ -950,20 +952,22 @@ export default {
 
       productIds = this.serviceList;
 
-      if (this.member.orderLink == "") {
-        this.$message({
-          type: "warning",
-          message: "请完善顾客姓名"
-        });
-        return;
-      }
+      if (this.$store.state.member == null) {
+        if (this.member.orderLink == undefined) {
+          this.$message({
+            type: "warning",
+            message: "请输入顾客姓名"
+          });
+          return;
+        }
 
-      if (!/^1[34578]\d{9}$/.test(this.member.mobile)) {
-        this.$message({
-          message: "请输入正确手机号码",
-          type: "warning"
-        });
-        return;
+        if (!/^1[34578]\d{9}$/.test(this.member.mobile)) {
+          this.$message({
+            message: "请输入正确手机号码",
+            type: "warning"
+          });
+          return;
+        }
       }
 
       if (this.serviceList.length == 0) {
@@ -973,21 +977,24 @@ export default {
         });
         return;
       }
-      if (this.memberValue != false) {
+
+      if (this.$store.state.member != null) {
         params = {
           // nurseDate: this.currentDate,
           orderType: 10,
           channel: 2,
           storeId: localStorage.getItem("storeId"),
-          cardNum: this.member.memberNum,
-          orderLink: this.member.orderLink,
-          mobile: this.member.mobile,
+          cardNum: this.$store.state.member.userNumber,
+          orderLink: this.$store.state.member.userName,
+          mobile: this.$store.state.member.userMobile,
           totalPrice: this.originalPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
           remark: this.remark
         };
-      } else {
+      }
+
+      if (this.$store.state.member == null) {
         params = {
           // nurseDate: this.currentDate,
           orderType: 10,
@@ -1268,8 +1275,10 @@ export default {
       var params = {
         subClassId: id,
         type: 2,
-        storeId: localStorage.getItem("storeId"),
-        companyType: 3
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3,
+        productStatus: 1,
+        isHoutai: 0
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -1296,7 +1305,10 @@ export default {
     fetchServiceMenu() {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
-      var params = { commodityTypeID: 1 };
+      var params = {
+        commodityTypeID: 1,
+        industryID: localStorage.getItem("industryID")
+      };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
@@ -1424,7 +1436,7 @@ export default {
             type: "error",
             message: error
           });
-        }
+        } 
       );
     },
 
@@ -1587,6 +1599,8 @@ export default {
   height: 85px;
   line-height: 40px;
   display: flex;
+  z-index: 100;
+  background: #ffffff;
   .left {
     font-size: 24px;
   }
@@ -1603,13 +1617,14 @@ export default {
 
 .adjSection {
   position: fixed;
-  top: 185px;
+  top: 165px;
   left: 0;
   right: 0;
   overflow: hidden;
   white-space: nowrap;
   display: flex;
   background: #ffffff;
+  z-index: 100;
 
   .blank {
     width: 190px;
@@ -1836,7 +1851,7 @@ export default {
       padding: 0 18px;
 
       &.active {
-        color: #23A547;
+        color: #23a547;
         font-weight: 700;
       }
     }
@@ -2059,7 +2074,7 @@ export default {
             span {
               margin-right: 15px;
               &.discount {
-                color: #23A547;
+                color: #23a547;
               }
               &:last-child {
                 margin-right: 0;
@@ -2262,7 +2277,7 @@ export default {
     .btn-settle {
       flex: 1;
       text-align: center;
-      background: #23A547;
+      background: #23a547;
       color: #fff;
     }
 
@@ -2323,7 +2338,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -2353,14 +2368,12 @@ export default {
       }
 
       .setEmpDatePicker {
-        border: 1px solid #eeeeee;
         width: 200px;
         margin-right: 7px;
         height: 42px;
       }
 
       .setEmpPicker {
-        border: 1px solid #eeeeee;
         width: 200px;
         height: 42px;
         margin-right: 7px;
@@ -2390,7 +2403,7 @@ export default {
             left: 0;
             bottom: 0;
             width: 4px;
-            background: #23A547;
+            background: #23a547;
           }
         }
 
@@ -2406,7 +2419,7 @@ export default {
         }
 
         .active {
-          color: #23A547;
+          color: #23a547;
         }
       }
     }
@@ -2438,7 +2451,7 @@ export default {
 
           &.active {
             font-weight: 700;
-            color: #23A547;
+            color: #23a547;
             &:after {
               content: "";
               position: absolute;
@@ -2448,7 +2461,7 @@ export default {
               width: 24px;
               height: 2px;
               margin: auto;
-              background: #23A547;
+              background: #23a547;
             }
           }
         }
@@ -2522,7 +2535,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -2721,7 +2734,7 @@ export default {
       color: #ffffff;
       font-size: 16px;
       font-weight: 700;
-      background: #23A547;
+      background: #23a547;
       border-radius: 6px;
     }
   }
@@ -2761,7 +2774,7 @@ export default {
       line-height: 42px;
       text-align: center;
       color: #ffffff;
-      background: #23A547;
+      background: #23a547;
     }
   }
   .result {
@@ -2884,7 +2897,7 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
-      background: #23A547;
+      background: #23a547;
       color: #fff;
       border-radius: 6px;
     }

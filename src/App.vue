@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="header" v-if="$route.meta.menubar">
+    <div class="topBand" v-if="$route.meta.menubar">
       <div class="logo">
         <img src="http://47.108.29.183:8089/vue/logo.750ee0fb.png" />
       </div>
@@ -8,7 +8,7 @@
           <div class="CompanyName">{{storeName}}</div>
       <el-dropdown class="user" @command="handleCommand">
         <span class="el-dropdown-link">
-          {{trueName}}
+          {{this.$store.state.trueName}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
         
@@ -50,8 +50,6 @@ export default {
     };
   },
   created() {},
-  watch: {},
-  mounted() {},
   methods: {
     // 退出登录
     handleCommand(command) {
@@ -62,7 +60,6 @@ export default {
       })
         .then(() => {
           this.$router.push({ path: "/login" });
-          localStorage.setItem("isLogin", false);
         })
         .catch(() => {});
     }
@@ -71,8 +68,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header {
+.topBand {
   display: flex;
+  min-width: 1400px;
 
   .logo {
     margin: 0 40px;

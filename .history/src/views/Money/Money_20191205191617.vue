@@ -1785,10 +1785,16 @@ export default {
       var params = {
         subClassId: id,
         type: 2,
+<<<<<<< HEAD
+        isHoutai: 0,
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
+=======
         companyId: localStorage.getItem("storeId"),
         companyType: 3,
         productStatus: 1,
         isHoutai: 0
+>>>>>>> 156509f2b8b2fe2a37813ff14b45420bfe6e5a4f
       };
       this.$https.fetchPost(url, params).then(
         res => {

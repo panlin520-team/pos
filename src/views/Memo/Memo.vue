@@ -22,7 +22,7 @@
           <div style="flex:1.5" class="nowrap">{{item.memoNumStart}}</div>
           <div style="flex:1.5" class="nowrap">{{item.memoNumEnd}}</div>
           <div style="flex:1" class="nowrap">{{item.createTime}}</div>
-          <div style="flex:1" class="nowrap">{{item.modifyOperator}}</div>
+          <div style="flex:1" class="nowrap">{{item.createOperator}}</div>
           <div style="flex:1" class="nowrap">
             <el-button type="success" size="mini" @click="fetchMemoSeries(item)">查询</el-button>
           </div>
@@ -158,6 +158,7 @@ export default {
           var params = {
             memoNumStart: this.newMemo.memoNumStart,
             memoNumEnd: this.newMemo.memoNumEnd,
+            createOperator: this.$store.state.trueName,
             storeId: localStorage.getItem("storeId")
           };
           this.$https.fetchPost(url, params).then(

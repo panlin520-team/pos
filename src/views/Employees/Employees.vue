@@ -6,7 +6,7 @@
       <div class="btns btnsRight">
         <!-- <div class="btn iconfont icon-team" title="查看分组" @click="groupOpen = true"></div> -->
         <div
-          class="btn iconfont icon-addMember"
+          class="iconfont icon-addMember btn-pointer"
           title="添加成员"
           @click="employeesOpen =true;employeesDetails = {};selectStatus = 1"
         ></div>
@@ -76,13 +76,13 @@
       <div class="popPage" v-if="employeesOpen == true">
         <div class="pageTop">
           <div class="btns btnsLeft">
-            <div class="btn btn-close el-icon-close" @click="emptyData;employeesOpen = false"></div>
+            <div class="el-icon-close btn-close btn-pointer" @click="emptyData;employeesOpen = false"></div>
           </div>
           <div class="title">员工资料</div>
           <div class="btns btnsRight">
-            <div class="btn btn-save" @click="saveEmployees" v-if="selectStatus == 0">保存</div>
-            <div class="btn btn-save" @click="newEmployees" v-if="selectStatus != 0">确认添加</div>
-            <div class="btn btn-del" v-if="selectStatus == 0" @click="delEmployees">删除</div>
+            <div class="btn-save btn-pointer " @click="saveEmployees" v-if="selectStatus == 0">保存</div>
+            <div class="btn-save btn-pointer" @click="newEmployees" v-if="selectStatus != 0">确认添加</div>
+            <div class="btn-del btn-pointer" v-if="selectStatus == 0" @click="delEmployees">删除</div>
           </div>
         </div>
         <div class="pageMain">
@@ -1019,26 +1019,33 @@ export default {
     border-bottom: 1px solid #dcdcdc;
     position: relative;
     .btnsLeft{
-      padding-left: 50px;
+      margin-left: 30px;
       font-size: 30px;
     }
     .title {
       margin: 0 auto;
       font-size: 25px;
       font-weight: 500;
+      flex: 1;
+      text-align: center;
     }
     .btnsRight {
-      width: 50px;
+      margin-right: 30px;
       height: 50px;
-      position: absolute;
-      right: 50px;
+      display: flex;
       .btn-save {
-        width: 100px;
+        flex: 1;
         font-size: 16px;
         color: #23A547;
+        margin-right: 15px;
       }
       .iconfont {
         font-size: 25px;
+      }
+      .btn-del {
+        display: inline-block;
+        font-size: 16px;
+        color: #E6A23C;
       }
     }
   }

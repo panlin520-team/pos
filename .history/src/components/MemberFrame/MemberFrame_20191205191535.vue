@@ -679,6 +679,10 @@ export default {
   left: 0;
   height: 200px;
   z-index: 160;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 156509f2b8b2fe2a37813ff14b45420bfe6e5a4f
   .concealVIP {
     position: absolute;
     left: 10px;

@@ -446,6 +446,18 @@ export default {
       })
         .then(() => {
           this.$store.commit("setMember", null);
+<<<<<<< HEAD
+          localStorage.setItem("member", null);
+          this.cardNum = null;
+          this.memberNum = null;
+          this.grade = null;
+          this.input_name = null;
+          this.input_number = null;
+          localStorage.setItem("memberName", null);
+          localStorage.setItem("memberNumber", null);
+          localStorage.setItem("membership", null);
+          localStorage.setItem("grade", null);
+=======
           localStorage.removeItem("member");
 
           this.cardNum = "";
@@ -457,6 +469,7 @@ export default {
           localStorage.removeItem("memberNumber");
           localStorage.removeItem("membership");
           localStorage.removeItem("grade");
+>>>>>>> 156509f2b8b2fe2a37813ff14b45420bfe6e5a4f
         })
         .catch(() => {});
     },
@@ -679,6 +692,10 @@ export default {
   left: 0;
   height: 200px;
   z-index: 160;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 156509f2b8b2fe2a37813ff14b45420bfe6e5a4f
   .concealVIP {
     position: absolute;
     left: 10px;

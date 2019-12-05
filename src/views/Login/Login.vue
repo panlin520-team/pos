@@ -69,6 +69,9 @@ export default {
       storeDrawer: false
     };
   },
+  created() {
+    this.logined();
+  },
   methods: {
     login(){
     this.storeName = localStorage.getItem("storeName");
@@ -112,7 +115,9 @@ export default {
             localStorage.setItem("userName", res.data.result.userName);
             localStorage.setItem("userId", res.data.result.id);
             localStorage.setItem("trueName", res.data.result.trueName);
-            localStorage.setItem("isLogin", true);
+            localStorage.setItem("industryID", res.data.result.industry);
+            localStorage.setItem("isLogin", 'true');
+            this.$store.commit("setTrueName", res.data.result.trueName);
           } else {
             this.$message.error(res.data.responseStatusType.error.errorMsg);
           }
@@ -170,7 +175,7 @@ export default {
 
     // 获取本地登录信息
     logined() {
-      if (localStorage.getItem("isLogin") == true) {
+      if (localStorage.getItem("isLogin") == "true") {
         this.storeName = localStorage.getItem("storeName");
         this.storeCode = localStorage.getItem("storeCode");
         this.userName = localStorage.getItem("userName");
@@ -178,11 +183,7 @@ export default {
         this.storeId = localStorage.getItem("storeId");
       }
     }
-  },
-  created() {
-    this.logined();
-  },
-  mounted() {}
+  }
 };
 </script>
 
@@ -276,7 +277,7 @@ export default {
       line-height: 40px;
       text-align: center;
       color: #ffffff;
-      background: #23A547;
+      background: #23a547;
       border-radius: 5px;
       margin-left: 5px;
     }

@@ -110,6 +110,7 @@ export default {
             localStorage.setItem("userName", res.data.result.userName);
             localStorage.setItem("userId", res.data.result.id);
             localStorage.setItem("trueName", res.data.result.trueName);
+            localStorage.setItem("industryID", res.data.result.industry);
             localStorage.setItem("isLogin", 'true');
             this.$store.commit("setTrueName", res.data.result.trueName);
           } else {

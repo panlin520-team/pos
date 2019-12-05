@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div class="mainSection" :style="{'width': (virtualWidth)+'px','padding-top': '155px'}">
+    <div class="mainSection" :style="{'width': (virtualWidth)+'px','padding-top': '135px'}">
       <div class="content">
         <div class="empList">
           <div class="empItem" v-for="item in storeEmployeesList" :key="item.beauticianId">
@@ -1275,8 +1275,10 @@ export default {
       var params = {
         subClassId: id,
         type: 2,
-        storeId: localStorage.getItem("storeId"),
-        companyType: 3
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3,
+        productStatus: 1,
+        isHoutai: 0
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -1303,7 +1305,10 @@ export default {
     fetchServiceMenu() {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
-      var params = { commodityTypeID: 1 };
+      var params = {
+        commodityTypeID: 1,
+        industryID: localStorage.getItem("industryID")
+      };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
@@ -1594,6 +1599,8 @@ export default {
   height: 85px;
   line-height: 40px;
   display: flex;
+  z-index: 100;
+  background: #ffffff;
   .left {
     font-size: 24px;
   }
@@ -1610,13 +1617,14 @@ export default {
 
 .adjSection {
   position: fixed;
-  top: 185px;
+  top: 165px;
   left: 0;
   right: 0;
   overflow: hidden;
   white-space: nowrap;
   display: flex;
   background: #ffffff;
+  z-index: 100;
 
   .blank {
     width: 190px;
@@ -2360,14 +2368,12 @@ export default {
       }
 
       .setEmpDatePicker {
-        border: 1px solid #eeeeee;
         width: 200px;
         margin-right: 7px;
         height: 42px;
       }
 
       .setEmpPicker {
-        border: 1px solid #eeeeee;
         width: 200px;
         height: 42px;
         margin-right: 7px;

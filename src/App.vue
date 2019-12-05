@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <div class="header" v-if="$route.meta.menubar">
+    <div class="topBand" v-if="$route.meta.menubar">
       <div class="logo">
         <img src="http://47.108.29.183:8089/vue/logo.750ee0fb.png" />
       </div>
@@ -64,8 +64,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.header {
+.topBand {
   display: flex;
+  min-width: 1400px;
 
   .logo {
     margin: 0 40px;

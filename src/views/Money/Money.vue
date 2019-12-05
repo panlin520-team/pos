@@ -367,10 +367,10 @@
         <div class="member">
           <div class="normal" v-if="this.$store.state.member == null">散客</div>
           <div class="personal" v-if="this.$store.state.member != null">
-            会员姓名：
-            <span>{{member.orderLink}}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;电话号码：
-            <span>{{member.mobile}}</span>
+            会员姓名:
+            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>
+            &nbsp;&nbsp;&nbsp;&nbsp;电话号码:
+            <span>{{this.$store.state.member.userMobile}}</span>
           </div>
         </div>
         <div class="warnText" v-if="warnValue == true">
@@ -991,7 +991,7 @@ export default {
         return;
       }
 
-      if (this.warnValue == true) {
+      if (this.$store.state.member != null) {
         productIds.forEach(value => {
           value.discount = 1;
           value.discountPrice = value.originalPrice;
@@ -1093,7 +1093,7 @@ export default {
           orderType: 2,
           channel: 2,
           storeId: localStorage.getItem("storeId"),
-          cardNum: this.$store.state.member.userCardNum,
+          cardNum: this.$store.state.member.userNumber,
           orderLink: this.$store.state.member.userName,
           mobile: this.$store.state.member.userMobile,
           totalPrice: this.originalPrice,
@@ -1241,8 +1241,6 @@ export default {
 
     // 打开结算框
     openAccount() {
-      // 显示当前获取到的会员信息
-      console.log(this.$store.state.member);
       if (this.serviceList.length == 0 && this.productList.length == 0) {
         this.$message({
           type: "warning",
@@ -1787,8 +1785,10 @@ export default {
       var params = {
         subClassId: id,
         type: 2,
-        storeId: localStorage.getItem("storeId"),
-        companyType: 3
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3,
+        productStatus: 1,
+        isHoutai: 0
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -1818,8 +1818,10 @@ export default {
       var params = {
         kindId: id,
         type: 1,
-        storeId: localStorage.getItem("storeId"),
-        companyType: 3
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3,
+        productStatus: 1,
+        isHoutai: 0
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -1846,7 +1848,7 @@ export default {
     fetchServiceMenu() {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
-      var params = { commodityTypeID: 1 };
+      var params = { commodityTypeID: 1, industryID: localStorage.getItem("industryID")};
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
@@ -3008,7 +3010,7 @@ export default {
 
 .productPop {
   .top {
-    padding: 25px 0 10px 0;
+    padding: 10px 0 10px 10px;
   }
 
   .title {

@@ -686,7 +686,7 @@ export default {
   left: 0;
   height: 200px;
   z-index: 160;
-  min-width: 1440px;
+
   .concealVIP {
     position: absolute;
     left: 10px;

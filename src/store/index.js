@@ -5,7 +5,7 @@ Vue.use(Vuex)
 
 const state = {
   leftNavState: '/',
-  fold: false,
+  fold: true,
   member: JSON.parse(localStorage.getItem("member")),
   trueName: localStorage.getItem('trueName')
 }

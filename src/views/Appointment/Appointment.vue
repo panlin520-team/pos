@@ -265,7 +265,7 @@
           v-if="appointmentOrder.appointmentStatus==1"
           @click="payAppointment(appointmentInfo)"
         >开单</div>
-        <div class="btn-settled btn-pointer" v-if="appointmentOrder.appointmentStatus==2">已支付</div>
+        <div class="btn-settled" v-if="appointmentOrder.appointmentStatus==2">已支付</div>
       </div>
     </pop-over>
 
@@ -1436,7 +1436,7 @@ export default {
             type: "error",
             message: error
           });
-        }
+        } 
       );
     },
 

@@ -238,7 +238,8 @@
         <div class="labelItem">
           <label>预约员工</label>
           <div class="text">
-            <span v-for="item in appointmentInfo.beauticians">{{item.beauticianName}}&nbsp;&nbsp;</span>
+            <!-- <span v-for="item in appointmentInfo.beauticians">{{item.beauticianName}}&nbsp;&nbsp;</span> -->
+            <span>{{appointmentInfo.beauticianNames}}</span>
           </div>
         </div>
         <div class="labelItem">
@@ -1398,36 +1399,30 @@ export default {
         res => {
           // 清空当前预约数组
           this.appointmentList = [];
-          // 定义空数组
-          var arr = [];
           if (res.data.result) {
             // 门店员工
-            this.storeEmployeesList = res.data.result.list;
-            var list = res.data.result.list;
+            this.storeEmployeesList = res.data.result;
+            var list = res.data.result;
             for (var i = 0; i < list.length; i++) {
-              var top = i * 105;
               if (list[i].appointmentList != null) {
                 var list2 = list[i].appointmentList;
                 for (var j = 0; j < list2.length; j++) {
-                  this.appointmentList.push(list2[j]);
-                  var width = (list2[j].appointmentOrder.duration / 30) * 135;
-                  var timeArrs = list2[j].nursingDate.split(" ");
-                  var startArr = timeArrs[1].split(":");
-                  var left =
-                    (parseInt(startArr[0]) - this.startTime) * 270 +
-                    parseInt(startArr[1] / 30) * 135;
-                  arr.push({
-                    width: width,
-                    left: left,
-                    top: top
-                  });
+                  var list3 = list2[j].beauticians;
+                  for (var l = 0; l < list3.length; l++) {
+                    var width = (list3[l].duration / 30) * 135;
+                    var timeArrs = list3[l].nursingDate.split(" ");
+                    var startArr = timeArrs[1].split(":");
+                    var left =
+                      (parseInt(startArr[0]) - this.startTime) * 270 +
+                      parseInt(startArr[1] / 30) * 135;
+                    var top = list3[l].sortIndex * 105;
+                    list3[l].width = width;
+                    list3[l].left = left;
+                    list3[l].top = top;
+                    this.appointmentList.push(list3[l]);
+                  }
                 }
               }
-            }
-            for (var k = 0; k < arr.length; k++) {
-              this.appointmentList[k].width = arr[k].width;
-              this.appointmentList[k].left = arr[k].left;
-              this.appointmentList[k].top = arr[k].top;
             }
           }
         },
@@ -1436,7 +1431,7 @@ export default {
             type: "error",
             message: error
           });
-        } 
+        }
       );
     },
 

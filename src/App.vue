@@ -5,13 +5,13 @@
         <img src="http://47.108.29.183:8089/vue/logo.750ee0fb.png" />
       </div>
       <MenuBar></MenuBar>
-          <div class="CompanyName">{{storeName}}</div>
+      <!-- <div class="CompanyName">{{storeName}}</div> -->
       <el-dropdown class="user" @command="handleCommand">
         <span class="el-dropdown-link">
           {{this.$store.state.trueName}}
           <i class="el-icon-arrow-down el-icon--right"></i>
         </span>
-        
+
         <el-dropdown-menu slot="dropdown">
           <el-dropdown-item command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
@@ -69,9 +69,7 @@ export default {
 
 <style lang="scss" scoped>
 .topBand {
-  display: flex;
-  min-width: 1400px;
-
+  
   .logo {
     margin: 0 40px;
 
@@ -84,7 +82,7 @@ export default {
     }
   }
 }
-.CompanyName{
+.CompanyName {
   width: 170px;
   white-space: pre-wrap;
   height: 80px;

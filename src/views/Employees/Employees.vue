@@ -22,7 +22,7 @@
         <div class="headerItem">姓名</div>
         <div class="headerItem">手机</div>
         <div class="headerItem">性别</div>
-        <div class="headerItem">分组</div>
+        <!-- <div class="headerItem">分组</div> -->
         <div class="headerItem">职务</div>
         <div class="headerItem">级别</div>
         <div class="headerItem">目前状态</div>
@@ -41,7 +41,7 @@
           <div
             style="flex:1"
           >{{item.gender == 0 ? '女' : ''}}{{item.gender == 1 ? '男' : ''}}{{item.gender == null ? '未知' : ''}}</div>
-          <div style="flex:1">{{item.groupName}}</div>
+          <!-- <div style="flex:1">{{item.groupName}}</div> -->
           <div style="flex:1">{{item.postName}}</div>
           <div style="flex:1">{{item.postLevelName}}</div>
           <div
@@ -59,7 +59,7 @@
           </div>-->
         </div>
         <!-- 分页 -->
-        <div class="pagination">
+        <!-- <div class="pagination">
           <el-pagination
             @current-change="handleCurrentChange"
             :current-page.sync="currentPage"
@@ -68,7 +68,7 @@
             :total="dataTotal"
             background
           ></el-pagination>
-        </div>
+        </div> -->
       </div>
     </div>
 
@@ -76,11 +76,14 @@
       <div class="popPage" v-if="employeesOpen == true">
         <div class="pageTop">
           <div class="btns btnsLeft">
-            <div class="el-icon-close btn-close btn-pointer" @click="emptyData;employeesOpen = false"></div>
+            <div
+              class="el-icon-close btn-close btn-pointer"
+              @click="emptyData;employeesOpen = false"
+            ></div>
           </div>
           <div class="title">员工资料</div>
           <div class="btns btnsRight">
-            <div class="btn-save btn-pointer " @click="saveEmployees" v-if="selectStatus == 0">保存</div>
+            <div class="btn-save btn-pointer" @click="saveEmployees" v-if="selectStatus == 0">保存</div>
             <div class="btn-save btn-pointer" @click="newEmployees" v-if="selectStatus != 0">确认添加</div>
             <div class="btn-del btn-pointer" v-if="selectStatus == 0" @click="delEmployees">删除</div>
           </div>
@@ -144,7 +147,7 @@
                   </el-select>
                 </div>
               </div>
-              <div class="item">
+              <!-- <div class="item">
                 <label class="label-left">所属分组</label>
                 <div class="value">
                   <el-select v-model="employeesDetails.groupId" placeholder="请选择分组">
@@ -156,16 +159,16 @@
                     ></el-option>
                   </el-select>
                 </div>
-              </div>
+              </div>-->
               <div class="item">
                 <label class="label-left">职务</label>
                 <div class="value">
-                  <el-select v-model="employeesDetails.postCategoryId" placeholder="请选择职务">
+                  <el-select v-model="employeesDetails.postId" placeholder="请选择职务">
                     <el-option
                       v-for="item in postNames"
-                      :key="item.postCategoryId"
+                      :key="item.postId"
                       :label="item.name"
-                      :value="item.postCategoryId"
+                      :value="item.postId"
                     ></el-option>
                   </el-select>
                 </div>
@@ -317,7 +320,7 @@ import MemberFrame from "@/components/MemberFrame/MemberFrame";
 
 export default {
   name: "Employees",
-  components: { InputNumber,MemberFrame },
+  components: { InputNumber, MemberFrame },
   data() {
     return {
       // 数据
@@ -396,7 +399,6 @@ export default {
     if (localStorage.getItem("storeId")) {
       this.$axios
         .all([
-          this.fetchGroup(),
           this.fetchPostNames(),
           this.fetchLevel(),
           this.fetchGroupLeader()
@@ -457,7 +459,7 @@ export default {
                   message: "删除成功",
                   type: "success"
                 });
-                this.fetchGroup();
+                // this.fetchGroup();
               } else {
                 this.$message({
                   message: res.data.responseStatusType.error.errorMsg,
@@ -513,7 +515,7 @@ export default {
                 type: "success"
               });
               this.groupDialog = false;
-              this.fetchGroup();
+              // this.fetchGroup();
             } else {
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
@@ -540,7 +542,7 @@ export default {
                 type: "success"
               });
               this.groupDialog = false;
-              this.fetchGroup();
+              // this.fetchGroup();
             } else {
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
@@ -608,8 +610,8 @@ export default {
         mobile: this.employeesDetails.mobile,
         gender: this.employeesDetails.gender,
         storeId: this.employeesDetails.storeId,
-        groupId: this.employeesDetails.groupId,
-        postCategoryId: this.employeesDetails.postCategoryId,
+        // groupId: this.employeesDetails.groupId,
+        postId: this.employeesDetails.postId,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
         postLevel: this.employeesDetails.postLevel,
@@ -642,15 +644,15 @@ export default {
         return false;
       }
 
-      if (params.groupId == undefined) {
-        this.$message({
-          message: "请选择分组",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.groupId == undefined) {
+      //   this.$message({
+      //     message: "请选择分组",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
-      if (params.postCategoryId == undefined) {
+      if (params.postId == undefined) {
         this.$message({
           message: "请选择职务",
           type: "warning"
@@ -690,6 +692,9 @@ export default {
               message: "门店成员资料保存成功",
               type: "success"
             });
+            this.employeesOpen = false;
+            this.emptyData();
+            this.fetchEmployees();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -713,8 +718,8 @@ export default {
         mobile: this.employeesDetails.mobile,
         gender: this.employeesDetails.gender,
         storeId: this.employeesDetails.storeId,
-        groupId: this.employeesDetails.groupId,
-        postCategoryId: this.employeesDetails.postCategoryId,
+        // groupId: this.employeesDetails.groupId,
+        postId: this.employeesDetails.postId,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
         postLevel: this.employeesDetails.postLevel,
@@ -748,15 +753,15 @@ export default {
         return false;
       }
 
-      if (params.groupId == undefined) {
-        this.$message({
-          message: "请选择分组",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.groupId == undefined) {
+      //   this.$message({
+      //     message: "请选择分组",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
-      if (params.postCategoryId == undefined) {
+      if (params.postId == undefined) {
         this.$message({
           message: "请选择职务",
           type: "warning"
@@ -796,6 +801,9 @@ export default {
               message: "门店成员资料添加成功",
               type: "success"
             });
+            this.employeesOpen = false;
+            this.emptyData();
+            this.fetchEmployees();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -878,9 +886,9 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result.list) {
+          if (res.data.result) {
             this.dataTotal = res.data.result.total;
-            this.emlpoyeesData = res.data.result.list;
+            this.emlpoyeesData = res.data.result;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -906,28 +914,28 @@ export default {
     },
 
     // 获取门店分组
-    fetchGroup() {
-      var url = this.$https.storeHost + "/manage/beautician/selectGroup";
-      var params = { storeId: localStorage.getItem("storeId") };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result.list) {
-            this.groups = res.data.result.list;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
+    // fetchGroup() {
+    //   var url = this.$https.storeHost + "/manage/beautician/selectGroup";
+    //   var params = { storeId: localStorage.getItem("storeId") };
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       if (res.data.result.list) {
+    //         this.groups = res.data.result.list;
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
 
     // 员工级别
     fetchLevel() {
@@ -956,13 +964,12 @@ export default {
 
     // 门店员工职务
     fetchPostNames() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectPostCategoryNoPage";
+      var url = this.$https.storeHost + "/manage/beautician/selectPost";
       var params = {};
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
-            this.postNames = res.data.result;
+            this.postNames = res.data.result.list;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1018,7 +1025,7 @@ export default {
     height: 81px;
     border-bottom: 1px solid #dcdcdc;
     position: relative;
-    .btnsLeft{
+    .btnsLeft {
       margin-left: 30px;
       font-size: 30px;
     }
@@ -1036,7 +1043,7 @@ export default {
       .btn-save {
         flex: 1;
         font-size: 16px;
-        color: #23A547;
+        color: #23a547;
         margin-right: 15px;
       }
       .iconfont {
@@ -1045,7 +1052,7 @@ export default {
       .btn-del {
         display: inline-block;
         font-size: 16px;
-        color: #E6A23C;
+        color: #e6a23c;
       }
     }
   }
@@ -1117,7 +1124,7 @@ export default {
     }
 
     .control {
-      color: #23A547;
+      color: #23a547;
     }
   }
 }

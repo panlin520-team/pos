@@ -616,19 +616,22 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.result) {
+          console.log(res.data.responseStatusType.message);
+          
+          if (res.data.result.message == Failure) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
+               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
+            console.log(123);
+            
           } else {
+            console.log(123123123123);
+
             this.$message({
               message: res.data.responseStatusType.message,
               type: "success"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
           }
         })
         .catch(err => {

@@ -626,9 +626,8 @@ export default {
               message: res.data.responseStatusType.message,
               type: "success"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
+            this.visible_details = tru;
+            this.visible_carLise = false;
           }
         })
         .catch(err => {

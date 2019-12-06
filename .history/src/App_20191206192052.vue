@@ -100,6 +100,6 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin: 0 20px;
+  margin: 0 40px;
 }
 </style>

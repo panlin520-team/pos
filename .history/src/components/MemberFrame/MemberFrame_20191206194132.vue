@@ -584,6 +584,17 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
+          // if (res.data.responseStatusType.message == Success) {
+          //   this.$message({
+          //     message: "划卡成功",
+          //     type: "success"
+          //   });
+          // } else {
+          //   this.$message({
+          //     message: res.data.responseStatusType.error.errorMsg,
+          //     type: "error"
+          //   });
+          // }
           if (this.useTimes < this.totalTimes) {
             this.$message({
               message: res.data.responseStatusType.message,
@@ -616,19 +627,22 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.result) {
+          console.log();
+          
+          if (res.data.responseStatusType.message == Success) {
+            this.$message({
+              message: "划卡成功",
+              type: "warning"
+            });
+            // this.$message({
+            //   message: res.data.responseStatusType.message,
+            //   type: "success"
+            // });
+          } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.message,
-              type: "success"
-            });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
           }
         })
         .catch(err => {

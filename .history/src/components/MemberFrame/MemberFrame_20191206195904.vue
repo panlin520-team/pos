@@ -618,7 +618,7 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
+               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
           } else {
@@ -626,9 +626,7 @@ export default {
               message: res.data.responseStatusType.message,
               type: "success"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
+            this.visible_details = false;
           }
         })
         .catch(err => {

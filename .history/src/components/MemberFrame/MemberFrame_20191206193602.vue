@@ -584,17 +584,25 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (this.useTimes < this.totalTimes) {
+          if (res.data.responseStatusType.message == Success) {
             this.$message({
-              message: res.data.responseStatusType.message,
+              message: "划卡成功",
               type: "success"
             });
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "error"
-            });
+          }else{
+            
           }
+          // if (this.useTimes < this.totalTimes) {
+          //   this.$message({
+          //     message: res.data.responseStatusType.message,
+          //     type: "success"
+          //   });
+          // } else {
+          //   this.$message({
+          //     message: res.data.responseStatusType.error.errorMsg,
+          //     type: "error"
+          //   });
+          // }
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");
@@ -618,17 +626,14 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "error"
-            });
-          } else {
-            this.$message({
               message: res.data.responseStatusType.message,
               type: "success"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
+            });
           }
         })
         .catch(err => {

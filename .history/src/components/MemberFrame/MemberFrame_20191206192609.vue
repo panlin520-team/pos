@@ -369,6 +369,7 @@ export default {
     },
     //搜索体验卡
     show_carLise() {
+
       this.memberdetails();
       this.visible_carLise = true;
     },
@@ -386,7 +387,7 @@ export default {
       if (this.experiencecardProductType == 1) {
         this.stampCard();
         if (res.useTimes < res.totalTimes) {
-          // res.useTimes += 1;
+          res.useTimes += 1;
         } else {
           res.useTimes = res.totalTimes;
           this.$message({
@@ -396,7 +397,7 @@ export default {
         }
       } else {
         if (res.useTimes < res.totalTimes) {
-          // res.useTimes += 1;
+          res.useTimes += 1;
           this.employeels();
           this.servicePopover = true;
         } else {
@@ -536,7 +537,8 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          console.log(res.data.result.userExperiencecardList);
+          console.log();
+          
           if (res.data.result.userExperiencecardList) {
             this.tableData_carLise = res.data.result.userExperiencecardList;
           } else {
@@ -618,17 +620,14 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "error"
-            });
-          } else {
-            this.$message({
               message: res.data.responseStatusType.message,
               type: "success"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
+            });
           }
         })
         .catch(err => {

@@ -616,19 +616,26 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.result) {
+          console.log(res.data.responseStatusType.message);
+          
+          if (res.data.responseStatusType.message == Failure) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
+               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
+            // this.$message({
+            //   message: res.data.responseStatusType.message,
+            //   type: "success"
+            // });
           } else {
+            // this.$message({
+            //   message: res.data.responseStatusType.error.errorMsg,
+            //   type: "error"
+            // });
             this.$message({
-              message: res.data.responseStatusType.message,
-              type: "success"
+              message: "划卡失败",
+              type: "warning"
             });
-          
-            // this.visible_details = false;
-            // this.visible_carLise = false;
           }
         })
         .catch(err => {

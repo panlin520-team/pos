@@ -93,7 +93,6 @@ export default {
 }
 .user {
   height: 80px;
-  line-height: 80px;
   text-align: center;
   font-size: 15px;
   color: #ffffff;

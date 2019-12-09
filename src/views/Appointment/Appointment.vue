@@ -749,7 +749,6 @@ export default {
 
     // 打开预约结算
     payAppointment(item) {
-      console.log('res',item);
       var orderList = item.productOrderList;
       var subclassIds = [];
       this.payTypes = null;

@@ -368,8 +368,7 @@
           <div class="normal" v-if="this.$store.state.member == null">散客</div>
           <div class="personal" v-if="this.$store.state.member != null">
             会员姓名:
-            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;电话号码:
+            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>电话号码:
             <span>{{this.$store.state.member.userMobile}}</span>
           </div>
         </div>
@@ -496,11 +495,11 @@
           <div
             v-for="(item,index) in empSet"
             :key="index"
-            :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
-            @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
+            :class="['item',{'active' : currentServiceId==item.postId}]"
+            @click="switchEmpList(index,item.postId,item.setEmpId)"
           >
             <div class="default" v-if="item.setEmpName==undefined || item.setEmpName=='' ">
-              <span>{{item.postCategoryName}}</span>(必填)
+              <span>{{item.postName}}</span>(必填)
             </div>
             <div class="active" v-if="item.setEmpName!=''">
               <span>{{item.setEmpName}}</span>
@@ -991,7 +990,7 @@ export default {
         return;
       }
 
-      if (this.$store.state.member != null) {
+      if (this.warnValue == true) {
         productIds.forEach(value => {
           value.discount = 1;
           value.discountPrice = value.originalPrice;
@@ -1465,7 +1464,7 @@ export default {
         } else {
           isEmpty = false;
           arr.push({
-            postCategoryId: list[i].postCategoryId,
+            postId: list[i].postId,
             beauticianId: list[i].setEmpId,
             beauticianName: list[i].setEmpName,
             beauticanJob: list[i].setEmpJob
@@ -1527,7 +1526,7 @@ export default {
       } else {
         for (var i = 0; i < list.length; i++) {
           arr.push({
-            postCategoryId: list[i].postCategoryId,
+            postId: list[i].postId,
             beauticianId: list[i].staffNumber,
             beauticianName: list[i].name,
             ratio: list[i].ratio
@@ -1611,7 +1610,7 @@ export default {
     fetchServiceEmp(id, item) {
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
-        return item.postCategoryId == id;
+        return item.postId == id;
       });
 
       if (item.beauticianId != this.currentEmpId) {
@@ -1634,7 +1633,7 @@ export default {
 
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
-      this.currentServiceTitle = this.empSet[index].postCategoryName;
+      this.currentServiceTitle = this.empSet[index].postName;
       this.empList = this.empSet[index].beauticianList;
       this.currentServiceId = curId;
       if (empId != undefined) {
@@ -1666,13 +1665,13 @@ export default {
           res => {
             if (res.data.result) {
               this.servicePopover = true;
-              this.empSet = res.data.result.list[0].postCategoryVOList;
+              this.empSet = res.data.result.list[0].postVOList;
               this.empList =
-                res.data.result.list[0].postCategoryVOList[0].beauticianList;
+                res.data.result.list[0].postVOList[0].beauticianList;
               this.currentServiceId =
-                res.data.result.list[0].postCategoryVOList[0].postCategoryId;
+                res.data.result.list[0].postVOList[0].postId;
               this.currentServiceTitle =
-                res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+                res.data.result.list[0].postVOList[0].postName;
             } else {
               this.empSet = [];
               this.$message({
@@ -1848,7 +1847,10 @@ export default {
     fetchServiceMenu() {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
-      var params = { commodityTypeID: 1, industryID: localStorage.getItem("industryID")};
+      var params = {
+        commodityTypeID: 1,
+        industryID: localStorage.getItem("industryID")
+      };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {

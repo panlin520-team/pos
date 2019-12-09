@@ -1133,7 +1133,8 @@ export default {
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
-                  payTypeAndAmount: JSON.stringify(payObj)
+                  payTypeAndAmount: JSON.stringify(payObj),
+                  createOperator: this.$store.state.trueName
                 };
                 this.$https.fetchPost(path, info).then(
                   res => {
@@ -1984,21 +1985,6 @@ export default {
           }
         );
       }
-      // // 待支付
-      // if (item.orderStatus == 1) {
-      //   this.billOpen = true;
-      // }
-      // // 已支付
-      // if (item.orderStatus == 2) {
-      //   this.orderDetailsPage = true;
-      // }
-      // // 服务中
-      // if (item.orderStatus == 3) {
-      //   this.orderDetailsPage = true;
-      // }
-      // // 已取消
-      // if (item.orderDetailsPage == 4) {
-      // }
     },
 
     // 门店项目与产品菜单显示切换

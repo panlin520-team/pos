@@ -189,7 +189,10 @@
                     x {{item.productNum}}
                   </div>
                   <div class="price">
-                    <span class="discount" v-if="item.discount != 1">{{item.discount * 10}}折</span>
+                    <span
+                      class="discount"
+                      v-if="item.discount != 1"
+                    >{{$calculate.accMul(item.discount,10)}}折</span>
                     <span>¥ {{item.productNum * item.discountPrice}}</span>
                   </div>
                 </div>
@@ -240,7 +243,7 @@
           <div class="bottom">
             <div class="orderPrice">
               <div class="original">原价：¥{{originalPrice}}</div>
-              <div class="total">总价：¥{{realPrice}}</div>
+              <div class="total">实付：¥{{realPrice}}</div>
             </div>
             <div class="checkout">
               <div class="btn-pointer" @click="openAccount">结算</div>
@@ -383,7 +386,7 @@
             <span class="symbol">元</span>
           </div>
           <div class="real">
-            总价：
+            实付：
             <span class="active">{{realPrice}}</span>
             <span class="symbol">元</span>
           </div>
@@ -990,6 +993,13 @@ export default {
         return;
       }
 
+      if (this.cashValue == "") {
+        this.cashValue = 0;
+      }
+
+      var totalPrice = 0;
+      var cashType = { payType: this.cashOption, amount: this.cashValue };
+
       if (this.warnValue == true) {
         productIds.forEach(value => {
           value.discount = 1;
@@ -997,26 +1007,27 @@ export default {
         });
       }
 
-      var totalPrice = 0;
-      var cashType = { payType: this.cashOption, amount: this.cashValue };
-
       // 获取选中账户值
       if (this.payTypes != null) {
         var payArr = this.payTypes;
         for (var i = 0; i < payArr.length; i++) {
           if (payArr[i].checked == true) {
-            if (payArr[i].value > payArr[i].amount) {
-              this.$message({
-                type: "error",
-                message: "使用金额不能大于账户余额!"
-              });
-              return;
+            if (payArr[i].value != "") {
+              if (payArr[i].value > payArr[i].amount) {
+                this.$message({
+                  type: "warning",
+                  message: "使用金额不能大于账户余额!"
+                });
+                return;
+              } else {
+                payTypeAndAmount.push({
+                  accountTypeId: payArr[i].accountTypeId,
+                  amount: payArr[i].value,
+                  payTypeName: payArr[i].accountType
+                });
+              }
             } else {
-              payTypeAndAmount.push({
-                accountTypeId: payArr[i].accountTypeId,
-                amount: payArr[i].value,
-                payTypeName: payArr[i].accountType
-              });
+              payArr[i].value = 0;
             }
           }
         }
@@ -1095,7 +1106,7 @@ export default {
           cardNum: this.$store.state.member.userNumber,
           orderLink: this.$store.state.member.userName,
           mobile: this.$store.state.member.userMobile,
-          totalPrice: this.originalPrice,
+          totalPrice: this.realPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
           // 水单号
@@ -1110,7 +1121,7 @@ export default {
           cardNum: null,
           orderLink: null,
           mobile: null,
-          totalPrice: this.originalPrice,
+          totalPrice: this.realPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
           // 水单号
@@ -1134,7 +1145,6 @@ export default {
                   productIds: JSON.stringify(productIds),
                   // 支付方式
                   payTypeAndAmount: JSON.stringify(payObj),
-                  createOperator: this.$store.state.trueName
                 };
                 this.$https.fetchPost(path, info).then(
                   res => {
@@ -1257,6 +1267,8 @@ export default {
       }
       if (this.$store.state.member == null) {
         this.accountPopver = true;
+        this.payTypes = null;
+        this.cashValue = 0;
         return;
       } else {
         var arr = this.serviceList.concat(this.productList);

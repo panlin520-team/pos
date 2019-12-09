@@ -167,7 +167,10 @@
                     x {{item.productNum}}
                   </div>
                   <div class="price">
-                    <span class="discount" v-if="item.discount != 1">{{item.discount * 10}}折</span>
+                    <span
+                      class="discount"
+                      v-if="item.discount != 1"
+                    >{{$calculate.accMul(item.discount,10)}}折</span>
                     <span>¥ {{item.productNum * item.discountPrice}}</span>
                   </div>
                 </div>
@@ -337,7 +340,7 @@
           <!-- <div class="label">
             <label>水单号</label>
             <input placeholder="水单号" v-model="accountInfo.memoNum" class="inputModel" />
-          </div> -->
+          </div>-->
           <div class="label">
             <label>备注</label>
             <input placeholder="备注(选填)" v-model="accountInfo.remark" class="inputModel" />
@@ -825,6 +828,10 @@ export default {
       //   return;
       // }
 
+      if (this.cashValue == "") {
+        this.cashValue = 0;
+      }
+
       var totalPrice = 0;
       var cashType = { payType: this.cashOption, amount: this.cashValue };
 
@@ -833,18 +840,22 @@ export default {
         var payArr = this.payTypes;
         for (var i = 0; i < payArr.length; i++) {
           if (payArr[i].checked == true) {
-            if (payArr[i].value > payArr[i].amount) {
-              this.$message({
-                type: "error",
-                message: "使用金额不能大于账户余额!"
-              });
-              return;
+            if (payArr[i].value != "") {
+              if (payArr[i].value > payArr[i].amount) {
+                this.$message({
+                  type: "error",
+                  message: "使用金额不能大于账户余额!"
+                });
+                return;
+              } else {
+                payTypeAndAmount.push({
+                  accountTypeId: payArr[i].accountTypeId,
+                  amount: payArr[i].value,
+                  payTypeName: payArr[i].accountType
+                });
+              }
             } else {
-              payTypeAndAmount.push({
-                accountTypeId: payArr[i].accountTypeId,
-                amount: payArr[i].value,
-                payTypeName: payArr[i].accountType
-              });
+              payArr[i].value = 0;
             }
           }
         }
@@ -937,8 +948,7 @@ export default {
               title: "结算成功",
               type: "success"
             });
-          }
-          else {
+          } else {
             this.$message.error(res.data.responseStatusType.error.errorMsg);
           }
         },

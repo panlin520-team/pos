@@ -1832,6 +1832,7 @@ export default {
 
     // 打开收银界面，清空一些关键信息
     openBill() {
+      this.memoNum = "";
       this.billOpen = true;
       // 服务项目菜单
       this.fetchServiceMenu();

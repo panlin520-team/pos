@@ -44,9 +44,11 @@
       <div class="headers">
         <div class="headerItem">订单号</div>
         <div class="headerItem">客户</div>
+        <div class="headerItem">类型</div>
         <div class="headerItem">时间</div>
         <div class="headerItem" style="flex:2">服务项目</div>
-        <div class="headerItem">金额</div>
+        <div class="headerItem">应付金额</div>
+        <div class="headerItem">已付金额</div>
         <div class="headerItem">状态</div>
       </div>
       <div class="list">
@@ -64,9 +66,14 @@
           <div style="flex:1" class="overflow" v-if="item.cardNumber ==''">
             <span class="consumer normal">散客</span>
           </div>
+          <div style="flex:1" class="overflow">{{item.orderTypeValue}}</div>
           <div style="flex:1" class="overflow">{{item.createTime}}</div>
           <div style="flex:2" class="overflow">
             <span v-for="list in item.productOrderList">{{list.productName}}&nbsp;&nbsp;</span>
+          </div>
+          <div style="flex:1" class="price overflow">
+            ¥
+            <span>{{item.totalPrice}}</span>
           </div>
           <div style="flex:1" class="price overflow">
             ¥
@@ -1144,7 +1151,7 @@ export default {
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
-                  payTypeAndAmount: JSON.stringify(payObj),
+                  payTypeAndAmount: JSON.stringify(payObj)
                 };
                 this.$https.fetchPost(path, info).then(
                   res => {

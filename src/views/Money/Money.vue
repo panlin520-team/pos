@@ -444,6 +444,75 @@
       </div>
     </pop-over>
 
+    <!-- 对话框 待支付订单结算方式 -->
+    <pop-over
+      :visible.sync="orderpayPopver"
+      @close="orderpayPopver = false"
+      width="500px"
+      marginTop="5vh"
+      custom-class="accountPop"
+    >
+      <div class="top" slot="top">
+        <div class="title">结算</div>
+      </div>
+      <div class="main" slot="main">
+        <div class="orderNum">
+          订单号:
+          <span>{{orderInfo.orderNumber}}</span>
+        </div>
+        <div class="member">
+          <div class="personal">
+            顾客姓名:
+            <span style="margin-right: 10px;">{{orderInfo.orderLink}}</span>
+            电话号码:
+            <span>{{orderInfo.mobile}}</span>
+          </div>
+        </div>
+        <div class="price">
+          <div class="original">
+            应付：
+            <span class="active">{{orderInfo.totalPrice}}</span>
+            <span class="symbol">元</span>
+          </div>
+        </div>
+        <div class="pay">
+          <div class="label">
+            <label>现金支付</label>
+            <InputNumber
+              :point="2"
+              placeholder="使用金额"
+              v-model.number="cashValue"
+              class="inputModel"
+            ></InputNumber>
+            <el-radio-group v-model="cashOption" size="mini" class="ratio">
+              <el-radio :label="3">线下</el-radio>
+              <el-radio :label="4">线上</el-radio>
+            </el-radio-group>
+          </div>
+          <div class="label" v-for="(item,index) in payTypes" v-if="item.amount > 0">
+            <label>{{item.accountType}}</label>
+            <InputNumber
+              :point="2"
+              placeholder="使用金额"
+              v-model.number="item.value"
+              class="inputModel"
+            ></InputNumber>
+            <div class="account">
+              <el-checkbox v-model="item.checked"></el-checkbox>
+              <div class="value">
+                余额：
+                <span class="active">{{item.amount}}</span>
+                <span class="symbol">元</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom" slot="bottom">
+        <div class="btn-pointer btn-submit" @click="settleOrder(orderInfo)">结算</div>
+      </div>
+    </pop-over>
+
     <!-- 对话框 会员查询-->
     <pop-over
       :visible.sync="memberPopver"
@@ -762,6 +831,8 @@ export default {
       subclassID: null,
       // 项目或产品代码
       productCode: null,
+      // 待支付订单信息
+      orderInfo: {},
 
       // 项目或产品可选工位与可选员工
       empSet: [],
@@ -821,6 +892,8 @@ export default {
       // 对话框
       // 结算
       accountPopver: false,
+      // 待支付订单
+      orderpayPopver: false,
       // 查询会员
       memberPopver: false,
       // 选择服务项目
@@ -1975,8 +2048,141 @@ export default {
       );
     },
 
+    // 结算待支付订单
+    settleOrder(params) {
+      var payPrice,
+        payObj,
+        cashType,
+        payTypeAndAmount = [];
+      cashType = { payType: this.cashOption, amount: this.cashValue };
+      if (this.payTypes != null) {
+        var payArr = this.payTypes;
+        for (var i = 0; i < payArr.length; i++) {
+          if (payArr[i].checked == true) {
+            if (payArr[i].value != "") {
+              if (payArr[i].value > payArr[i].amount) {
+                this.$message({
+                  type: "warning",
+                  message: "使用金额不能大于账户余额!"
+                });
+                return;
+              } else {
+                payTypeAndAmount.push({
+                  accountTypeId: payArr[i].accountTypeId,
+                  amount: payArr[i].value,
+                  payTypeName: payArr[i].accountType
+                });
+              }
+            } else {
+              payArr[i].value = 0;
+            }
+          }
+        }
+        // 计算选中账户值总额
+        var accountPrice = 0;
+        for (var i = 0; i < payTypeAndAmount.length; i++) {
+          accountPrice += payTypeAndAmount[i].amount;
+        }
+        // 支付总金额
+        payPrice = cashType.amount + accountPrice;
+        if (cashType.payType == 3) {
+          payObj = [
+            {
+              payType: cashType.payType,
+              amount: cashType.amount,
+              payTypeName: "线下"
+            },
+            {
+              payType: 5,
+              amount: accountPrice,
+              payTypeName: "账户总支付",
+              accountType: payTypeAndAmount
+            }
+          ];
+        }
+        if (cashType.payType == 4) {
+          payObj = [
+            {
+              payType: cashType.payType,
+              amount: cashType.amount,
+              payTypeName: "线上"
+            },
+            {
+              payType: 5,
+              amount: accountPrice,
+              payTypeName: "账户总支付",
+              accountType: payTypeAndAmount
+            }
+          ];
+        }
+      } else {
+        payPrice = cashType.amount;
+        if (cashType.payType == 3) {
+          payObj = [
+            {
+              payType: cashType.payType,
+              amount: cashType.amount,
+              payTypeName: "线下"
+            }
+          ];
+        }
+        if (cashType.payType == 4) {
+          payObj = [
+            {
+              payType: cashType.payType,
+              amount: cashType.amount,
+              payTypeName: "线上"
+            }
+          ];
+        }
+      }
+      // 支付金额
+      if (payPrice != params.totalPrice) {
+        this.$message({
+          type: "error",
+          message: "支付金额不等于订单实际总金额!"
+        });
+        return;
+      }
+      var path = this.$https.orderHost + "/order/payOrder";
+      var info = {
+        orderNumber: params.orderNumber,
+        payPrice: payPrice,
+        // 订单列表
+        productIds: JSON.stringify(params.productOrderList),
+        // 支付方式
+        payTypeAndAmount: JSON.stringify(payObj)
+      };
+      this.$https.fetchPost(path, info).then(
+        res => {
+          this.orderpayPopver = false;
+          this.emptyData();
+          this.fetchOrder();
+          this.$notify({
+            // 信息
+            message: res.data.result,
+            // 关闭自动关闭
+            duration: 0,
+            title: "结算成功",
+            type: "success"
+          });
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     // 获取订单详细(根据订单状态)
     getOrder(item) {
+<<<<<<< HEAD
+=======
+      this.payTypes = null;
+      this.cashValue = 0;
+>>>>>>> 3645cf0e15aa2909fc37af0641ab96de9241dc5e
       // 已支付
       if (item.orderStatus == 2) {
         var url = this.$https.orderHost + "/order/selectOrderByNum";
@@ -2004,6 +2210,49 @@ export default {
             });
           }
         );
+      }
+      if (item.orderStatus == 1) {
+        if (item.cardNumber == "") {
+          this.orderInfo = item;
+          this.orderpayPopver = true;
+        } else {
+          var list = item.productOrderList;
+          var subclassIds = [];
+          for (var i = 0; i < list.length; i++) {
+            subclassIds.push(list[i].subclassID);
+          }
+          var url =
+            this.$https.accountHost + "/manage/memberUser/listMemberAccount";
+          var params = {
+            memberNum: item.cardNumber,
+            subClassIds: JSON.stringify(subclassIds)
+          };
+          this.$https.fetchPost(url, params).then(
+            res => {
+              if (res.data.result.list) {
+                this.orderpayPopver = true;
+                this.orderInfo = item;
+                var list = res.data.result.list;
+                list.forEach(item => {
+                  item.checked = false;
+                  item.value = 0;
+                });
+                this.payTypes = list;
+              } else {
+                this.$message({
+                  message: res.data.responseStatusType.error.errorMsg,
+                  type: "warning"
+                });
+              }
+            },
+            error => {
+              this.$message({
+                type: "error",
+                message: error
+              });
+            }
+          );
+        }
       }
     },
 
@@ -3266,6 +3515,16 @@ export default {
 
   .title {
     @extend %text-font17;
+  }
+
+  .orderNum {
+    height: 30px;
+    line-height: 30px;
+    padding: 0 25px;
+    font-size: 14px;
+    span {
+      color: #feb019;
+    }
   }
 
   .member {

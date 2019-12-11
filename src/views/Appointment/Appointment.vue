@@ -167,7 +167,10 @@
                     x {{item.productNum}}
                   </div>
                   <div class="price">
-                    <span class="discount" v-if="item.discount != 1">{{item.discount * 10}}折</span>
+                    <span
+                      class="discount"
+                      v-if="item.discount != 1"
+                    >{{$calculate.accMul(item.discount,10)}}折</span>
                     <span>¥ {{item.productNum * item.discountPrice}}</span>
                   </div>
                 </div>
@@ -285,20 +288,20 @@
         <div class="member">
           <div class="normal" v-if="memberValue == false">
             顾客姓名：
-            <span>{{accountInfo.orderLink}}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;电话号码：
+            <span style="margin-right: 10px;">{{accountInfo.orderLink}}</span>
+            电话号码：
             <span>{{accountInfo.mobile}}</span>
           </div>
           <div class="personal" v-if="memberValue == true">
             会员姓名：
-            <span>{{accountInfo.orderLink}}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;电话号码：
+            <span style="margin-right: 10px;">{{accountInfo.orderLink}}</span>
+            电话号码：
             <span>{{accountInfo.mobile}}</span>
           </div>
         </div>
         <div class="price">
           <div class="real">
-            总价：
+            实际价格：
             <span class="active">{{accountInfo.realPrice}}</span>
             <span class="symbol">元</span>
           </div>
@@ -334,10 +337,10 @@
               </div>
             </div>
           </div>
-          <div class="label">
+          <!-- <div class="label">
             <label>水单号</label>
             <input placeholder="水单号" v-model="accountInfo.memoNum" class="inputModel" />
-          </div>
+          </div>-->
           <div class="label">
             <label>备注</label>
             <input placeholder="备注(选填)" v-model="accountInfo.remark" class="inputModel" />
@@ -407,7 +410,7 @@
       </div>
       <div class="main" slot="main">
         <div class="setEmp" v-for="(items,index) in empSet" :key="index">
-          <div class="label">{{items.postCategoryName}}:</div>
+          <div class="label">{{items.postName}}:</div>
           <el-select
             v-model="items.staffNumber"
             value-key="name"
@@ -751,14 +754,17 @@ export default {
     payAppointment(item) {
       var orderList = item.productOrderList;
       var subclassIds = [];
+      this.payTypes = null;
+      this.cashValue = 0;
+      this.remark = "";
       if (item.cardNumber == "" || item.cardNumber == null) {
         this.accountPopver = true;
         this.accountInfo = {
           orderLink: item.orderLink,
           mobile: item.mobile,
           memberNum: item.cardNumber,
-          realPrice: item.totalPrice,
-          memoNum: item.memoNum,
+          realPrice: item.totalDiscount,
+          // memoNum: item.memoNum,
           remark: item.remark,
           orderNumber: item.orderNumber
         };
@@ -781,8 +787,8 @@ export default {
                 orderLink: item.orderLink,
                 mobile: item.mobile,
                 memberNum: item.cardNumber,
-                realPrice: item.totalPrice,
-                memoNum: item.memoNum,
+                realPrice: item.totalDiscount,
+                // memoNum: item.memoNum,
                 remark: item.remark,
                 orderNumber: item.orderNumber
               };
@@ -814,12 +820,16 @@ export default {
       var payObj,
         payTypeAndAmount = [];
 
-      if (this.accountInfo.memoNum == "") {
-        this.$message({
-          type: "error",
-          message: "水单号不能为空!"
-        });
-        return;
+      // if (this.accountInfo.memoNum == "") {
+      //   this.$message({
+      //     type: "error",
+      //     message: "水单号不能为空!"
+      //   });
+      //   return;
+      // }
+
+      if (this.cashValue == "") {
+        this.cashValue = 0;
       }
 
       var totalPrice = 0;
@@ -830,18 +840,22 @@ export default {
         var payArr = this.payTypes;
         for (var i = 0; i < payArr.length; i++) {
           if (payArr[i].checked == true) {
-            if (payArr[i].value > payArr[i].amount) {
-              this.$message({
-                type: "error",
-                message: "使用金额不能大于账户余额!"
-              });
-              return;
+            if (payArr[i].value != "") {
+              if (payArr[i].value > payArr[i].amount) {
+                this.$message({
+                  type: "error",
+                  message: "使用金额不能大于账户余额!"
+                });
+                return;
+              } else {
+                payTypeAndAmount.push({
+                  accountTypeId: payArr[i].accountTypeId,
+                  amount: payArr[i].value,
+                  payTypeName: payArr[i].accountType
+                });
+              }
             } else {
-              payTypeAndAmount.push({
-                accountTypeId: payArr[i].accountTypeId,
-                amount: payArr[i].value,
-                payTypeName: payArr[i].accountType
-              });
+              payArr[i].value = 0;
             }
           }
         }
@@ -921,18 +935,22 @@ export default {
 
       this.$https.fetchPost(path, info).then(
         res => {
-          this.accountPopver = false;
-          this.appointmentDetailsPop = false;
-          this.emptyData();
-          this.fetchEmpAndAppointment();
-          this.$notify({
-            // 信息
-            message: res.data.result,
-            // 关闭自动关闭
-            duration: 0,
-            title: "结算成功",
-            type: "success"
-          });
+          if (res.data.responseStatusType.message == "Success") {
+            this.accountPopver = false;
+            this.appointmentDetailsPop = false;
+            this.emptyData();
+            this.fetchEmpAndAppointment();
+            this.$notify({
+              // 信息
+              message: res.data.result,
+              // 关闭自动关闭
+              duration: 0,
+              title: "结算成功",
+              type: "success"
+            });
+          } else {
+            this.$message.error(res.data.responseStatusType.error.errorMsg);
+          }
         },
         error => {
           this.$message({
@@ -1145,10 +1163,10 @@ export default {
         } else {
           isEmpty = false;
           arr.push({
-            postCategoryName: list[i].postCategoryName,
-            postCategoryId: list[i].postCategoryId,
+            postName: list[i].postName,
+            postId: list[i].postId,
             beauticianName: list[i].staffNumber.name,
-            beauticanJob: list[i].postCategoryName,
+            beauticanJob: list[i].postName,
             staffNumber: list[i].staffNumber.staffNumber,
             nursingDate: list[i].nursingDate + " " + list[i].time,
             duration: list[i].duration
@@ -1242,7 +1260,7 @@ export default {
           res => {
             if (res.data.result) {
               this.servicePopover = true;
-              var arr = res.data.result.list[0].postCategoryVOList;
+              var arr = res.data.result.list[0].postVOList;
               arr.forEach(item => {
                 item.staffNumber = null;
                 item.nursingDate = this.currentDate;
@@ -1523,6 +1541,8 @@ export default {
       // 现金支付方式
       this.cashValue = 0;
       this.cashOption = 3;
+      // 会员支付方式
+      this.payTypes = null;
     },
 
     // 显示截止时间线位置

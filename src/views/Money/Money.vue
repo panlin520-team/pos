@@ -44,9 +44,11 @@
       <div class="headers">
         <div class="headerItem">订单号</div>
         <div class="headerItem">客户</div>
+        <div class="headerItem">类型</div>
         <div class="headerItem">时间</div>
         <div class="headerItem" style="flex:2">服务项目</div>
-        <div class="headerItem">金额</div>
+        <div class="headerItem">应付金额</div>
+        <div class="headerItem">已付金额</div>
         <div class="headerItem">状态</div>
       </div>
       <div class="list">
@@ -64,9 +66,14 @@
           <div style="flex:1" class="overflow" v-if="item.cardNumber ==''">
             <span class="consumer normal">散客</span>
           </div>
+          <div style="flex:1" class="overflow">{{item.orderTypeValue}}</div>
           <div style="flex:1" class="overflow">{{item.createTime}}</div>
           <div style="flex:2" class="overflow">
             <span v-for="list in item.productOrderList">{{list.productName}}&nbsp;&nbsp;</span>
+          </div>
+          <div style="flex:1" class="price overflow">
+            ¥
+            <span>{{item.totalPrice}}</span>
           </div>
           <div style="flex:1" class="price overflow">
             ¥
@@ -189,7 +196,10 @@
                     x {{item.productNum}}
                   </div>
                   <div class="price">
-                    <span class="discount" v-if="item.discount != 1">{{item.discount * 10}}折</span>
+                    <span
+                      class="discount"
+                      v-if="item.discount != 1"
+                    >{{$calculate.accMul(item.discount,10)}}折</span>
                     <span>¥ {{item.productNum * item.discountPrice}}</span>
                   </div>
                 </div>
@@ -240,7 +250,7 @@
           <div class="bottom">
             <div class="orderPrice">
               <div class="original">原价：¥{{originalPrice}}</div>
-              <div class="total">总价：¥{{realPrice}}</div>
+              <div class="total">实付：¥{{realPrice}}</div>
             </div>
             <div class="checkout">
               <div class="btn-pointer" @click="openAccount">结算</div>
@@ -368,8 +378,7 @@
           <div class="normal" v-if="this.$store.state.member == null">散客</div>
           <div class="personal" v-if="this.$store.state.member != null">
             会员姓名:
-            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>
-            &nbsp;&nbsp;&nbsp;&nbsp;电话号码:
+            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>电话号码:
             <span>{{this.$store.state.member.userMobile}}</span>
           </div>
         </div>
@@ -384,7 +393,7 @@
             <span class="symbol">元</span>
           </div>
           <div class="real">
-            总价：
+            实付：
             <span class="active">{{realPrice}}</span>
             <span class="symbol">元</span>
           </div>
@@ -496,11 +505,11 @@
           <div
             v-for="(item,index) in empSet"
             :key="index"
-            :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
-            @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
+            :class="['item',{'active' : currentServiceId==item.postId}]"
+            @click="switchEmpList(index,item.postId,item.setEmpId)"
           >
             <div class="default" v-if="item.setEmpName==undefined || item.setEmpName=='' ">
-              <span>{{item.postCategoryName}}</span>(必填)
+              <span>{{item.postName}}</span>(必填)
             </div>
             <div class="active" v-if="item.setEmpName!=''">
               <span>{{item.setEmpName}}</span>
@@ -991,33 +1000,41 @@ export default {
         return;
       }
 
-      if (this.$store.state.member != null) {
+      if (this.cashValue == "") {
+        this.cashValue = 0;
+      }
+
+      var totalPrice = 0;
+      var cashType = { payType: this.cashOption, amount: this.cashValue };
+
+      if (this.warnValue == true) {
         productIds.forEach(value => {
           value.discount = 1;
           value.discountPrice = value.originalPrice;
         });
       }
 
-      var totalPrice = 0;
-      var cashType = { payType: this.cashOption, amount: this.cashValue };
-
       // 获取选中账户值
       if (this.payTypes != null) {
         var payArr = this.payTypes;
         for (var i = 0; i < payArr.length; i++) {
           if (payArr[i].checked == true) {
-            if (payArr[i].value > payArr[i].amount) {
-              this.$message({
-                type: "error",
-                message: "使用金额不能大于账户余额!"
-              });
-              return;
+            if (payArr[i].value != "") {
+              if (payArr[i].value > payArr[i].amount) {
+                this.$message({
+                  type: "warning",
+                  message: "使用金额不能大于账户余额!"
+                });
+                return;
+              } else {
+                payTypeAndAmount.push({
+                  accountTypeId: payArr[i].accountTypeId,
+                  amount: payArr[i].value,
+                  payTypeName: payArr[i].accountType
+                });
+              }
             } else {
-              payTypeAndAmount.push({
-                accountTypeId: payArr[i].accountTypeId,
-                amount: payArr[i].value,
-                payTypeName: payArr[i].accountType
-              });
+              payArr[i].value = 0;
             }
           }
         }
@@ -1096,7 +1113,7 @@ export default {
           cardNum: this.$store.state.member.userNumber,
           orderLink: this.$store.state.member.userName,
           mobile: this.$store.state.member.userMobile,
-          totalPrice: this.originalPrice,
+          totalPrice: this.realPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
           // 水单号
@@ -1111,7 +1128,7 @@ export default {
           cardNum: null,
           orderLink: null,
           mobile: null,
-          totalPrice: this.originalPrice,
+          totalPrice: this.realPrice,
           industryID: 1,
           productIds: JSON.stringify(productIds),
           // 水单号
@@ -1134,8 +1151,7 @@ export default {
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
-                  payTypeAndAmount: JSON.stringify(payObj),
-                  createOperator: this.$store.state.trueName
+                  payTypeAndAmount: JSON.stringify(payObj)
                 };
                 this.$https.fetchPost(path, info).then(
                   res => {
@@ -1258,6 +1274,8 @@ export default {
       }
       if (this.$store.state.member == null) {
         this.accountPopver = true;
+        this.payTypes = null;
+        this.cashValue = 0;
         return;
       } else {
         var arr = this.serviceList.concat(this.productList);
@@ -1466,7 +1484,7 @@ export default {
         } else {
           isEmpty = false;
           arr.push({
-            postCategoryId: list[i].postCategoryId,
+            postId: list[i].postId,
             beauticianId: list[i].setEmpId,
             beauticianName: list[i].setEmpName,
             beauticanJob: list[i].setEmpJob
@@ -1528,7 +1546,7 @@ export default {
       } else {
         for (var i = 0; i < list.length; i++) {
           arr.push({
-            postCategoryId: list[i].postCategoryId,
+            postId: list[i].postId,
             beauticianId: list[i].staffNumber,
             beauticianName: list[i].name,
             ratio: list[i].ratio
@@ -1612,7 +1630,7 @@ export default {
     fetchServiceEmp(id, item) {
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
-        return item.postCategoryId == id;
+        return item.postId == id;
       });
 
       if (item.beauticianId != this.currentEmpId) {
@@ -1635,7 +1653,7 @@ export default {
 
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
-      this.currentServiceTitle = this.empSet[index].postCategoryName;
+      this.currentServiceTitle = this.empSet[index].postName;
       this.empList = this.empSet[index].beauticianList;
       this.currentServiceId = curId;
       if (empId != undefined) {
@@ -1667,13 +1685,13 @@ export default {
           res => {
             if (res.data.result) {
               this.servicePopover = true;
-              this.empSet = res.data.result.list[0].postCategoryVOList;
+              this.empSet = res.data.result.list[0].postVOList;
               this.empList =
-                res.data.result.list[0].postCategoryVOList[0].beauticianList;
+                res.data.result.list[0].postVOList[0].beauticianList;
               this.currentServiceId =
-                res.data.result.list[0].postCategoryVOList[0].postCategoryId;
+                res.data.result.list[0].postVOList[0].postId;
               this.currentServiceTitle =
-                res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+                res.data.result.list[0].postVOList[0].postName;
             } else {
               this.empSet = [];
               this.$message({

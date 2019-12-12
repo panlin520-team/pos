@@ -2178,8 +2178,11 @@ export default {
 
     // 获取订单详细(根据订单状态)
     getOrder(item) {
+<<<<<<< HEAD
+=======
       this.payTypes = null;
       this.cashValue = 0;
+>>>>>>> 3645cf0e15aa2909fc37af0641ab96de9241dc5e
       // 已支付
       if (item.orderStatus == 2) {
         var url = this.$https.orderHost + "/order/selectOrderByNum";

@@ -8,7 +8,6 @@
     background-color="#23A547"
     active-text-color="#ffffff"
     router
-    @select="handleMenu"
   >
     <el-menu-item index="/">收银</el-menu-item>
     <el-menu-item index="/appointment">预约</el-menu-item>
@@ -61,16 +60,11 @@ export default {
         }
       }
       this.$store.state.leftNavState = nav_name;
-      if (nav_name == "") {
+      if (nav_name == "/") {
         this.curIndex = "/";
       } else {
         this.curIndex = "/" + this.$store.state.leftNavState;
       }
-    },
-    // 主菜单点击
-    handleMenu(index) {
-      this.$store.state.leftNavState = index;
-      this.curIndex = "/" + this.$store.state.leftNavState;
     }
   }
 };

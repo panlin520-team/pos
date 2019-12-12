@@ -914,9 +914,6 @@ export default {
     filterOrderStatus(key) {
       let orderStatus = "";
       switch (key) {
-        case 0:
-          orderStatus = "未知";
-          break;
         case 1:
           orderStatus = "待支付";
           break;
@@ -924,9 +921,12 @@ export default {
           orderStatus = "已支付";
           break;
         case 3:
-          orderStatus = "服务中";
+          orderStatus = "已发货或服务中";
           break;
         case 4:
+          orderStatus = "已退款";
+          break;
+        case 5:
           orderStatus = "已取消";
           break;
       }

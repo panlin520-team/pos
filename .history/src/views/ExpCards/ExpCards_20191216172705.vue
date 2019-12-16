@@ -3,7 +3,12 @@
   <div class="expcardPage">
     <div class="ordersearch">
       <label>体验卡名称：</label>
-      <el-input v-model="input_experience" placeholder="请输入要查询的商品" @keyup.enter="enterSearchMember"></el-input>
+      <el-input
+        v-model="input_experience"
+        placeholder="请输入要查询的商品"
+        @input="debounce"
+        @keyup.enter="enterSearchMember"
+      ></el-input>
       <span @click="searchexp" v-on:keyup.13.native="submit">
         <!-- <el-button size="medium" type="warning"> -->
         <i class="el-icon-search"></i>
@@ -93,6 +98,7 @@
         <el-button type="success" @click="purchase">确认购买</el-button>
       </div>
     </PopOver>
+    <div style="width:100%;height:220px;background:#f0f2f5"></div>
     <MemberFrame></MemberFrame>
   </div>
 </template>
@@ -184,8 +190,20 @@ export default {
       this.visible_examine = false;
     },
     //搜索体验卡
-    searchexp() {
-      this.searchCars();
+    // searchexp() {
+    //   // this.searchCars();
+    // },
+    searchexp: function() {
+      let that = this;
+      let lastTime;
+      let now = +new Date();
+      if (lastTime && lastTime - now < 2000) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(function() {
+        console.log("点击");
+        lastTime = +new Date();
+      }, 200);
     },
     //取消
     tallyClick() {
@@ -416,7 +434,7 @@ export default {
   flex-flow: column;
   .ordersearch {
     width: 700px;
-    height: 44px;
+    height: 42px;
     display: flex;
     position: relative;
     margin: 15px auto;
@@ -429,12 +447,12 @@ export default {
       font-weight: bold;
     }
     .el-input {
-      border: 2px solid #feb019;
+      border: 1px solid #feb019;
       border-radius: 4px;
     }
     span {
       width: 65px;
-      height: 36px;
+      height: 34px;
       padding-top: 7px;
       text-align: center;
       position: absolute;
@@ -448,7 +466,6 @@ export default {
     }
   }
   .expxardeCars {
-    box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
     width: 1182px;
     margin: 0 auto;
     padding-bottom: 55px;

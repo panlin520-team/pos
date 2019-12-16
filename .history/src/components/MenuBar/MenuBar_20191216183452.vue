@@ -76,7 +76,7 @@ export default {
 
   &.el-menu--horizontal {
     border-bottom: none;
-    min-width: 861px;
+    min-width: 862px;
   }
 
   .el-menu-item.is-active {

@@ -766,7 +766,7 @@ export default {
   }
   .elright {
     border-radius: 4px;
-    width: 42%;
+    w
     padding: 15px 0 0 15px;
   }
   .row-bg {
@@ -858,9 +858,8 @@ export default {
   }
   // 右边部分
   .list-content-right {
-    min-width: 580px;
-    margin-left: 30px;
-    margin-right: 20px;
+    width: 610px;
+    margin-left: 100px;
     border: 1px solid #eee;
     .list-content {
       height: 470px;
@@ -922,9 +921,9 @@ export default {
     }
     // 底部盒子
     .bottom-box {
-      width: 90%;
-      margin: 0 auto;
+      width: 609px;
       border-top: 1px solid #eee;
+      border-left: 1px solid #eee;
       padding: 20px 30px 14px 50px;
       .remark {
         display: inline-block;
@@ -940,7 +939,7 @@ export default {
         border-color: #23a547 !important;
       }
       .display-box {
-        margin-top: 25px;
+        margin-top: 45px;
         float: right;
         margin-right: 30px;
       }

@@ -434,7 +434,7 @@ export default {
     }
     span {
       width: 65px;
-      height: 36px;
+      height: 34px;
       padding-top: 7px;
       text-align: center;
       position: absolute;

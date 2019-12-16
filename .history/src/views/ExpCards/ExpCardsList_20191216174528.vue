@@ -271,12 +271,12 @@ export default {
       font-weight: bold;
     }
     .el-input {
-      border: 2px solid #feb019;
+      border: 1px solid #feb019;
       border-radius: 4px;
     }
     span {
       width: 65px;
-      height: 36px;
+      height: 34px;
       padding-top: 7px;
       text-align: center;
       position: absolute;

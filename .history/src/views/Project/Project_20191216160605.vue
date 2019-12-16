@@ -940,7 +940,7 @@ export default {
         border-color: #23a547 !important;
       }
       .display-box {
-        margin-top: 25px;
+        margin-top: 45px;
         float: right;
         margin-right: 30px;
       }

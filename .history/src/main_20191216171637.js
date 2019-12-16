@@ -14,6 +14,7 @@ import echarts from "echarts"
 Vue.prototype.$echarts = echarts
 
 
+
 // 自定义组件--弹框
 import PopOver from '@/components/PopOver/index.js'
 Vue.use(PopOver)

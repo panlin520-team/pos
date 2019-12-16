@@ -13,6 +13,8 @@ Vue.use(ElementUI)
 import echarts from "echarts"
 Vue.prototype.$echarts = echarts
 
+let timer
+let lastTime
 
 // 自定义组件--弹框
 import PopOver from '@/components/PopOver/index.js'

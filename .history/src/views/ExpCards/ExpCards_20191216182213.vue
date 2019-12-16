@@ -93,6 +93,7 @@
         <el-button type="success" @click="purchase">确认购买</el-button>
       </div>
     </PopOver>
+    <!-- <div style="width:100%;height:220px;background:#f0f2f5"></div> -->
     <MemberFrame></MemberFrame>
   </div>
 </template>
@@ -416,7 +417,7 @@ export default {
   flex-flow: column;
   .ordersearch {
     width: 700px;
-    height: 44px;
+    height: 42px;
     display: flex;
     position: relative;
     margin: 15px auto;
@@ -429,12 +430,12 @@ export default {
       font-weight: bold;
     }
     .el-input {
-      border: 2px solid #feb019;
+      border: 1px solid #feb019;
       border-radius: 4px;
     }
     span {
       width: 65px;
-      height: 36px;
+      height: 34px;
       padding-top: 7px;
       text-align: center;
       position: absolute;

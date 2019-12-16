@@ -17,6 +17,10 @@ Vue.prototype.$echarts = echarts
 import PopOver from '@/components/PopOver/index.js'
 Vue.use(PopOver)
 
+// 防抖
+import debounce from '@/utils/debounce.js'
+Vue.use(debounce)
+
 import axios from 'axios';
 Vue.prototype.$axios = axios;
 

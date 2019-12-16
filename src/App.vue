@@ -73,7 +73,7 @@ export default {
 <style lang="scss" scoped>
 .topBand {
   .logo {
-    margin: 0 40px;
+    margin: 0 10px 0 30px;
 
     img {
       width: 200px;
@@ -85,6 +85,7 @@ export default {
   }
 }
 .CompanyName {
+  min-width: 170px;
   width: 170px;
   white-space: pre-wrap;
   height: 80px;

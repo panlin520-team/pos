@@ -35,7 +35,7 @@
         <div class="search">
           <input type="text" v-model="keyword" placeholder="订单号 / 客户名 / 时间 / 金额" />
         </div>
-        <div class="btn btn-money" @click="openBill">收银</div>
+        <div class="btn btn-money" @click="openBill" v-debounce>收银</div>
       </div>
     </div>
 
@@ -609,7 +609,7 @@
           总价：
           <span>¥ {{ productNum ? productNum*productPrice : 0*productPrice }}</span>
         </div>
-        <div class="btn btn-submit" @click="pushService">确认</div>
+        <div class="btn btn-submit" @click="pushService" v-debounce>确认</div>
       </div>
     </pop-over>
 
@@ -668,7 +668,7 @@
           总价：
           <span>¥ {{ productNum ? productNum*productPrice : 0*productPrice }}</span>
         </div>
-        <div class="btn btn-submit" @click="pushProduct">确认</div>
+        <div class="btn btn-submit" @click="pushProduct" v-debounce>确认</div>
       </div>
     </pop-over>
 
@@ -700,7 +700,7 @@
         </div>
       </div>
       <div class="bottom" slot="bottom">
-        <div class="btn btn-submit" @click="handleChangeService">确认</div>
+        <div class="btn btn-submit" @click="handleChangeService" v-debounce>确认</div>
       </div>
     </pop-over>
 
@@ -732,7 +732,7 @@
         </div>
       </div>
       <div class="bottom" slot="bottom">
-        <div class="btn btn-submit" @click="handleChangeProduct">确认</div>
+        <div class="btn btn-submit" @click="handleChangeProduct" v-debounce>确认</div>
       </div>
     </pop-over>
     <MemberFrame></MemberFrame>

@@ -49,22 +49,22 @@ export default {
       virtualHeight: window.innerHeight
     };
   },
-  created() {
-  },
-  mounted() {
-  },
+  created() {},
+  mounted() {},
   methods: {
     // 退出登录
     handleCommand(command) {
-      this.$confirm("确认退出登录吗？", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$router.push({ path: "/login" });
+      if (command == "logout") {
+        this.$confirm("确认退出登录吗？", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
         })
-        .catch(() => {});
+          .then(() => {
+            this.$router.push({ path: "/login" });
+          })
+          .catch(() => {});
+      }
     }
   }
 };

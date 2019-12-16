@@ -200,7 +200,7 @@
               <div class="total">总价：¥{{realPrice}}</div>
             </div>
             <div class="checkout">
-              <div class="btn-pointer" @click="submitAppointment">确认预约</div>
+              <div class="btn-pointer" @click="submitAppointment" v-debounce>确认预约</div>
             </div>
           </div>
         </div>
@@ -463,7 +463,7 @@
           总价：
           <span>¥ {{ productNum ? productNum*productPrice : 0*productPrice }}</span>
         </div>
-        <div class="btn btn-submit" @click="pushService">确认</div>
+        <div class="btn btn-submit" @click="pushService" v-debounce>确认</div>
       </div>
     </pop-over>
 
@@ -495,7 +495,7 @@
         </div>
       </div>
       <div class="bottom" slot="bottom">
-        <div class="btn btn-submit" @click="handleChangeService">确认</div>
+        <div class="btn btn-submit" @click="handleChangeService" v-debounce>确认</div>
       </div>
     </pop-over>
     <MemberFrame></MemberFrame>

@@ -1,8 +1,8 @@
 // 防抖
 export default {
-  install (Vue) {
+  install(Vue) {
     Vue.directive('debounce', {
-      inserted (el, binding) {
+      inserted(el, binding) {
         el.addEventListener('click', () => {
           if (!el.disabled) {
             el.disabled = true
@@ -15,5 +15,3 @@ export default {
     })
   }
 }
-
-

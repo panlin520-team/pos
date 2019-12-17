@@ -2,11 +2,11 @@
 <template>
   <div class="loginPage">
     <div class="loginForm">
-      <div class="title">系统收银平台</div>
-      <div class="label" @click="storeDrawer = true">
+      <div class="title">俪凝美聚</div>
+      <!-- <div class="label" @click="storeDrawer = true">
         <input type="text" v-model="storeName" placeholder="选择门店" disabled class="btn-pointer" />
         <i class="el-icon-arrow-right"></i>
-      </div>
+      </div>-->
       <div class="label">
         <input type="text" v-model="userName" placeholder="用户名" />
       </div>
@@ -18,7 +18,7 @@
       </div>
     </div>
     <!-- 门店列表 -->
-    <el-drawer
+    <!-- <el-drawer
       custom-class="storeDrawer"
       :show-close="false"
       :visible.sync="storeDrawer"
@@ -40,7 +40,7 @@
           @click="setStore(item)"
         >{{item.code}}-{{item.name}}</div>
       </div>
-    </el-drawer>
+    </el-drawer>-->
   </div>
 </template>
 
@@ -80,16 +80,16 @@ export default {
     login() {
       var url = this.$https.authHost + "/manager/authority/storeLogin";
       var params = {
-        storeCode: this.storeCode,
+        // storeCode: this.storeCode,
         userName: this.userName,
         password: this.password
       };
 
-      if (params.storeCode == "") {
-        this.$message.error("请选择店铺");
-        this.storeDrawer = true;
-        return false;
-      }
+      // if (params.storeCode == "") {
+      //   this.$message.error("请选择店铺");
+      //   this.storeDrawer = true;
+      //   return false;
+      // }
 
       if (params.username == "") {
         this.$message.error("请输入用户名");
@@ -107,18 +107,16 @@ export default {
             // 避免错误出现阻止跳转
             this.$router.replace({ path: "/" }).catch(err => {});
             // 本地存储
-            localStorage.setItem("storeName", this.storeName);
             localStorage.setItem("storeCode", res.data.result.storeCode);
-            localStorage.setItem("storeId", res.data.result.storeId);
+            localStorage.setItem("storeId", res.data.result.companyId);
             localStorage.setItem("userName", res.data.result.userName);
             localStorage.setItem("userId", res.data.result.id);
-            localStorage.setItem("trueName", res.data.result.trueName);
             localStorage.setItem("industryID", res.data.result.industry);
-            localStorage.setItem("isLogin", "true");
+            localStorage.setItem("trueName", res.data.result.trueName);
+            localStorage.setItem("storeName", res.data.result.companyName);
             this.$store.commit("setTrueName", res.data.result.trueName);
-            setTimeout(() => {
-              location.reload();
-            }, 100);
+            this.$store.commit("setStoreName", res.data.result.companyName);
+            localStorage.setItem("isLogin", "true");
           } else {
             this.$message.error(res.data.responseStatusType.error.errorMsg);
           }
@@ -133,47 +131,47 @@ export default {
     },
 
     // 选择门店
-    setStore(i) {
-      localStorage.setItem("storeName", i.name);
-      this.storeName = i.name;
-      this.storeCode = i.code;
-      this.storeDrawer = false;
-    },
+    // setStore(i) {
+    //   localStorage.setItem("storeName", i.name);
+    //   this.storeName = i.name;
+    //   this.storeCode = i.code;
+    //   this.storeDrawer = false;
+    // },
 
     // 查询门店数据获取
-    fetchStore(value) {
-      if (value) {
-        var params = {
-          code: value
-        };
-        var url =
-          this.$https.storeHost + "/manage/store/selectStoreByCodeOrName";
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result) {
-              this.storeData = res.data.result;
-            } else {
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-              this.storeData = null;
-            }
-          },
-          error => {
-            this.$message({
-              type: "error",
-              message: error
-            });
-          }
-        );
-      } else {
-        this.$message({
-          type: "warning",
-          message: "请输入门店编号"
-        });
-      }
-    },
+    // fetchStore(value) {
+    //   if (value) {
+    //     var params = {
+    //       code: value
+    //     };
+    //     var url =
+    //       this.$https.storeHost + "/manage/store/selectStoreByCodeOrName";
+    //     this.$https.fetchPost(url, params).then(
+    //       res => {
+    //         if (res.data.result) {
+    //           this.storeData = res.data.result;
+    //         } else {
+    //           this.$message({
+    //             message: res.data.responseStatusType.error.errorMsg,
+    //             type: "warning"
+    //           });
+    //           this.storeData = null;
+    //         }
+    //       },
+    //       error => {
+    //         this.$message({
+    //           type: "error",
+    //           message: error
+    //         });
+    //       }
+    //     );
+    //   } else {
+    //     this.$message({
+    //       type: "warning",
+    //       message: "请输入门店编号"
+    //     });
+    //   }
+    // },
 
     // 获取本地登录信息
     logined() {
@@ -199,12 +197,12 @@ export default {
 
   .loginForm {
     width: 360px;
-    height: 420px;
+    height: 360px;
     padding: 5px 30px;
     position: absolute;
-    top: 40%;
+    top: 50%;
     left: 50%;
-    transform: translateX(-40%) translateY(-50%);
+    transform: translateX(-50%) translateY(-50%);
     border-radius: 5px;
     background: rgba(35, 165, 71, 0.8);
 

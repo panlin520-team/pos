@@ -5,7 +5,7 @@
         <img src="http://47.108.29.183:8089/vue/logo.750ee0fb.png" />
       </div>
       <MenuBar></MenuBar>
-      <div class="CompanyName">{{storeName}}</div>
+      <div class="CompanyName">{{this.$store.state.storeName}}</div>
       <el-dropdown class="user" @command="handleCommand">
         <span class="el-dropdown-link">
           {{this.$store.state.trueName}}
@@ -42,15 +42,12 @@ export default {
   data() {
     return {
       //店铺名称
-      storeName: localStorage.getItem("storeName"),
-      // 用户名
-      trueName: localStorage.getItem("trueName"),
+      storeName: "",
       // 浏览器可视高度
       virtualHeight: window.innerHeight
     };
   },
   created() {},
-  mounted() {},
   methods: {
     // 退出登录
     handleCommand(command) {

@@ -82,13 +82,13 @@ export default {
   }
 }
 .CompanyName {
-  min-width: 170px;
   width: 170px;
   white-space: pre-wrap;
   height: 80px;
   padding-top: 20px;
   font-size: 14px;
-  color: rgb(238, 215, 8);
+  font-weight: 700;
+  color: #ffffff;
   text-align: center;
 }
 .user {
@@ -101,5 +101,9 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0 20px;
+
+  span {
+    font-weight: 700;
+  }
 }
 </style>

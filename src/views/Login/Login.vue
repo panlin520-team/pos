@@ -8,10 +8,10 @@
         <i class="el-icon-arrow-right"></i>
       </div>-->
       <div class="label">
-        <input type="text" v-model="userName" placeholder="用户名" />
+        <input type="text" v-model="userName" placeholder="用户名" @keyup.enter="login" />
       </div>
       <div class="label">
-        <input type="password" v-model="password" placeholder="密码" />
+        <input type="password" v-model="password" placeholder="密码" @keyup.enter="login" />
       </div>
       <div class="label">
         <div class="btn-pointer btn-login" @click="login">登录</div>
@@ -85,18 +85,18 @@ export default {
         password: this.password
       };
 
-      // if (params.storeCode == "") {
+      // if (this.storeCode == "") {
       //   this.$message.error("请选择店铺");
       //   this.storeDrawer = true;
       //   return false;
       // }
 
-      if (params.username == "") {
+      if (this.username == "") {
         this.$message.error("请输入用户名");
         return false;
       }
 
-      if (params.password == "") {
+      if (this.password == "") {
         this.$message.error("请输入密码");
         return false;
       }

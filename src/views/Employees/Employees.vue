@@ -26,15 +26,11 @@
         <div class="headerItem">职务</div>
         <div class="headerItem">级别</div>
         <div class="headerItem">目前状态</div>
+        <div class="headerItem">操作</div>
       </div>
       <div class="list scrollY">
         <!--  :style="{'height': (virtualHeight-125)+'px'}" -->
-        <div
-          class="listItem"
-          v-for="(item,index) in emlpoyeesDataFilter"
-          :key="index"
-          @click="fetchEmployeesDet(item.beauticianId)"
-        >
+        <div class="listItem" v-for="(item,index) in emlpoyeesDataFilter" :key="index">
           <div style="flex:1">{{index+1}}</div>
           <div style="flex:1">{{item.name}}</div>
           <div style="flex:1">{{item.mobile}}</div>
@@ -57,6 +53,10 @@
               disabled
             ></el-switch>
           </div>-->
+          <div style="flex:1">
+            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.beauticianId)">查看</el-button>
+            <el-button type="warning" size="mini" @click="delEmployees(item.beauticianId)">删除</el-button>
+          </div>
         </div>
         <!-- 分页 -->
         <!-- <div class="pagination">
@@ -68,11 +68,216 @@
             :total="dataTotal"
             background
           ></el-pagination>
-        </div> -->
+        </div>-->
       </div>
     </div>
 
-    <transition name="el-zoom-in-bottom">
+    <pop-over
+      :visible.sync="employeesOpen"
+      @close="employeesOpen = false"
+      width="500px"
+      marginTop="5vh"
+      custom-class="employeesPop"
+      id="pop"
+    >
+      <div class="top" slot="top">
+        <div class="title">员工资料</div>
+      </div>
+      <div class="main" slot="main">
+        <div class="items scrollY" style="height:400px;">
+          <!-- 头像上传 -->
+          <div class="item">
+            <label class="label-left" style="line-height: 60px;">头像</label>
+            <div class="value">
+              <el-upload
+                class="avatar-uploader"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+              >
+                <img
+                  v-if="employeesDetails.imageUrl"
+                  :src="employeesDetails.imageUrl"
+                  class="avatar"
+                />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+                <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+                <i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
+              </el-upload>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">姓名</label>
+            <div class="value">
+              <input
+                type="text"
+                placeholder="请输入姓名"
+                v-model="employeesDetails.name"
+                class="input-value"
+              />
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">手机</label>
+            <div class="value">
+              <input
+                type="text"
+                placeholder="请输入手机号码"
+                v-model="employeesDetails.mobile"
+                class="input-value"
+              />
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">openid</label>
+            <div class="value">
+              <input
+                type="text"
+                placeholder="请输入openid"
+                v-model="employeesDetails.openid"
+                class="input-value"
+              />
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">性别</label>
+            <div class="value">
+              <el-select v-model="employeesDetails.gender" placeholder="请选择性别">
+                <el-option
+                  v-for="item in genders"
+                  :key="item.value"
+                  :label="item.name"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <!-- <div class="item">
+                <label class="label-left">所属分组</label>
+                <div class="value">
+                  <el-select v-model="employeesDetails.groupId" placeholder="请选择分组">
+                    <el-option
+                      v-for="item in groups"
+                      :key="item.groupId"
+                      :label="item.name"
+                      :value="item.groupId"
+                    ></el-option>
+                  </el-select>
+                </div>
+          </div>-->
+          <div class="item">
+            <label class="label-left">职务</label>
+            <div class="value">
+              <el-select v-model="employeesDetails.postId" placeholder="请选择职务">
+                <el-option
+                  v-for="item in postNames"
+                  :key="item.postId"
+                  :label="item.name"
+                  :value="item.postId"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">级别</label>
+            <div class="value">
+              <el-select v-model="employeesDetails.postLevel" placeholder="请选择级别">
+                <el-option
+                  v-for="item in levels"
+                  :key="item.postLevelId"
+                  :label="item.postLevelName"
+                  :value="item.postLevelId"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">入职时间</label>
+            <div class="value">
+              <el-date-picker
+                v-model="employeesDetails.entryTime"
+                :editable="false"
+                :clearable="false"
+                align="center"
+                type="date"
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd"
+                placeholder="选择入职时间"
+                v-if="selectStatus == 1"
+                class="setEmpDatePicker"
+              ></el-date-picker>
+              <el-date-picker
+                v-model="employeesDetails.entryTime"
+                :editable="false"
+                :clearable="false"
+                align="center"
+                type="date"
+                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd"
+                placeholder="选择入职时间"
+                v-if="selectStatus == 0"
+                class="setEmpDatePicker"
+                disabled
+              ></el-date-picker>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">目前状态</label>
+            <div class="value">
+              <el-select v-model="employeesDetails.workingState" placeholder="请选择员工目前状态">
+                <el-option
+                  v-for="item in workingStates"
+                  :key="item.state"
+                  :label="item.name"
+                  :value="item.state"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">排序</label>
+            <div class="value">
+              <InputNumber
+                :point="0"
+                placeholder="排序"
+                v-model.number="employeesDetails.sort"
+                class="input-value"
+              ></InputNumber>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">简介</label>
+            <div class="value">
+              <el-button type="primary" size="small" @click="editorPop = true">点击编辑</el-button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="bottom" slot="bottom">
+        <div class="btn-save btn-pointer" @click="saveEmployees" v-if="selectStatus == 0">保存</div>
+        <div class="btn-save btn-pointer" @click="newEmployees" v-if="selectStatus != 0">确认添加</div>
+        <div class="btn-del btn-pointer" v-if="selectStatus == 0" @click="delEmployees">删除</div>
+      </div>
+    </pop-over>
+
+    <pop-over
+      :visible.sync="editorPop"
+      @close="editorPop = false"
+      width="800px"
+      marginTop="5vh"
+      mainPadding="10px 15px"
+      custom-class="editorPop"
+    >
+      <div class="top" slot="top">
+        <div class="title">员工简介</div>
+      </div>
+      <div class="main" slot="main">
+        <Editor></Editor>
+      </div>
+    </pop-over>
+
+    <!-- <transition name="el-zoom-in-bottom">
       <div class="popPage" v-if="employeesOpen == true">
         <div class="pageTop">
           <div class="btns btnsLeft">
@@ -84,16 +289,16 @@
           <div class="title">员工资料</div>
           <div class="btns btnsRight">
             <div class="btn-save btn-pointer" @click="saveEmployees" v-if="selectStatus == 0">保存</div>
-            <div class="btn-save btn-pointer" @click="newEmployees" v-if="selectStatus != 0">确认添加</div>
+            <div class="btn-save btn-pointer" @click="newEmployees" v-if="selectStatus != 0">添加</div>
             <div class="btn-del btn-pointer" v-if="selectStatus == 0" @click="delEmployees">删除</div>
           </div>
         </div>
         <div class="pageMain">
           <br />
           <div class="items scrollY" :style="{'height': (virtualHeight-125)+'px'}">
-            <div class="pd10">
-              <!-- 头像上传 -->
-              <!-- <div class="item">
+    <div class="pd10">-->
+    <!-- 头像上传 -->
+    <!-- <div class="item">
                 <label class="label-left" style="line-height: 100px;">头像</label>
                 <div class="value">
                   <el-upload
@@ -111,8 +316,8 @@
                     <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                   </el-upload>
                 </div>
-              </div>-->
-              <div class="item">
+    </div>-->
+    <!-- <div class="item">
                 <label class="label-left">姓名</label>
                 <div class="value">
                   <input
@@ -146,8 +351,8 @@
                     ></el-option>
                   </el-select>
                 </div>
-              </div>
-              <!-- <div class="item">
+    </div>-->
+    <!-- <div class="item">
                 <label class="label-left">所属分组</label>
                 <div class="value">
                   <el-select v-model="employeesDetails.groupId" placeholder="请选择分组">
@@ -159,8 +364,8 @@
                     ></el-option>
                   </el-select>
                 </div>
-              </div>-->
-              <div class="item">
+    </div>-->
+    <!-- <div class="item">
                 <label class="label-left">职务</label>
                 <div class="value">
                   <el-select v-model="employeesDetails.postId" placeholder="请选择职务">
@@ -186,8 +391,8 @@
                   </el-select>
                 </div>
               </div>
-              <div class="item">
-                <label class="label-left">入职时间</label>
+    <div class="item">-->
+    <!-- <label class="label-left">入职时间</label>
                 <div class="value">
                   <el-date-picker
                     v-model="employeesDetails.entryTime"
@@ -274,7 +479,7 @@
           </div>
         </div>
       </div>
-    </transition>
+    </transition>-->
 
     <!-- 分组详细修改和新增 -->
     <el-dialog
@@ -317,13 +522,15 @@
 <script>
 import InputNumber from "@/components/InputNumber/InputNumber";
 import MemberFrame from "@/components/MemberFrame/MemberFrame";
+import Editor from "@/components/Editor/Editor";
 
 export default {
   name: "Employees",
-  components: { InputNumber, MemberFrame },
+  components: { InputNumber, MemberFrame, Editor },
   data() {
     return {
       // 数据
+      imageUrl: "",
       // 关键字搜索
       keyword: "",
       // 门店员工
@@ -374,6 +581,8 @@ export default {
       groupOpen: false,
       // 成员详细信息
       employeesOpen: false,
+      // 编辑器
+      editorPop: false,
 
       // 页码控制
       // 当前页码
@@ -561,10 +770,10 @@ export default {
     },
 
     // 删除成员
-    delEmployees() {
+    delEmployees(id) {
       var url = this.$https.storeHost + "/manage/beautician/deleteBeautician";
       var params = {
-        beauticianIds: this.employeesDetails.beauticianId,
+        beauticianIds: id,
         modifyOperator: localStorage.getItem("trueName"),
         createOperator: localStorage.getItem("trueName")
       };
@@ -965,7 +1174,7 @@ export default {
     // 门店员工职务
     fetchPostNames() {
       var url = this.$https.storeHost + "/manage/beautician/selectPost";
-      var params = {};
+      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
@@ -990,25 +1199,28 @@ export default {
     emptyData() {
       this.selectStatus = 0;
       this.employeesDetails = {};
-    }
+    },
 
     // 图片上传
-    // handleAvatarSuccess(res, file) {
-    //   this.employeesDetails.imageUrl = URL.createObjectURL(file.raw);
-    // },
-    // 设置上传参数
-    // beforeAvatarUpload(file) {
-    //   const isJPG = file.type === "image/jpeg";
-    //   const isLt2M = file.size / 1024 / 1024 < 2;
+    handleAvatarSuccess(res, file) {
+      // this.$set(this.employeesDetails, "imageUrl", URL.createObjectURL(file.raw));
+      this.employeesDetails.imageUrl = URL.createObjectURL(file.raw);
+      console.log("url", URL.createObjectURL(file.raw));
+    },
 
-    //   if (!isJPG) {
-    //     this.$message.error("上传头像图片只能是 JPG 格式!");
-    //   }
-    //   if (!isLt2M) {
-    //     this.$message.error("上传头像图片大小不能超过 2MB!");
-    //   }
-    //   return isJPG && isLt2M;
-    // }
+    // 设置上传参数
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === "image/jpeg";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    }
   }
 };
 </script>
@@ -1082,7 +1294,6 @@ export default {
   position: relative;
   display: flex;
   margin: 0 20px;
-  padding-right: 30px;
 
   .headerItem {
     flex: 1;
@@ -1102,24 +1313,10 @@ export default {
     line-height: 50px;
     font-size: 14px;
     text-align: center;
-    padding-right: 30px;
     cursor: pointer;
 
     &:nth-child(odd) {
       background-color: #f8f8f8;
-    }
-
-    &:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      background: url("../../assets/images/icon-right.png") right center / 28px
-        no-repeat;
-      width: 28px;
-      height: 28px;
-      margin: auto;
     }
 
     .control {
@@ -1132,12 +1329,7 @@ export default {
   position: relative;
   margin: 0 auto;
   padding: 0 15px;
-  background-color: #ffffff;
-
-  .pd10 {
-    padding: 0 15px;
-    background-color: #f8f8f8;
-  }
+  background-color: #f8f8f8;
 
   .input-value {
     background: #ffffff;
@@ -1148,7 +1340,7 @@ export default {
   .item {
     position: relative;
     line-height: 40px;
-    padding: 15px;
+    padding: 7px 12px;
     border-bottom: 1px solid #dcdcdc;
     display: flex;
 
@@ -1188,8 +1380,8 @@ export default {
 
 // 图片上传框
 .avatar-uploader {
-  width: 100px;
-  height: 100px;
+  width: 60px;
+  height: 60px;
   display: inline-block;
   background-color: transparent;
 }
@@ -1205,16 +1397,16 @@ export default {
 .avatar-uploader-icon {
   font-size: 28px;
   color: #8c939d;
-  width: 100px;
-  height: 100px;
-  line-height: 100px;
+  width: 60px;
+  height: 60px;
+  line-height: 60px;
   text-align: center;
   background-color: #eeeeee;
 }
 
 .avatar {
-  width: 100px;
-  height: 100px;
+  width: 60px;
+  height: 60px;
   display: block;
 }
 
@@ -1243,6 +1435,54 @@ export default {
         width: 220px;
         height: 40px;
       }
+    }
+  }
+}
+
+.editorPop {
+  .top {
+    padding: 5px 15px;
+  }
+  .title {
+    font-size: 17px;
+    font-weight: 700;
+  }
+}
+
+.employeesPop {
+  .top {
+    padding: 5px 15px;
+  }
+  .title {
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .bottom {
+    text-align: right;
+
+    .btn-save {
+      padding: 7px 15px;
+      font-size: 14px;
+      margin-right: 15px;
+      border-radius: 6px;
+      color: #ffffff;
+      background-color: #23a547;
+      text-align: center;
+      display: inline-block;
+    }
+    .iconfont {
+      font-size: 25px;
+    }
+    .btn-del {
+      padding: 7px 15px;
+      font-size: 14px;
+      margin-right: 15px;
+      border-radius: 6px;
+      color: #ffffff;
+      background: #e6a23c;
+      text-align: center;
+      display: inline-block;
     }
   }
 }

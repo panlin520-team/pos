@@ -121,8 +121,6 @@ export default {
     defaultLeftNav() {
       let cur_path = this.$route.path;
       let routers = this.$router.options.routes;
-      console.log(cur_path);
-      
       for (let i = 0; i < routers.length; i++) {
         let children = routers[i].children;
         if (children) {

@@ -18,7 +18,8 @@
         <input type="text" v-model="keyword" placeholder="请输入关键字检索" />
       </div>
       <div class="headers">
-        <div class="headerItem">序号</div>
+        <div class="headerItem" style="flex:0.5">序号</div>
+        <div class="headerItem">头像</div>
         <div class="headerItem">姓名</div>
         <div class="headerItem">手机</div>
         <div class="headerItem">性别</div>
@@ -31,7 +32,10 @@
       <div class="list scrollY">
         <!--  :style="{'height': (virtualHeight-125)+'px'}" -->
         <div class="listItem" v-for="(item,index) in emlpoyeesDataFilter" :key="index">
-          <div style="flex:1">{{index+1}}</div>
+          <div style="flex:0.5">{{index+1}}</div>
+          <div style="flex:1">
+            <img :src="item.headUrl" alt />
+          </div>
           <div style="flex:1">{{item.name}}</div>
           <div style="flex:1">{{item.mobile}}</div>
           <div
@@ -91,16 +95,12 @@
             <div class="value">
               <el-upload
                 class="avatar-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
                 :show-file-list="false"
+                :action="uploadUrl"
                 :on-success="handleAvatarSuccess"
                 :before-upload="beforeAvatarUpload"
               >
-                <img
-                  v-if="employeesDetails.imageUrl"
-                  :src="employeesDetails.imageUrl"
-                  class="avatar"
-                />
+                <img v-if="employeesDetails.headUrl" :src="employeesDetails.headUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                 <!-- <img v-if="imageUrl" :src="imageUrl" class="avatar" />
                 <i v-else class="el-icon-plus avatar-uploader-icon"></i>-->
@@ -134,7 +134,7 @@
             <div class="value">
               <input
                 type="text"
-                placeholder="请输入openid"
+                placeholder="微信openid"
                 v-model="employeesDetails.openid"
                 class="input-value"
               />
@@ -204,21 +204,7 @@
                 format="yyyy-MM-dd"
                 value-format="yyyy-MM-dd"
                 placeholder="选择入职时间"
-                v-if="selectStatus == 1"
                 class="setEmpDatePicker"
-              ></el-date-picker>
-              <el-date-picker
-                v-model="employeesDetails.entryTime"
-                :editable="false"
-                :clearable="false"
-                align="center"
-                type="date"
-                format="yyyy-MM-dd"
-                value-format="yyyy-MM-dd"
-                placeholder="选择入职时间"
-                v-if="selectStatus == 0"
-                class="setEmpDatePicker"
-                disabled
               ></el-date-picker>
             </div>
           </div>
@@ -249,7 +235,11 @@
           <div class="item">
             <label class="label-left">简介</label>
             <div class="value">
-              <el-button type="primary" size="small" @click="editorPop = true">点击编辑</el-button>
+              <el-button
+                type="primary"
+                size="small"
+                @click="catchData(employeesDetails.introduction);"
+              >点击编辑</el-button>
             </div>
           </div>
         </div>
@@ -267,13 +257,18 @@
       width="800px"
       marginTop="5vh"
       mainPadding="10px 15px"
+      bottomPadding="0 15px"
       custom-class="editorPop"
     >
       <div class="top" slot="top">
         <div class="title">员工简介</div>
       </div>
       <div class="main" slot="main">
-        <Editor></Editor>
+        <Editor :catchData="catchData" :content="content" @change="changeEditor"></Editor>
+      </div>
+      <div class="bottom" slot="bottom">
+        <el-button type="primary" size="small" @click="saveEditor">确认</el-button>
+        <el-button type="info" size="small" @click="cancelEditor">取消</el-button>
       </div>
     </pop-over>
 
@@ -529,6 +524,7 @@ export default {
   components: { InputNumber, MemberFrame, Editor },
   data() {
     return {
+      uploadUrl: this.$https.productHost + "/manage/product/uploadFuwenbenPic",
       // 数据
       imageUrl: "",
       // 关键字搜索
@@ -583,6 +579,7 @@ export default {
       employeesOpen: false,
       // 编辑器
       editorPop: false,
+      content: null,
 
       // 页码控制
       // 当前页码
@@ -630,6 +627,479 @@ export default {
   },
   watch: {},
   methods: {
+    // 保存富文本编辑
+    saveEditor(val) {
+      this.employeesDetails.introduction = this.content;
+      this.editorPop = false;
+    },
+
+    // 取消富文本编辑
+    cancelEditor() {
+      this.editorPop = false;
+    },
+
+    // 富文本编辑监听
+    changeEditor(val) {
+      this.content = val;
+    },
+
+    // 富文本编辑器内容获取
+    catchData(val) {
+      this.editorPop = true;
+      this.content = val;
+    },
+
+    // 删除成员
+    delEmployees(id) {
+      var url = this.$https.storeHost + "/manage/beautician/deleteBeautician";
+      var params = {
+        beauticianIds: id,
+        modifyOperator: localStorage.getItem("trueName"),
+        createOperator: localStorage.getItem("trueName")
+      };
+
+      this.$confirm("确认删除该员工吗?", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$https.fetchPost(url, params).then(
+            res => {
+              if (res.data.responseStatusType.message == "Success") {
+                this.$message({
+                  message: "删除成功",
+                  type: "success"
+                });
+                this.employeesOpen = false;
+                this.fetchEmployees();
+              } else {
+                this.$message({
+                  message: res.data.responseStatusType.error.errorMsg,
+                  type: "warning"
+                });
+              }
+            },
+            error => {
+              this.$message({
+                type: "error",
+                message: error
+              });
+            }
+          );
+        })
+        .catch(() => {});
+    },
+
+    // 保存成员信息修改
+    saveEmployees() {
+      var params = {
+        beauticianId: this.employeesDetails.beauticianId,
+        headUrl: this.employeesDetails.headUrl,
+        openId: this.employeesDetails.openId,
+        name: this.employeesDetails.name,
+        mobile: this.employeesDetails.mobile,
+        gender: this.employeesDetails.gender,
+        storeId: this.employeesDetails.storeId,
+        postId: this.employeesDetails.postId,
+        workingState: this.employeesDetails.workingState,
+        entryTime: this.employeesDetails.entryTime,
+        postLevel: this.employeesDetails.postLevel,
+        sort: this.employeesDetails.sort,
+        introduction: this.employeesDetails.introduction,
+        modifyOperator: localStorage.getItem("trueName"),
+        createOperator: localStorage.getItem("trueName")
+      };
+
+      if (params.name == "" || params.name == null) {
+        this.$message({
+          message: "请填写名称",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.mobile == "" || !/^1[34578]\d{9}$/.test(params.mobile)) {
+        this.$message({
+          message: "请输入正确手机号码",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.gender == undefined) {
+        this.$message({
+          message: "请选择性别",
+          type: "warning"
+        });
+        return false;
+      }
+
+      // if (params.openid == "") {
+      //   this.$message({
+      //     message: "请输入openid",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
+
+      // if (params.groupId == undefined) {
+      //   this.$message({
+      //     message: "请选择分组",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
+
+      if (params.postId == undefined) {
+        this.$message({
+          message: "请选择职务",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.postLevel == undefined) {
+        this.$message({
+          message: "请选择级别",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.workingState == undefined) {
+        this.$message({
+          message: "请选择目前状态",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.entryTime == undefined) {
+        this.$message({
+          message: "请选择入职时间",
+          type: "warning"
+        });
+        return false;
+      }
+
+      var url = this.$https.storeHost + "/manage/beautician/updateBeautician";
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: "门店成员资料保存成功",
+              type: "success"
+            });
+            this.employeesOpen = false;
+            this.emptyData();
+            this.fetchEmployees();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 新建成员
+    newEmployees() {
+      var params = {
+        beauticianId: this.employeesDetails.beauticianId,
+        headUrl: this.employeesDetails.headUrl,
+        openId: this.employeesDetails.openId,
+        name: this.employeesDetails.name,
+        mobile: this.employeesDetails.mobile,
+        gender: this.employeesDetails.gender,
+        storeId: localStorage.getItem("storeId"),
+        postId: this.employeesDetails.postId,
+        workingState: this.employeesDetails.workingState,
+        entryTime: this.employeesDetails.entryTime,
+        postLevel: this.employeesDetails.postLevel,
+        sort: this.employeesDetails.sort,
+        introduction: this.employeesDetails.introduction,
+        modifyOperator: localStorage.getItem("trueName"),
+        createOperator: localStorage.getItem("trueName")
+      };
+
+      console.log("params", params);
+
+      if (params.name == "" || params.name == null) {
+        this.$message({
+          message: "请填写名称",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.mobile == "" || !/^1[34578]\d{9}$/.test(params.mobile)) {
+        this.$message({
+          message: "请输入正确手机号码",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.gender == undefined) {
+        this.$message({
+          message: "请选择性别",
+          type: "warning"
+        });
+        return false;
+      }
+
+      // if (params.openid == "") {
+      //   this.$message({
+      //     message: "请输入openid",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
+
+      // if (params.groupId == undefined) {
+      //   this.$message({
+      //     message: "请选择分组",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
+
+      if (params.postId == undefined) {
+        this.$message({
+          message: "请选择职务",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.postLevel == undefined) {
+        this.$message({
+          message: "请选择级别",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.workingState == undefined) {
+        this.$message({
+          message: "请选择目前状态",
+          type: "warning"
+        });
+        return false;
+      }
+
+      if (params.entryTime == undefined) {
+        this.$message({
+          message: "请选择入职时间",
+          type: "warning"
+        });
+        return false;
+      }
+
+      var url = this.$https.storeHost + "/manage/beautician/insertBeautician";
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: "门店成员资料添加成功",
+              type: "success"
+            });
+            this.employeesOpen = false;
+            this.emptyData();
+            this.fetchEmployees();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 员工详细信息
+    fetchEmployeesDet(i) {
+      this.employeesDetails = {};
+      this.selectStatus = 0;
+      var params = {
+        beauticianId: i
+      };
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianById";
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.employeesOpen = true;
+            this.employeesDetails = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 获取门店员工
+    fetchEmployees() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianList";
+      var params = {
+        storeId: localStorage.getItem("storeId"),
+        pageNum: this.currentPage,
+        pageSize: this.pageSize
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.dataTotal = res.data.result.total;
+            this.emlpoyeesData = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+            this.dataTotal = 0;
+            this.emlpoyeesData = [];
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 员工级别
+    fetchLevel() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectPostLevelNoPage";
+      var params = {};
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.levels = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店员工职务
+    fetchPostNames() {
+      var url = this.$https.storeHost + "/manage/beautician/selectPost";
+      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.postNames = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 图片上传
+    handleAvatarSuccess(res, file) {
+      this.$message({
+        type: "success",
+        message: "头像上传成功"
+      });
+      this.$set(this.employeesDetails, "headUrl", res.data.src);
+      this.employeesDetails.imageUrl = res.data.src;
+    },
+
+    // 设置上传参数
+    beforeAvatarUpload(file) {
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+
+      return isLt2M;
+    },
+
+    // 清空必要信息
+    emptyData() {
+      this.selectStatus = 0;
+      this.employeesDetails = {};
+      this.content = null;
+    },
+
+    // 改变页码
+    handleCurrentChange(val) {
+      this.currentPage = val;
+      this.fetchEmployees();
+    },
+
+    // 获取门店分组
+    fetchGroup() {
+      var url = this.$https.storeHost + "/manage/beautician/selectGroup";
+      var params = { storeId: localStorage.getItem("storeId") };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result.list) {
+            this.groups = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     // 打开分组详细对话框
     fetchGroupDet(item) {
       this.groupDialog = true;
@@ -644,6 +1114,31 @@ export default {
         this.groupObject = "";
         this.groupId = "";
       }
+    },
+
+    // 获取分组组长可选列表
+    fetchGroupLeader() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+      var params = { storeId: localStorage.getItem("storeId") };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.groupLeader = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
 
     // 删除分组
@@ -767,459 +1262,6 @@ export default {
           }
         );
       }
-    },
-
-    // 删除成员
-    delEmployees(id) {
-      var url = this.$https.storeHost + "/manage/beautician/deleteBeautician";
-      var params = {
-        beauticianIds: id,
-        modifyOperator: localStorage.getItem("trueName"),
-        createOperator: localStorage.getItem("trueName")
-      };
-
-      this.$confirm("确认删除该员工吗?", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() => {
-          this.$https.fetchPost(url, params).then(
-            res => {
-              if (res.data.responseStatusType.message == "Success") {
-                this.$message({
-                  message: "删除成功",
-                  type: "success"
-                });
-                this.employeesOpen = false;
-                this.fetchEmployees();
-              } else {
-                this.$message({
-                  message: res.data.responseStatusType.error.errorMsg,
-                  type: "warning"
-                });
-              }
-            },
-            error => {
-              this.$message({
-                type: "error",
-                message: error
-              });
-            }
-          );
-        })
-        .catch(() => {});
-    },
-
-    // 保存成员信息修改
-    saveEmployees() {
-      var params = {
-        beauticianId: this.employeesDetails.beauticianId,
-        name: this.employeesDetails.name,
-        mobile: this.employeesDetails.mobile,
-        gender: this.employeesDetails.gender,
-        storeId: this.employeesDetails.storeId,
-        // groupId: this.employeesDetails.groupId,
-        postId: this.employeesDetails.postId,
-        workingState: this.employeesDetails.workingState,
-        entryTime: this.employeesDetails.entryTime,
-        postLevel: this.employeesDetails.postLevel,
-        sort: this.employeesDetails.sort,
-        modifyOperator: localStorage.getItem("trueName"),
-        createOperator: localStorage.getItem("trueName")
-      };
-
-      if (params.name == "" || params.name == null) {
-        this.$message({
-          message: "请填写名称",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.mobile == "" || !/^1[34578]\d{9}$/.test(params.mobile)) {
-        this.$message({
-          message: "请输入正确手机号码",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.gender == undefined) {
-        this.$message({
-          message: "请选择性别",
-          type: "warning"
-        });
-        return false;
-      }
-
-      // if (params.groupId == undefined) {
-      //   this.$message({
-      //     message: "请选择分组",
-      //     type: "warning"
-      //   });
-      //   return false;
-      // }
-
-      if (params.postId == undefined) {
-        this.$message({
-          message: "请选择职务",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.postLevel == undefined) {
-        this.$message({
-          message: "请选择级别",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.workingState == undefined) {
-        this.$message({
-          message: "请选择目前状态",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.entryTime == undefined) {
-        this.$message({
-          message: "请选择入职时间",
-          type: "warning"
-        });
-        return false;
-      }
-
-      var url = this.$https.storeHost + "/manage/beautician/updateBeautician";
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.responseStatusType.message == "Success") {
-            this.$message({
-              message: "门店成员资料保存成功",
-              type: "success"
-            });
-            this.employeesOpen = false;
-            this.emptyData();
-            this.fetchEmployees();
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 新建成员
-    newEmployees() {
-      var params = {
-        name: this.employeesDetails.name,
-        mobile: this.employeesDetails.mobile,
-        gender: this.employeesDetails.gender,
-        storeId: this.employeesDetails.storeId,
-        // groupId: this.employeesDetails.groupId,
-        postId: this.employeesDetails.postId,
-        workingState: this.employeesDetails.workingState,
-        entryTime: this.employeesDetails.entryTime,
-        postLevel: this.employeesDetails.postLevel,
-        sort: this.employeesDetails.sort,
-        modifyOperator: localStorage.getItem("trueName"),
-        createOperator: localStorage.getItem("trueName"),
-        storeId: localStorage.getItem("storeId")
-      };
-
-      if (params.name == "" || params.name == null) {
-        this.$message({
-          message: "请填写名称",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.mobile == "" || !/^1[34578]\d{9}$/.test(params.mobile)) {
-        this.$message({
-          message: "请输入正确手机号码",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.gender == undefined) {
-        this.$message({
-          message: "请选择性别",
-          type: "warning"
-        });
-        return false;
-      }
-
-      // if (params.groupId == undefined) {
-      //   this.$message({
-      //     message: "请选择分组",
-      //     type: "warning"
-      //   });
-      //   return false;
-      // }
-
-      if (params.postId == undefined) {
-        this.$message({
-          message: "请选择职务",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.postLevel == undefined) {
-        this.$message({
-          message: "请选择级别",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.workingState == undefined) {
-        this.$message({
-          message: "请选择目前状态",
-          type: "warning"
-        });
-        return false;
-      }
-
-      if (params.entryTime == undefined) {
-        this.$message({
-          message: "请选择入职时间",
-          type: "warning"
-        });
-        return false;
-      }
-
-      var url = this.$https.storeHost + "/manage/beautician/insertBeautician";
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.responseStatusType.message == "Success") {
-            this.$message({
-              message: "门店成员资料添加成功",
-              type: "success"
-            });
-            this.employeesOpen = false;
-            this.emptyData();
-            this.fetchEmployees();
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 员工详细信息
-    fetchEmployeesDet(i) {
-      this.employeesDetails = {};
-      this.selectStatus = 0;
-      var params = {
-        beauticianId: i
-      };
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectBeauticianById";
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.employeesOpen = true;
-            this.employeesDetails = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 获取分组组长可选列表
-    fetchGroupLeader() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
-      var params = { storeId: localStorage.getItem("storeId") };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.groupLeader = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 获取门店员工
-    fetchEmployees() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectBeauticianList";
-      var params = {
-        storeId: localStorage.getItem("storeId"),
-        pageNum: this.currentPage,
-        pageSize: this.pageSize
-      };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.dataTotal = res.data.result.total;
-            this.emlpoyeesData = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-            this.dataTotal = 0;
-            this.emlpoyeesData = [];
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 改变页码
-    handleCurrentChange(val) {
-      this.currentPage = val;
-      this.fetchEmployees();
-    },
-
-    // 获取门店分组
-    // fetchGroup() {
-    //   var url = this.$https.storeHost + "/manage/beautician/selectGroup";
-    //   var params = { storeId: localStorage.getItem("storeId") };
-    //   this.$https.fetchPost(url, params).then(
-    //     res => {
-    //       if (res.data.result.list) {
-    //         this.groups = res.data.result.list;
-    //       } else {
-    //         this.$message({
-    //           message: res.data.responseStatusType.error.errorMsg,
-    //           type: "warning"
-    //         });
-    //       }
-    //     },
-    //     error => {
-    //       this.$message({
-    //         type: "error",
-    //         message: error
-    //       });
-    //     }
-    //   );
-    // },
-
-    // 员工级别
-    fetchLevel() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectPostLevelNoPage";
-      var params = {};
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.levels = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 门店员工职务
-    fetchPostNames() {
-      var url = this.$https.storeHost + "/manage/beautician/selectPost";
-      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.postNames = res.data.result.list;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
-
-    // 清空必要信息
-    emptyData() {
-      this.selectStatus = 0;
-      this.employeesDetails = {};
-    },
-
-    // 图片上传
-    handleAvatarSuccess(res, file) {
-      // this.$set(this.employeesDetails, "imageUrl", URL.createObjectURL(file.raw));
-      this.employeesDetails.imageUrl = URL.createObjectURL(file.raw);
-      console.log("url", URL.createObjectURL(file.raw));
-    },
-
-    // 设置上传参数
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === "image/jpeg";
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error("上传头像图片只能是 JPG 格式!");
-      }
-      if (!isLt2M) {
-        this.$message.error("上传头像图片大小不能超过 2MB!");
-      }
-      return isJPG && isLt2M;
     }
   }
 };
@@ -1310,13 +1352,19 @@ export default {
   .listItem {
     position: relative;
     display: flex;
-    line-height: 50px;
+    line-height: 70px;
     font-size: 14px;
     text-align: center;
-    cursor: pointer;
 
     &:nth-child(odd) {
       background-color: #f8f8f8;
+    }
+
+    img {
+      display: inline-block;
+      vertical-align: middle;
+      width: 60px;
+      height: 60px;
     }
 
     .control {
@@ -1446,6 +1494,12 @@ export default {
   .title {
     font-size: 17px;
     font-weight: 700;
+  }
+
+  .bottom {
+    height: 50px;
+
+    text-align: right;
   }
 }
 

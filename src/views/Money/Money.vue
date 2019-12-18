@@ -1945,7 +1945,8 @@ export default {
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
       var params = {
         commodityTypeID: 1,
-        industryID: localStorage.getItem("industryID")
+        industryID: localStorage.getItem("industryID"),
+        commodityTypeIndustryID: localStorage.getItem("industryID")
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -2757,8 +2758,8 @@ export default {
     .boxItem {
       position: relative;
       float: left;
-      width: 230px;
-      height: 170px;
+      width: 160px;
+      height: 130px;
       background-color: #f8f8f8;
       border-radius: 6px;
       text-align: center;
@@ -2768,11 +2769,11 @@ export default {
       box-shadow: 0 2px 2px 1px #dddddd;
 
       .name {
-        height: 120px;
+        height: 80px;
         font-size: 15px;
         color: #28282d;
         line-height: 20px;
-        padding: 40px 5px 0 5px;
+        padding: 30px 5px 0 5px;
         overflow: hidden;
         border-top-left-radius: 6px;
         border-top-right-radius: 6px;

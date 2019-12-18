@@ -441,8 +441,8 @@ export default {
             this.tableData2 = res.data.result.list;
             this.pagetotal2 = res.data.result.list.length;
           } else {
-            this.tableData2 = [];
-            this.pagetotal2 = 0;
+            this.tableData = [];
+            this.pagetotal = 0;
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"

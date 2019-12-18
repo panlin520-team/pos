@@ -269,7 +269,7 @@ export default {
             this.pagesize2 = res.data.result.size;
           } else {
             this.storageList = [];
-            this.pagetotal2 = 0;
+            this.pagetotal2 = 0
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"

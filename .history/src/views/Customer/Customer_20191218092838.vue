@@ -149,7 +149,7 @@
             <span>{{mobile}}</span>
           </div>
         </div>
-        <div class="CustBottom" :style="{'height': (virtualHeight-320)+'px'}">
+        <div class="CustBottom" :style="{'height': (virtualHeight-240)+'px'}">
           <div class="menus hover" @click="num=0" :class="{active:num==1}">个人档案</div>
           <div class="menus" @click="num=1" :class="{active:num==2}">护理记录</div>
           <div class="menus" @click="num=2" :class="{active:num==3}">储蓄记录</div>
@@ -609,16 +609,16 @@
           <p>数据分析</p>
           <el-tabs v-model="activeAnalysis" @tab-click="handleAnalysis">
             <el-tab-pane label="最近10笔消费" name="first">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="最近10笔充值" name="second">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_recharge">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_recharge">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="项目消费次数Top10" name="third">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_consumption">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_consumption">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="项目消费金额Top10" name="fourth">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_money">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_money">哈哈</div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -1199,7 +1199,7 @@ export default {
         ],
         series: [
           {
-            name: "充值金额",
+            name: "直接访问",
             type: "bar",
             barWidth: "60%",
             data: this.rechargedatas
@@ -1321,7 +1321,6 @@ export default {
       } else {
         this.visible_recharge = false;
         this.rechargeList();
-        // this.$refs.moduleName.memberbalance();
         setTimeout(() => {
           this.savingAccount();
         }, 200);
@@ -2283,7 +2282,7 @@ export default {
     .CustLeft {
       width: 260px;
       height: 100%;
-      overflow: auto;
+
       .CustTop {
         background-color: #fff;
 

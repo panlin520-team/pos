@@ -1321,7 +1321,6 @@ export default {
       } else {
         this.visible_recharge = false;
         this.rechargeList();
-        // this.$refs.moduleName.memberbalance();
         setTimeout(() => {
           this.savingAccount();
         }, 200);

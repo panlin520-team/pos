@@ -732,16 +732,16 @@
         </div>
       </div>
     </div>
-    <!-- <MemberFrame ref="moduleName"></MemberFrame> -->
+    <MemberFrame ref="moduleName"></MemberFrame>
   </div>
 </template>
 
 <script>
-// import MemberFrame from "@/components/MemberFrame/MemberFrame";
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
 
 export default {
   name: "hello",
-  components: {},
+  components: { MemberFrame },
   data() {
     var checkAge = (rule, value, callback) => {
       if (value == "") {
@@ -1321,7 +1321,7 @@ export default {
       } else {
         this.visible_recharge = false;
         this.rechargeList();
-        // this.$refs.moduleName.memberbalance();
+         this.$refs.moduleName.methods();
         setTimeout(() => {
           this.savingAccount();
         }, 200);

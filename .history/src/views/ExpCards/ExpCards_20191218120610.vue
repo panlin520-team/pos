@@ -69,9 +69,9 @@
           <el-select v-model="value_payment" placeholder="请选择支付方式">
             <el-option
               v-for="item in option_payment"
-              :key="item.payTypeId"
-              :label="item.payTypeName"
-              :value="item.payTypeId"
+              :key="item.payType"
+              :label="item.label"
+              :value="item.payType"
             ></el-option>
           </el-select>
           <el-select v-model="value_employees" @change="clickpeople" placeholder="请选择出售员工">
@@ -179,7 +179,7 @@ export default {
       this.sellEmployee();
       this.visible_examine = true;
       this.projectCars();
-      this.sellpartylpy();
+      
     },
     closePopOver() {
       this.visible_examine = false;
@@ -361,7 +361,8 @@ export default {
     },
     //请求支付方式
     sellpartylpy() {
-      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var url =
+        this.$https.payHost + "/manage/payment/selectPayTypeList";
       var params = {
         // storeId: localStorage.getItem("storeId")
       };
@@ -369,9 +370,9 @@ export default {
         res => {
           console.log(res);
           if (res.data.result) {
-            this.option_payment = res.data.result;
+            // this.option_saleEmployees = res.data.result;
           } else {
-            this.option_payment = [];
+            // this.option_saleEmployees = [];
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"

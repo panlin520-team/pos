@@ -626,7 +626,12 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.responseStatusType.message == "Failure") {
+          if (this.useTimes < this.totalTimes) {
+            this.$message({
+              message: res.data.responseStatusType.message,
+              type: "success"
+            });
+          } else if (res.data.responseStatusType.message == "Failure") {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"

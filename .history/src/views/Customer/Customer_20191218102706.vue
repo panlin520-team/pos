@@ -609,16 +609,16 @@
           <p>数据分析</p>
           <el-tabs v-model="activeAnalysis" @tab-click="handleAnalysis">
             <el-tab-pane label="最近10笔消费" name="first">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="最近10笔充值" name="second">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_recharge">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_recharge">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="项目消费次数Top10" name="third">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_consumption">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_consumption">哈哈</div>
             </el-tab-pane>
             <el-tab-pane label="项目消费金额Top10" name="fourth">
-              <div style="width:800px;height:600px;margin: 0 auto;" id="main_money">哈哈</div>
+              <div style="width:800px;height:700px;margin-left:200px;" id="main_money">哈哈</div>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -1321,7 +1321,6 @@ export default {
       } else {
         this.visible_recharge = false;
         this.rechargeList();
-        // this.$refs.moduleName.memberbalance();
         setTimeout(() => {
           this.savingAccount();
         }, 200);
@@ -2283,7 +2282,7 @@ export default {
     .CustLeft {
       width: 260px;
       height: 100%;
-      overflow: auto;
+      overflow: a
       .CustTop {
         background-color: #fff;
 

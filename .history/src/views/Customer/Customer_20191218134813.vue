@@ -741,7 +741,7 @@
 
 export default {
   name: "hello",
-  components: {},
+  components: {  },
   data() {
     var checkAge = (rule, value, callback) => {
       if (value == "") {

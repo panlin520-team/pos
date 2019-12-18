@@ -633,8 +633,8 @@ export default {
             });
           }else{
             this.$message({
-              message: "划卡成功",
-              type: "success"
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
             });
           }
         })

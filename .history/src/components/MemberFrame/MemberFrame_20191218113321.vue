@@ -626,15 +626,12 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.responseStatusType.message == "Failure") {
+          console.log(res.data.responseStatusType.message);
+
+          if (res.data.responseStatusType.message == Failure) {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
-            });
-          }else{
-            this.$message({
-              message: "划卡成功",
-              type: "success"
             });
           }
         })

@@ -69,9 +69,9 @@
           <el-select v-model="value_payment" placeholder="请选择支付方式">
             <el-option
               v-for="item in option_payment"
-              :key="item.payTypeId"
+              :key="item.payType"
               :label="item.payTypeName"
-              :value="item.payTypeId"
+              :value="item.payType"
             ></el-option>
           </el-select>
           <el-select v-model="value_employees" @change="clickpeople" placeholder="请选择出售员工">

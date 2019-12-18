@@ -171,7 +171,7 @@
       <div class="reecherass">
         <div class="rachers" id="main_recharge"></div>
       </div>
-
+      
       <div class="piechart" id="main_piechert"></div>
     </div>
     <MemberFrame></MemberFrame>
@@ -415,8 +415,6 @@ export default {
             this.tableData = res.data.result.list;
             this.pagetotal = res.data.result.list.length;
           } else {
-            this.tableData = [];
-            this.pagetotal = 0;
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -441,8 +439,6 @@ export default {
             this.tableData2 = res.data.result.list;
             this.pagetotal2 = res.data.result.list.length;
           } else {
-            this.tableData2 = [];
-            this.pagetotal2 = 0;
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -828,7 +824,7 @@ export default {
     }
   }
 }
-//金额明细弹出框
+//出入库弹出框
 .storageblock {
   .stgblcktop {
     text-align: center;
@@ -838,10 +834,10 @@ export default {
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
   }
   .stgblckbottomIP {
-    text-align: center;
+    margin-left: 195px;
   }
   .stgblckbottom {
-    text-align: center;
+    tex
   }
 }
 </style>

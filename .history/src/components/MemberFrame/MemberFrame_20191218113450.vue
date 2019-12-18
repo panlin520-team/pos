@@ -631,12 +631,7 @@ export default {
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
-          }else{
-            this.$message({
-              message: "划卡成功",
-              type: "success"
-            });
-          }
+          }e
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");

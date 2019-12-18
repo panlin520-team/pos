@@ -626,17 +626,17 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.responseStatusType.message == "Failure") {
+          if (this.useTimes < this.totalTimes) {
+            this.$message({
+              message: res.data.responseStatusType.message,
+              type: "success"
+            });
+          } else if (res.data.responseStatusType.message == "Failure") {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
-          }else{
-            this.$message({
-              message: "划卡成功",
-              type: "success"
-            });
-          }
+          }e
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");

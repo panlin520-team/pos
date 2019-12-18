@@ -476,7 +476,7 @@ export default {
           localStorage.removeItem("membership");
           localStorage.removeItem("grade");
           localStorage.removeItem("list");
-          this.accounBalance = [];
+          this.accounBalance = []
         })
         .catch(() => {});
     },
@@ -626,15 +626,15 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.responseStatusType.message == "Failure") {
+          if (this.useTimes < this.totalTimes) {
+            this.$message({
+              message: res.data.responseStatusType.message,
+              type: "success"
+            });
+          } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
-            });
-          }else{
-            this.$message({
-              message: "划卡成功",
-              type: "success"
             });
           }
         })
@@ -659,7 +659,7 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.result !== null) {
+          if (res.data.result == null) {
             this.$message({
               message: res.data.result,
               type: "success",
@@ -691,8 +691,7 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.empSet = res.data.result.list[0].postCategoryVOList;
-            this.empList =
-              res.data.result.list[0].postCategoryVOList[0].beauticianList;
+            this.empList = res.data.result.list[0].postCategoryVOList[0].beauticianList;
             this.currentServiceId =
               res.data.result.list[0].postCategoryVOList[0].postCategoryId;
             this.currentServiceTitle =

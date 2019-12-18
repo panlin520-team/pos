@@ -634,7 +634,7 @@ export default {
           }else{
             this.$message({
               message: "划卡成功",
-              type: "success"
+              type: "sesscss"
             });
           }
         })

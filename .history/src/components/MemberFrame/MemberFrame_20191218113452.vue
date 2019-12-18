@@ -632,10 +632,7 @@ export default {
               type: "error"
             });
           }else{
-            this.$message({
-              message: "划卡成功",
-              type: "success"
-            });
+            
           }
         })
         .catch(err => {

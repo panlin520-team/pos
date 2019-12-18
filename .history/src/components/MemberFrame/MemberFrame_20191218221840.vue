@@ -1050,11 +1050,7 @@ export default {
         });
     },
     submit() {
-      if (this.input_number) {
-        this.show_stgbcar2();
-      } else {
-        this.show_stgbcar();
-      }
+      this.show_stgbcar();
     }
   },
   created() {

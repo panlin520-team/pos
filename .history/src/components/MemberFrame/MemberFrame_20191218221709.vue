@@ -61,7 +61,7 @@
                   <label>联系电话：</label>
                   <el-input v-model="input_number" @input="hqjdinputpoto" placeholder="请输入手机号"></el-input>
                   <div class="userName-boxs">
-                    <i class="el-icon-search" @click="show_stgbcar2"></i>
+                    <i class="el-icon-search" v-on:keyup.13.native="submit2" @click="show_stgbcar2"></i>
                   </div>
                 </div>
                 <div class="gradevip">
@@ -1050,11 +1050,10 @@ export default {
         });
     },
     submit() {
-      if (this.input_number) {
-        this.show_stgbcar2();
-      } else {
-        this.show_stgbcar();
-      }
+      this.show_stgbcar();
+    },
+    submit() {
+      this.show_stgbcar();
     }
   },
   created() {
@@ -1063,6 +1062,12 @@ export default {
       let key = window.event.keyCode;
       if (key == 13) {
         _this.submit();
+      }
+    };
+    document.onkeydown = function(e) {
+      let key = window.event.keyCode;
+      if (key == 13) {
+        _this.submit2();
       }
     };
     this.input_name = localStorage.getItem("memberName");

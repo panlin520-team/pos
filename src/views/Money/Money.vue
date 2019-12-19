@@ -181,7 +181,7 @@
             <div class="upside">
               <div class="tit">订单</div>
               <div class="customer">
-                <div class="normal btn-pointer" v-if="this.$store.state.member == null">散客</div>
+                <div class="normal" v-if="this.$store.state.member == null">散客</div>
                 <div class="personal" v-if="this.$store.state.member != null">
                   <div class="name">{{this.$store.state.member.userName}}</div>
                 </div>

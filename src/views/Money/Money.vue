@@ -1224,7 +1224,8 @@ export default {
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
-                  payTypeAndAmount: JSON.stringify(payObj)
+                  payTypeAndAmount: JSON.stringify(payObj),
+                  createOperator: localStorage.getItem("trueName")
                 };
                 this.$https.fetchPost(path, info).then(
                   res => {
@@ -1280,7 +1281,8 @@ export default {
           // 订单列表
           productIds: JSON.stringify(productIds),
           // 支付方式
-          payTypeAndAmount: JSON.stringify(payObj)
+          payTypeAndAmount: JSON.stringify(payObj),
+          createOperator: localStorage.getItem("trueName")
         };
         this.$https.fetchPost(path, info).then(
           res => {
@@ -2152,7 +2154,8 @@ export default {
         // 订单列表
         productIds: JSON.stringify(params.productOrderList),
         // 支付方式
-        payTypeAndAmount: JSON.stringify(payObj)
+        payTypeAndAmount: JSON.stringify(payObj),
+        createOperator: localStorage.getItem("trueName")
       };
       this.$https.fetchPost(path, info).then(
         res => {

@@ -1326,7 +1326,8 @@ export default {
         this.$https.dataHost + "/commodityType/selectSubclassByConditionNoPage";
       var params = {
         commodityTypeID: 1,
-        industryID: localStorage.getItem("industryID")
+        industryID: localStorage.getItem("industryID"),
+        commodityTypeIndustryID: localStorage.getItem("industryID")
       };
       this.$https.fetchPost(url, params).then(
         res => {

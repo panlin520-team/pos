@@ -103,45 +103,50 @@
     <transition name="el-zoom-in-bottom">
       <div class="popPage billPage" v-if="billOpen == true">
         <div class="left">
-          <!-- 切换 -->
+          <!-- 大类 -->
           <div class="tab">
             <div class="btn-pointer btn-close el-icon-close" @click="billOpen = false;emptyData"></div>
             <div
-              class="tabItem"
+              class="tabItem btn-pointer"
               v-for="item in menu"
-              :class="item.menuId == currentMenuId ? 'active' : ''"
-              @click="changeCurrentMenuId(item.menuId)"
-            >{{item.menuName}}</div>
+              :class="item.commodityTypeID == currentMenuId ? 'active' : ''"
+              @click="fetchMenuItem(item.commodityTypeID)"
+            >{{item.commodityTypeName}}</div>
+            <div class="find">
+              <el-input
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+                v-model="searchKey"
+                @keyup.enter.native="findResult"
+              ></el-input>
+            </div>
           </div>
 
-          <!-- 项目与产品菜单 -->
+          <!-- 小类 -->
           <div class="submenu">
-            <!-- 项目 currentMenuId == 1" -->
             <div
               class="submenuItem btn-pointer"
-              v-for="item in serviceMenu"
-              v-if="currentMenuId == 1"
+              v-for="item in menuItem"
               :key="item.subclassID"
-              :class="item.subclassID == currentServiceMenuId ? 'active' : ''"
-              @click="fetchServiceItemsById(item.subclassID)"
+              :class="item.subclassID == currentMenuItemId ? 'active' : ''"
+              @click="fetchCommodity(item.subclassID)"
             >{{item.subclassName}}</div>
             <!-- 产品 currentMenuId == 2 -->
-            <div
+            <!-- <div
               class="submenuItem btn-pointer"
               v-for="item in productMenu"
               v-if="currentMenuId == 2"
               :key="item.productKindId"
               :class="item.productKindId == currentProductMenuId ? 'active' : ''"
               @click="fetchProductItemsById(item.productKindId)"
-            >{{item.productTypeName}}</div>
+            >{{item.productTypeName}}</div>-->
           </div>
-          <!-- 产品与项目列表 -->
+          <!-- 商品 -->
           <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
             <div
               class="boxItem btn-pointer"
-              v-for="(item,index) in serviceItems"
-              @click="fetchServiceParams(item)"
-              v-if="currentMenuId == 1"
+              v-for="(item,index) in commodityItem"
+              @click="fetchCommodityParams(item)"
             >
               <div class="name">{{item.productName}}</div>
               <div class="info">
@@ -155,7 +160,7 @@
                 </div>
               </div>
             </div>
-            <div
+            <!-- <div
               class="boxItem btn-pointer"
               v-for="item in productItems"
               @click="fetchProductParams(item)"
@@ -172,7 +177,7 @@
                   <span>{{item.stockNum}}</span>
                 </div>
               </div>
-            </div>
+            </div>-->
           </div>
         </div>
 
@@ -181,7 +186,7 @@
             <div class="upside">
               <div class="tit">订单</div>
               <div class="customer">
-                <div class="normal btn-pointer" v-if="this.$store.state.member == null">散客</div>
+                <div class="normal" v-if="this.$store.state.member == null">散客</div>
                 <div class="personal" v-if="this.$store.state.member != null">
                   <div class="name">{{this.$store.state.member.userName}}</div>
                 </div>
@@ -250,7 +255,7 @@
           <div class="bottom">
             <div class="orderPrice">
               <div class="original">原价：¥{{originalPrice}}</div>
-              <div class="total">实付：¥{{realPrice}}</div>
+              <div class="total">折后价：¥{{realPrice}}</div>
             </div>
             <div class="checkout">
               <div class="btn-pointer" @click="openAccount">结算</div>
@@ -393,7 +398,7 @@
             <span class="symbol">元</span>
           </div>
           <div class="real">
-            实付：
+            折后价：
             <span class="active">{{realPrice}}</span>
             <span class="symbol">元</span>
           </div>
@@ -412,8 +417,8 @@
               <el-radio :label="4">线上</el-radio>
             </el-radio-group>
           </div>
-          <div class="label" v-for="(item,index) in payTypes" v-if="item.amount > 0">
-            <label>{{item.accountType}}</label>
+          <div class="label" v-for="(item,index) in payTypes" v-if="item.accountTypeAmount > 0">
+            <label>{{item.payTypeName}}</label>
             <InputNumber
               :point="2"
               placeholder="使用金额"
@@ -424,7 +429,7 @@
               <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
               <div class="value">
                 余额：
-                <span class="active">{{item.amount}}</span>
+                <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
               </div>
             </div>
@@ -574,11 +579,11 @@
           <div
             v-for="(item,index) in empSet"
             :key="index"
-            :class="['item',{'active' : currentServiceId==item.postId}]"
-            @click="switchEmpList(index,item.postId,item.setEmpId)"
+            :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
+            @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
           >
             <div class="default" v-if="item.setEmpName==undefined || item.setEmpName=='' ">
-              <span>{{item.postName}}</span>(必填)
+              <span>{{item.postCategoryName}}</span>(必填)
             </div>
             <div class="active" v-if="item.setEmpName!=''">
               <span>{{item.setEmpName}}</span>
@@ -726,6 +731,12 @@
             <InputNumber :point="2" :max="1" placeholder="0 ~ 1" v-model.number="discount"></InputNumber>
           </div>
         </div>
+        <!-- <div class="label">
+          <label>折扣价:</label>
+          <div class="price_input">
+            <InputNumber :point="2" placeholder="折扣价" v-model.number="discountPrice"></InputNumber>
+          </div>
+        </div> -->
         <div class="label">
           <label>数量:</label>
           <el-input-number v-model="productNum" :min="1" :step="1" label="数量" class="price_input"></el-input-number>
@@ -753,6 +764,8 @@ export default {
       currentDate: this.dateFormat(),
       // 查询关键词
       keyword: "",
+      searchKey: "",
+      productKey: "",
       // 当前页码
       currentPage: 1,
       // 每页显示个数
@@ -766,16 +779,11 @@ export default {
       // 订单
       orderData: [],
       // 门店开单菜单
-      menu: [
-        {
-          menuId: 1,
-          menuName: "项目"
-        },
-        {
-          menuId: 2,
-          menuName: "产品"
-        }
-      ],
+      menu: [],
+      currentMenuId: "",
+      menuItem: [],
+      currentMenuItemId: "",
+      commodityItem: [],
       // 会员查询默认可选项
       employeeOptions: [
         {
@@ -799,8 +807,6 @@ export default {
       // 会员信息
       memberValue: false,
       member: {},
-      // 当前门店项目和产品菜单
-      currentMenuId: 1,
       // 门店项目
       serviceMenu: [],
       currentServiceMenuId: "",
@@ -854,7 +860,7 @@ export default {
       remark: "",
       // 原价
       originalPrice: 0,
-      // 总价
+      // 实际价格
       realPrice: 0,
       // 项目价格修改
       servicePrice: {},
@@ -1333,6 +1339,7 @@ export default {
 
     // 打开结算框
     openAccount() {
+      var memberNum = "";
       if (this.serviceList.length == 0 && this.productList.length == 0) {
         this.$message({
           type: "warning",
@@ -1347,48 +1354,58 @@ export default {
         });
         return;
       }
+
       if (this.$store.state.member == null) {
-        this.accountPopver = true;
-        this.payTypes = null;
-        this.cashValue = 0;
-        return;
+        memberNum = "";
       } else {
-        var arr = this.serviceList.concat(this.productList);
-        var subclassIds = [];
-        for (var i = 0; i < arr.length; i++) {
-          subclassIds.push(arr[i].subclassId);
-        }
-        var url =
-          this.$https.accountHost + "/manage/memberUser/listMemberAccount";
-        var params = {
-          memberNum: this.$store.state.member.userNumber,
-          subClassIds: JSON.stringify(subclassIds)
-        };
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result.list) {
-              this.accountPopver = true;
-              var list = res.data.result.list;
-              list.forEach(item => {
-                item.checked = false;
-                item.value = 0;
-              });
-              this.payTypes = list;
-            } else {
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
+        memberNum = this.$store.state.member.userNumber;
+      }
+
+      // if (this.$store.state.member == null) {
+      //   this.accountPopver = true;
+      //   this.payTypes = null;
+      //   this.cashValue = this.realPrice;
+      //   return;
+      // } else {
+      var arr = this.serviceList.concat(this.productList);
+      var subclassIds = [];
+      for (var i = 0; i < arr.length; i++) {
+        subclassIds.push(arr[i].subclassId);
+      }
+      // 数组以","分隔成字符串
+      var newArr = subclassIds.join(",");
+
+      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var params = {
+        memberNum: memberNum,
+        subClassId: newArr,
+        industryId: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.accountPopver = true;
+            var list = res.data.result;
+            list.forEach(item => {
+              item.checked = false;
+              item.value = 0;
+            });
+            this.payTypes = list;
+          } else {
             this.$message({
-              type: "error",
-              message: error
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
             });
           }
-        );
-      }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+      // }
     },
 
     // 打开修改已选择产品数量、价格
@@ -1705,7 +1722,7 @@ export default {
     fetchServiceEmp(id, item) {
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
-        return item.postId == id;
+        return item.postCategoryId == id;
       });
 
       if (item.beauticianId != this.currentEmpId) {
@@ -1728,7 +1745,7 @@ export default {
 
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
-      this.currentServiceTitle = this.empSet[index].postName;
+      this.currentServiceTitle = this.empSet[index].postCategoryName;
       this.empList = this.empSet[index].beauticianList;
       this.currentServiceId = curId;
       if (empId != undefined) {
@@ -1740,14 +1757,14 @@ export default {
     fetchServiceParams(item) {
       this.productName = item.productName;
       this.productPrice = item.retailPrice;
-      this.subclassID = item.subClassID;
+      this.subclassID = item.subClassId;
       this.productCode = item.productCode;
       this.productNum = 1;
       this.currentEmpId = null;
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
-      var params = { subclassID: item.subClassID };
+      var params = { subclassID: item.subClassId };
 
       if (item.stockNum == 0) {
         this.$message({
@@ -1760,13 +1777,13 @@ export default {
           res => {
             if (res.data.result) {
               this.servicePopover = true;
-              this.empSet = res.data.result.list[0].postVOList;
+              this.empSet = res.data.result.list[0].postCategoryVOList;
               this.empList =
-                res.data.result.list[0].postVOList[0].beauticianList;
+                res.data.result.list[0].postCategoryVOList[0].beauticianList;
               this.currentServiceId =
-                res.data.result.list[0].postVOList[0].postId;
+                res.data.result.list[0].postCategoryVOList[0].postCategoryId;
               this.currentServiceTitle =
-                res.data.result.list[0].postVOList[0].postName;
+                res.data.result.list[0].postCategoryVOList[0].postCategoryName;
             } else {
               this.empSet = [];
               this.$message({
@@ -1823,7 +1840,7 @@ export default {
         this.productData = item;
         this.productName = item.productName;
         this.productPrice = item.retailPrice;
-        this.subclassID = item.subClassID;
+        this.subclassID = item.subClassId;
         this.productCode = item.productCode;
         this.productNum = 1;
         this.productPopover = true;
@@ -1836,14 +1853,47 @@ export default {
     openBill() {
       this.memoNum = "";
       this.billOpen = true;
-      // 服务项目菜单
-      this.fetchServiceMenu();
-      // 产品菜单
-      this.fetchProductMenu();
+      // 项目大类
+      this.fetchMenu();
+      // // 服务项目菜单
+      // this.fetchServiceMenu();
+      // // 产品菜单
+      // this.fetchProductMenu();
       // 门店员工
       this.fetchEmployees();
       // 清空必要数据
       this.emptyData();
+    },
+
+    // 搜索项目下商品
+    findResult() {
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        keyWordProductName: this.searchKey,
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
+        productStatus: 1,
+        isHoutai: 0
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.serviceItems = res.data.result.list;
+          } else {
+            this.serviceItems = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
 
     // 清空data必要对象和数组
@@ -1871,6 +1921,8 @@ export default {
       this.cashOption = 3;
       // 订单详细
       this.orderDetails = null;
+      this.serviceKey = "";
+      this.productKey = "";
     },
 
     // 门店项目列表
@@ -1937,6 +1989,109 @@ export default {
           });
         }
       );
+    },
+
+    // 门店大类
+    fetchMenu() {
+      var url = this.$https.dataHost + "/commodityType/selectCommodityTypeList";
+      var params = {
+        isDingzhi: 1,
+        commodityTypeIndustryID: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.menu = res.data.result.list;
+            this.currentMenuId = res.data.result.list[0].commodityTypeID;
+            this.fetchMenuItem(res.data.result.list[0].commodityTypeID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类
+    fetchMenuItem(id) {
+      this.currentMenuId = id;
+      var url =
+        this.$https.dataHost + "/commodityType/selectSubclassByCondition";
+      var params = {
+        commodityTypeID: id
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.menuItem = res.data.result.list;
+            this.currentMenuItemId = res.data.result.list[0].subclassID;
+            this.fetchCommodity(res.data.result.list[0].subclassID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类商品
+    fetchCommodity(id) {
+      this.currentMenuItemId = id;
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        subClassId: id,
+        isHoutai: 0,
+        companyType: 3,
+        productStatus: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.commodityItem = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店商品参数
+    fetchCommodityParams(item) {
+      // 实体商品
+      if (item.productType == 1) {
+        this.fetchProductParams(item);
+      }
+
+      // 服务商品
+      if (item.productType == 2) {
+        this.fetchServiceParams(item);
+      }
     },
 
     // 门店项目菜单
@@ -2722,6 +2877,17 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
+    }
+
+    .find {
+      width: 200px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 6px;
+      right: 15px;
+      position: absolute;
+      text-align: center;
+      display: inline-block;
     }
   }
 

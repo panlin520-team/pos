@@ -307,7 +307,7 @@
           </div>
         </div>
         <div class="pay">
-          <div class="label">
+          <!-- <div class="label">
             <label>现金支付</label>
             <InputNumber
               :point="2"
@@ -319,9 +319,9 @@
               <el-radio :label="3">线下</el-radio>
               <el-radio :label="4">线上</el-radio>
             </el-radio-group>
-          </div>
-          <div class="label" v-for="(item,index) in payTypes" v-if="item.amount > 0">
-            <label>{{item.accountType}}</label>
+          </div>-->
+          <div class="label" v-for="(item,index) in payTypes">
+            <label>{{item.payTypeName}}</label>
             <InputNumber
               :point="2"
               placeholder="使用金额"
@@ -329,10 +329,13 @@
               class="inputModel"
             ></InputNumber>
             <div class="account">
-              <el-checkbox v-model="item.checked"></el-checkbox>
-              <div class="value">
+              <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
+              <div
+                class="value"
+                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+              >
                 余额：
-                <span class="active">{{item.amount}}</span>
+                <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
               </div>
             </div>
@@ -348,7 +351,7 @@
         </div>
       </div>
       <div class="bottom" slot="bottom">
-        <div class="btn-pointer btn-submit" @click="settleAccounts">结算</div>
+        <div class="btn-pointer btn-submit" @click="settleAccounts(accountInfo)">结算</div>
       </div>
     </pop-over>
 
@@ -755,68 +758,68 @@ export default {
       var orderList = item.productOrderList;
       var subclassIds = [];
       this.payTypes = null;
-      this.cashValue = 0;
       this.remark = "";
-      if (item.cardNumber == "" || item.cardNumber == null) {
-        this.accountPopver = true;
-        this.accountInfo = {
-          orderLink: item.orderLink,
-          mobile: item.mobile,
-          memberNum: item.cardNumber,
-          realPrice: item.totalDiscount,
-          // memoNum: item.memoNum,
-          remark: item.remark,
-          orderNumber: item.orderNumber
-        };
-      } else {
-        for (var i = 0; i < orderList.length; i++) {
-          subclassIds.push(orderList[i].subclassID);
-        }
-        var url =
-          this.$https.accountHost + "/manage/memberUser/listMemberAccount";
-        var params = {
-          memberNum: item.cardNumber,
-          subClassIds: JSON.stringify(subclassIds)
-        };
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result.list) {
-              this.accountPopver = true;
-              this.memberValue = true;
-              this.accountInfo = {
-                orderLink: item.orderLink,
-                mobile: item.mobile,
-                memberNum: item.cardNumber,
-                realPrice: item.totalDiscount,
-                // memoNum: item.memoNum,
-                remark: item.remark,
-                orderNumber: item.orderNumber
-              };
-              var list = res.data.result.list;
-              list.forEach(item => {
-                item.checked = false;
-                item.value = 0;
-              });
-              this.payTypes = list;
-            } else {
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
+      // if (item.cardNumber == "" || item.cardNumber == null) {
+      //   this.accountPopver = true;
+      //   this.accountInfo = {
+      //     orderLink: item.orderLink,
+      //     mobile: item.mobile,
+      //     memberNum: item.cardNumber,
+      //     realPrice: item.totalDiscount,
+      //     // memoNum: item.memoNum,
+      //     remark: item.remark,
+      //     orderNumber: item.orderNumber
+      //   };
+      // } else {
+      for (var i = 0; i < orderList.length; i++) {
+        subclassIds.push(orderList[i].subclassID);
+      }
+      var newArr = subclassIds.join(",");
+      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var params = {
+        memberNum: item.cardNumber,
+        subClassId: newArr,
+        industryId: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.accountPopver = true;
+            this.memberValue = true;
+            this.accountInfo = {
+              orderLink: item.orderLink,
+              mobile: item.mobile,
+              memberNum: item.cardNumber,
+              realPrice: item.totalDiscount,
+              // memoNum: item.memoNum,
+              remark: item.remark,
+              orderNumber: item.orderNumber
+            };
+            var list = res.data.result;
+            list.forEach(item => {
+              item.checked = false;
+              item.value = 0;
+            });
+            this.payTypes = list;
+          } else {
             this.$message({
-              type: "error",
-              message: error
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
             });
           }
-        );
-      }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+      // }
     },
 
     // 结账
-    settleAccounts() {
+    settleAccounts(params) {
       var payObj,
         payTypeAndAmount = [];
 
@@ -828,12 +831,8 @@ export default {
       //   return;
       // }
 
-      if (this.cashValue == "") {
-        this.cashValue = 0;
-      }
-
       var totalPrice = 0;
-      var cashType = { payType: this.cashOption, amount: this.cashValue };
+      // var cashType = { payType: this.cashOption, amount: this.cashValue };
 
       // 获取选中账户值
       if (this.payTypes != null) {
@@ -849,9 +848,11 @@ export default {
                 return;
               } else {
                 payTypeAndAmount.push({
-                  accountTypeId: payArr[i].accountTypeId,
+                  payType: payArr[i].payTypeId,
                   amount: payArr[i].value,
-                  payTypeName: payArr[i].accountType
+                  payTypeName: payArr[i].payTypeName,
+                  accountType: payArr[i].accountType,
+                  payTypeCategory: payArr[i].payTypeCategory
                 });
               }
             } else {
@@ -865,60 +866,61 @@ export default {
           accountPrice += payTypeAndAmount[i].amount;
         }
         // 支付总金额
-        totalPrice = cashType.amount + accountPrice;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-      } else {
-        totalPrice = cashType.amount;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            }
-          ];
-        }
+        totalPrice = accountPrice;
+        // if (cashType.payType == 3) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线下"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
+        // if (cashType.payType == 4) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线上"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
       }
+      // else {
+      //   totalPrice = cashType.amount;
+      //   if (cashType.payType == 3) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线下"
+      //       }
+      //     ];
+      //   }
+      //   if (cashType.payType == 4) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线上"
+      //       }
+      //     ];
+      //   }
+      // }
 
-      if (totalPrice != this.accountInfo.realPrice) {
+      if (totalPrice != params.realPrice) {
         this.$message({
           type: "error",
           message: "支付金额不等于订单实际总金额!"
@@ -928,9 +930,11 @@ export default {
 
       var path = this.$https.orderHost + "/order/payOrder";
       var info = {
-        orderNumber: this.accountInfo.orderNumber,
-        payPrice: this.accountInfo.realPrice,
-        payTypeAndAmount: JSON.stringify(payObj)
+        orderNumber: params.orderNumber,
+        payPrice: params.realPrice,
+        productIds: JSON.stringify(params.productOrderList),
+        payTypeAndAmount: JSON.stringify(payTypeAndAmount),
+        createOperator: localStorage.getItem("trueName")
       };
 
       this.$https.fetchPost(path, info).then(
@@ -1007,13 +1011,11 @@ export default {
           orderLink: this.$store.state.member.userName,
           mobile: this.$store.state.member.userMobile,
           totalPrice: this.originalPrice,
-          industryID: 1,
+          industryID: localStorage.getItem("industryID"),
           productIds: JSON.stringify(productIds),
           remark: this.remark
         };
-      }
-
-      if (this.$store.state.member == null) {
+      } else {
         params = {
           // nurseDate: this.currentDate,
           orderType: 10,
@@ -1023,7 +1025,7 @@ export default {
           orderLink: this.member.orderLink,
           mobile: this.member.mobile,
           totalPrice: this.originalPrice,
-          industryID: 1,
+          industryID: localStorage.getItem("industryID"),
           productIds: JSON.stringify(productIds),
           remark: this.remark
         };

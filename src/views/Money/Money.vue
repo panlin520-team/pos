@@ -389,7 +389,7 @@
         </div>
         <div class="warnText" v-if="warnValue == true">
           注意：
-          <span>当前订单内存在一项要求不打折，所有项将按原价支付</span>
+          <span>当前订单内存在不打折商品，所有项将按原价支付</span>
         </div>
         <div class="price">
           <div class="original">
@@ -404,7 +404,7 @@
           </div>
         </div>
         <div class="pay">
-          <div class="label">
+          <!-- <div class="label">
             <label>现金支付</label>
             <InputNumber
               :point="2"
@@ -416,8 +416,8 @@
               <el-radio :label="3">线下</el-radio>
               <el-radio :label="4">线上</el-radio>
             </el-radio-group>
-          </div>
-          <div class="label" v-for="(item,index) in payTypes" v-if="item.accountTypeAmount > 0">
+          </div>-->
+          <div class="label" v-for="(item,index) in payTypes">
             <label>{{item.payTypeName}}</label>
             <InputNumber
               :point="2"
@@ -427,7 +427,10 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
-              <div class="value">
+              <div
+                class="value"
+                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+              >
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
@@ -481,7 +484,7 @@
           </div>
         </div>
         <div class="pay">
-          <div class="label">
+          <!-- <div class="label">
             <label>现金支付</label>
             <InputNumber
               :point="2"
@@ -493,9 +496,9 @@
               <el-radio :label="3">线下</el-radio>
               <el-radio :label="4">线上</el-radio>
             </el-radio-group>
-          </div>
-          <div class="label" v-for="(item,index) in payTypes" v-if="item.amount > 0">
-            <label>{{item.accountType}}</label>
+          </div>-->
+          <div class="label" v-for="(item,index) in payTypes">
+            <label>{{item.payTypeName}}</label>
             <InputNumber
               :point="2"
               placeholder="使用金额"
@@ -504,9 +507,12 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked"></el-checkbox>
-              <div class="value">
+              <div
+                class="value"
+                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+              >
                 余额：
-                <span class="active">{{item.amount}}</span>
+                <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
               </div>
             </div>
@@ -736,7 +742,7 @@
           <div class="price_input">
             <InputNumber :point="2" placeholder="折扣价" v-model.number="discountPrice"></InputNumber>
           </div>
-        </div> -->
+        </div>-->
         <div class="label">
           <label>数量:</label>
           <el-input-number v-model="productNum" :min="1" :step="1" label="数量" class="price_input"></el-input-number>
@@ -1107,9 +1113,11 @@ export default {
                 return;
               } else {
                 payTypeAndAmount.push({
-                  accountTypeId: payArr[i].accountTypeId,
+                  payType: payArr[i].payTypeId,
                   amount: payArr[i].value,
-                  payTypeName: payArr[i].accountType
+                  payTypeName: payArr[i].payTypeName,
+                  accountType: payArr[i].accountType,
+                  payTypeCategory: payArr[i].payTypeCategory
                 });
               }
             } else {
@@ -1123,58 +1131,59 @@ export default {
           accountPrice += payTypeAndAmount[i].amount;
         }
         // 支付总金额
-        totalPrice = cashType.amount + accountPrice;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-      } else {
-        totalPrice = cashType.amount;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            }
-          ];
-        }
+        totalPrice = accountPrice;
+        // if (cashType.payType == 3) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线下"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
+        // if (cashType.payType == 4) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线上"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
       }
+      // else {
+      //   totalPrice = cashType.amount;
+      //   if (cashType.payType == 3) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线下"
+      //       }
+      //     ];
+      //   }
+      //   if (cashType.payType == 4) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线上"
+      //       }
+      //     ];
+      //   }
+      // }
 
       if (totalPrice != this.realPrice) {
         this.$message({
@@ -1193,7 +1202,7 @@ export default {
           orderLink: this.$store.state.member.userName,
           mobile: this.$store.state.member.userMobile,
           totalPrice: this.realPrice,
-          industryID: 1,
+          industryID: localStorage.getItem("industryID"),
           productIds: JSON.stringify(productIds),
           // 水单号
           memoNum: this.memoNum,
@@ -1208,7 +1217,7 @@ export default {
           orderLink: null,
           mobile: null,
           totalPrice: this.realPrice,
-          industryID: 1,
+          industryID: localStorage.getItem("industryID"),
           productIds: JSON.stringify(productIds),
           // 水单号
           memoNum: this.memoNum,
@@ -1230,7 +1239,7 @@ export default {
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
-                  payTypeAndAmount: JSON.stringify(payObj),
+                  payTypeAndAmount: JSON.stringify(payTypeAndAmount),
                   createOperator: localStorage.getItem("trueName")
                 };
                 this.$https.fetchPost(path, info).then(
@@ -1278,6 +1287,7 @@ export default {
           }
         );
       }
+
       // 若订单号存在
       else {
         var path = this.$https.orderHost + "/order/payOrder";
@@ -1287,7 +1297,7 @@ export default {
           // 订单列表
           productIds: JSON.stringify(productIds),
           // 支付方式
-          payTypeAndAmount: JSON.stringify(payObj),
+          payTypeAndAmount: JSON.stringify(payTypeAndAmount),
           createOperator: localStorage.getItem("trueName")
         };
         this.$https.fetchPost(path, info).then(
@@ -1388,7 +1398,7 @@ export default {
             var list = res.data.result;
             list.forEach(item => {
               item.checked = false;
-              item.value = 0;
+              item.value = this.realPrice;
             });
             this.payTypes = list;
           } else {
@@ -1577,7 +1587,7 @@ export default {
           isEmpty = false;
           arr.push({
             postId: list[i].postId,
-            beauticianId: list[i].setEmpId,
+            beauticianId: list[i].setStaffNumber,
             beauticianName: list[i].setEmpName,
             beauticanJob: list[i].setEmpJob
           });
@@ -1730,6 +1740,7 @@ export default {
         if (res) {
           this.$set(res, "setEmpName", item.name);
           this.$set(res, "setEmpId", item.beauticianId);
+          this.$set(res, "setStaffNumber", item.staffNumber);
           this.$set(res, "setEmpJob", this.currentServiceTitle);
           // 绑定当前已选员工id，方便右侧员工列表渲染
           this.currentEmpId = item.beauticianId;
@@ -1737,6 +1748,7 @@ export default {
       } else {
         this.$set(res, "setEmpName", "");
         this.$set(res, "setEmpId", "");
+        this.$set(res, "setStaffNumber", item.staffNumber);
         this.$set(res, "setEmpJob", "");
         // 绑定当前已选员工id，方便右侧员工列表渲染
         this.currentEmpId = null;
@@ -2209,10 +2221,7 @@ export default {
     // 结算待支付订单
     settleOrder(params) {
       var payPrice,
-        payObj,
-        cashType,
         payTypeAndAmount = [];
-      cashType = { payType: this.cashOption, amount: this.cashValue };
       if (this.payTypes != null) {
         var payArr = this.payTypes;
         for (var i = 0; i < payArr.length; i++) {
@@ -2226,9 +2235,11 @@ export default {
                 return;
               } else {
                 payTypeAndAmount.push({
-                  accountTypeId: payArr[i].accountTypeId,
+                  payType: payArr[i].payTypeId,
                   amount: payArr[i].value,
-                  payTypeName: payArr[i].accountType
+                  payTypeName: payArr[i].payTypeName,
+                  accountType: payArr[i].accountType,
+                  payTypeCategory: payArr[i].payTypeCategory
                 });
               }
             } else {
@@ -2242,58 +2253,61 @@ export default {
           accountPrice += payTypeAndAmount[i].amount;
         }
         // 支付总金额
-        payPrice = cashType.amount + accountPrice;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            },
-            {
-              payType: 5,
-              amount: accountPrice,
-              payTypeName: "账户总支付",
-              accountType: payTypeAndAmount
-            }
-          ];
-        }
-      } else {
-        payPrice = cashType.amount;
-        if (cashType.payType == 3) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线下"
-            }
-          ];
-        }
-        if (cashType.payType == 4) {
-          payObj = [
-            {
-              payType: cashType.payType,
-              amount: cashType.amount,
-              payTypeName: "线上"
-            }
-          ];
-        }
+        payPrice = accountPrice;
+
+        // if (cashType.payType == 3) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线下"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
+        // if (cashType.payType == 4) {
+        //   payObj = [
+        //     {
+        //       payType: cashType.payType,
+        //       amount: cashType.amount,
+        //       payTypeName: "线上"
+        //     },
+        //     {
+        //       payType: 5,
+        //       amount: accountPrice,
+        //       payTypeName: "账户总支付",
+        //       accountType: payTypeAndAmount
+        //     }
+        //   ];
+        // }
       }
+      // else {
+      //   payPrice = cashType.amount;
+      //   if (cashType.payType == 3) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线下"
+      //       }
+      //     ];
+      //   }
+      //   if (cashType.payType == 4) {
+      //     payObj = [
+      //       {
+      //         payType: cashType.payType,
+      //         amount: cashType.amount,
+      //         payTypeName: "线上"
+      //       }
+      //     ];
+      //   }
+      // }
+
       // 支付金额
       if (payPrice != params.totalPrice) {
         this.$message({
@@ -2302,6 +2316,7 @@ export default {
         });
         return;
       }
+
       var path = this.$https.orderHost + "/order/payOrder";
       var info = {
         orderNumber: params.orderNumber,
@@ -2309,7 +2324,7 @@ export default {
         // 订单列表
         productIds: JSON.stringify(params.productOrderList),
         // 支付方式
-        payTypeAndAmount: JSON.stringify(payObj),
+        payTypeAndAmount: JSON.stringify(payTypeAndAmount),
         createOperator: localStorage.getItem("trueName")
       };
       this.$https.fetchPost(path, info).then(
@@ -2367,31 +2382,32 @@ export default {
       }
       if (item.orderStatus == 1) {
         this.payTypes = null;
-        this.cashValue = 0;
         if (item.cardNumber == "") {
           this.orderInfo = item;
           this.orderpayPopver = true;
         } else {
           var list = item.productOrderList;
+          var totalPrice = item.totalPrice;
           var subclassIds = [];
           for (var i = 0; i < list.length; i++) {
             subclassIds.push(list[i].subclassID);
           }
-          var url =
-            this.$https.accountHost + "/manage/memberUser/listMemberAccount";
+          var newArr = subclassIds.join(",");
+          var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
           var params = {
             memberNum: item.cardNumber,
-            subClassIds: JSON.stringify(subclassIds)
+            subClassId: newArr,
+            industryId: localStorage.getItem("industryID")
           };
           this.$https.fetchPost(url, params).then(
             res => {
-              if (res.data.result.list) {
+              if (res.data.result) {
                 this.orderpayPopver = true;
                 this.orderInfo = item;
-                var list = res.data.result.list;
+                var list = res.data.result;
                 list.forEach(item => {
                   item.checked = false;
-                  item.value = 0;
+                  item.value = totalPrice;
                 });
                 this.payTypes = list;
               } else {

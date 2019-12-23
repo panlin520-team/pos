@@ -81,27 +81,42 @@
     <el-collapse-transition>
       <div class="popPage setPage" v-if="setValue == true">
         <div class="left">
-          <!-- 切换 -->
+          <!-- 大类 -->
           <div class="tab">
             <div class="btn-pointer btn-close el-icon-close" @click="setValue = false;emptyData"></div>
-            <div class="tabItem active">项目</div>
+            <div
+              class="tabItem btn-pointer"
+              v-for="item in tabMenu"
+              v-if="item.commodityProductType == 2"
+              :class="item.commodityTypeID == currentMenuId ? 'active' : ''"
+              @click="fetchMenuItem(item.commodityTypeID)"
+            >{{item.commodityTypeName}}</div>
+            <div class="find">
+              <el-input
+                placeholder="搜索"
+                prefix-icon="el-icon-search"
+                v-model="searchKey"
+                @keyup.enter.native="findResult"
+              ></el-input>
+            </div>
           </div>
 
-          <!-- 项目菜单 -->
+          <!-- 小类 -->
           <div class="submenu">
             <div
               class="submenuItem btn-pointer"
-              v-for="item in serviceMenu"
+              v-for="item in menuItem"
               :key="item.subclassID"
-              :class="item.subclassID == currentServiceMenuId ? 'active' : ''"
-              @click="fetchServiceItemsById(item.subclassID)"
+              :class="item.subclassID == currentMenuItemId ? 'active' : ''"
+              @click="fetchCommodity(item.subclassID)"
             >{{item.subclassName}}</div>
           </div>
-          <!-- 项目列表 -->
+
+          <!-- 商品 -->
           <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
             <div
               class="boxItem btn-pointer"
-              v-for="(item,index) in serviceItems"
+              v-for="(item,index) in commodityItem"
               @click="fetchServiceParams(item)"
             >
               <div class="name">{{item.productName}}</div>
@@ -300,8 +315,13 @@
           </div>
         </div>
         <div class="price">
+          <div class="oriPrice">
+            原价：
+            <span class="active">{{accountInfo.totalPrice}}</span>
+            <span class="symbol">元</span>
+          </div>
           <div class="real">
-            实际价格：
+            折后价：
             <span class="active">{{accountInfo.realPrice}}</span>
             <span class="symbol">元</span>
           </div>
@@ -329,7 +349,7 @@
               class="inputModel"
             ></InputNumber>
             <div class="account">
-              <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
+              <el-checkbox v-model="item.checked"></el-checkbox>
               <div
                 class="value"
                 v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
@@ -413,7 +433,7 @@
       </div>
       <div class="main" slot="main">
         <div class="setEmp" v-for="(items,index) in empSet" :key="index">
-          <div class="label">{{items.postName}}:</div>
+          <div class="label">{{items.postCategoryName}}:</div>
           <el-select
             v-model="items.staffNumber"
             value-key="name"
@@ -489,7 +509,23 @@
         <div class="label">
           <label>折扣:</label>
           <div class="price_input">
-            <InputNumber :point="2" :max="1" placeholder="0 ~ 1" v-model.number="discount"></InputNumber>
+            <InputNumber
+              :point="2"
+              :max="1"
+              placeholder="0 ~ 1"
+              v-model.number="discount"
+              @handelInput="changePrice"
+            ></InputNumber>
+          </div>
+        </div>
+        <div class="label">
+          <label>折后价:</label>
+          <div class="price_input">
+            <InputNumber
+              placeholder="折后价"
+              v-model.number="discountPrice"
+              @handelInput="changeDiscount"
+            ></InputNumber>
           </div>
         </div>
         <div class="label">
@@ -521,6 +557,14 @@ export default {
       startTime: 9,
       endTime: 22,
       storeTimes: [],
+      // 搜素项目关键词
+      searchKey: "",
+      // 门店项目
+      tabMenu: [],
+      currentMenuId: "",
+      menuItem: [],
+      currentMenuItemId: "",
+      commodityItem: [],
       // 可选时间
       judgeTimeList: [],
       // 门店成员
@@ -658,7 +702,7 @@ export default {
     }
   },
   methods: {
-    // 开始预约相关操作
+    // 取消预约
     switchMember() {
       if (this.memberValue == true) {
         this.$msgbox({
@@ -689,6 +733,136 @@ export default {
         memberNum: row.memberNum
       };
       this.memberPopver = false;
+    },
+
+    // 门店大类
+    fetchMenu() {
+      var url = this.$https.dataHost + "/commodityType/selectCommodityTypeList";
+      var params = {
+        isDingzhi: 1,
+        commodityTypeIndustryID: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            var result = res.data.result.list;
+            var arr = [];
+            result.forEach(item => {
+              if (item.commodityProductType == 2) {
+                arr.push(item);
+              }
+            });
+            this.tabMenu = arr;
+            this.currentMenuId = arr[0].commodityTypeID;
+            this.fetchMenuItem(arr[0].commodityTypeID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类
+    fetchMenuItem(id) {
+      this.currentMenuId = id;
+      var url =
+        this.$https.dataHost + "/commodityType/selectSubclassByCondition";
+      var params = {
+        commodityTypeID: id
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.menuItem = res.data.result.list;
+            this.currentMenuItemId = res.data.result.list[0].subclassID;
+            this.fetchCommodity(res.data.result.list[0].subclassID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类商品
+    fetchCommodity(id) {
+      this.currentMenuItemId = id;
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        subClassId: id,
+        isHoutai: 0,
+        companyType: 3,
+        productStatus: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.commodityItem = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 搜索项目下商品
+    findResult() {
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        keyWordProductName: this.searchKey,
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
+        productStatus: 1,
+        isHoutai: 0
+      };
+      if (this.searchKey != "") {
+        this.$https.fetchPost(url, params).then(
+          res => {
+            if (res.data.result) {
+              this.serviceItems = res.data.result.list;
+            } else {
+              this.serviceItems = [];
+              this.$message({
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "warning"
+              });
+            }
+          },
+          error => {
+            this.$message({
+              type: "error",
+              message: error
+            });
+          }
+        );
+      }
     },
 
     // 根据姓名或电话获取会员信息
@@ -759,6 +933,7 @@ export default {
       var subclassIds = [];
       this.payTypes = null;
       this.remark = "";
+      var realPrice = item.totalDiscount;
       // if (item.cardNumber == "" || item.cardNumber == null) {
       //   this.accountPopver = true;
       //   this.accountInfo = {
@@ -790,15 +965,17 @@ export default {
               orderLink: item.orderLink,
               mobile: item.mobile,
               memberNum: item.cardNumber,
+              totalPrice: item.totalPrice,
               realPrice: item.totalDiscount,
               // memoNum: item.memoNum,
+              productIds: item.productOrderList,
               remark: item.remark,
               orderNumber: item.orderNumber
             };
             var list = res.data.result;
             list.forEach(item => {
               item.checked = false;
-              item.value = 0;
+              item.value = realPrice;
             });
             this.payTypes = list;
           } else {
@@ -932,7 +1109,7 @@ export default {
       var info = {
         orderNumber: params.orderNumber,
         payPrice: params.realPrice,
-        productIds: JSON.stringify(params.productOrderList),
+        productIds: JSON.stringify(params.productIds),
         payTypeAndAmount: JSON.stringify(payTypeAndAmount),
         createOperator: localStorage.getItem("trueName")
       };
@@ -1073,19 +1250,45 @@ export default {
       this.servicePricePopver = true;
     },
 
+    // 修改价格，计算折扣
+    changePrice(val) {
+      this.discountPrice = this.$calculate.accMul(
+        this.originalPrice,
+        this.discount
+      );
+    },
+
+    // 修改折扣，计算折后价
+    changeDiscount(val) {
+      this.discount = this.$calculate.accDiv(
+        this.discountPrice,
+        this.originalPrice
+      );
+    },
+
     // 确认修改已选择项目数量、价格
     handleChangeService() {
-      if (this.productNum == undefined || this.productNum == "") {
+      if (this.discount === "") {
+        this.$message({
+          type: "warning",
+          message: "折扣不能为空"
+        });
+        return;
+      }
+      if (this.discountPrice === "") {
+        this.$message({
+          type: "warning",
+          message: "折后价不能为空"
+        });
+        return;
+      }
+      if (this.productNum === "") {
         this.$message({
           type: "warning",
           message: "数量不能为空"
         });
         return;
       } else {
-        this.discountPrice = this.$calculate.accMul(
-          this.originalPrice,
-          this.discount
-        );
         var params = {
           discount: this.discount,
           discountPrice: this.discountPrice,
@@ -1243,13 +1446,13 @@ export default {
     fetchServiceParams(item) {
       this.productName = item.productName;
       this.productPrice = item.retailPrice;
-      this.subclassID = item.subClassID;
+      this.subclassID = item.subClassId;
       this.productCode = item.productCode;
       this.productNum = 1;
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
-      var params = { subclassID: item.subClassID };
+      var params = { subclassID: item.subClassId };
 
       if (item.stockNum == 0) {
         this.$message({
@@ -1262,7 +1465,7 @@ export default {
           res => {
             if (res.data.result) {
               this.servicePopover = true;
-              var arr = res.data.result.list[0].postVOList;
+              var arr = res.data.result.list[0].postCategoryVOList;
               arr.forEach(item => {
                 item.staffNumber = null;
                 item.nursingDate = this.currentDate;
@@ -1517,10 +1720,12 @@ export default {
 
     // 打开预约创建
     createAppointment() {
-      // 服务项目菜单
-      this.fetchServiceMenu();
       this.emptyData();
       this.setValue = true;
+      // 项目大类
+      this.fetchMenu();
+      // 服务项目菜单
+      // this.fetchServiceMenu();
     },
 
     // 清空data必要对象和数组
@@ -1849,6 +2054,17 @@ export default {
       height: 40px;
       line-height: 40px;
       text-align: center;
+    }
+
+    .find {
+      width: 200px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 6px;
+      right: 15px;
+      position: absolute;
+      text-align: center;
+      display: inline-block;
     }
   }
 

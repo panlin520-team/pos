@@ -702,7 +702,23 @@
         <div class="label">
           <label>折扣:</label>
           <div class="price_input">
-            <InputNumber :point="2" :max="1" placeholder="0 ~ 1" v-model.number="discount"></InputNumber>
+            <InputNumber
+              :point="2"
+              :max="1"
+              placeholder="0 ~ 1"
+              v-model.number="discount"
+              @handelInput="changePrice"
+            ></InputNumber>
+          </div>
+        </div>
+        <div class="label">
+          <label>折后价:</label>
+          <div class="price_input">
+            <InputNumber
+              placeholder="折后价"
+              v-model.number="discountPrice"
+              @handelInput="changeDiscount"
+            ></InputNumber>
           </div>
         </div>
         <div class="label">
@@ -734,15 +750,25 @@
         <div class="label">
           <label>折扣:</label>
           <div class="price_input">
-            <InputNumber :point="2" :max="1" placeholder="0 ~ 1" v-model.number="discount"></InputNumber>
+            <InputNumber
+              :point="2"
+              :max="1"
+              placeholder="0 ~ 1"
+              v-model.number="discount"
+              @handelInput="changePrice"
+            ></InputNumber>
           </div>
         </div>
-        <!-- <div class="label">
-          <label>折扣价:</label>
+        <div class="label">
+          <label>折后价:</label>
           <div class="price_input">
-            <InputNumber :point="2" placeholder="折扣价" v-model.number="discountPrice"></InputNumber>
+            <InputNumber
+              placeholder="折后价"
+              v-model.number="discountPrice"
+              @handelInput="changeDiscount"
+            ></InputNumber>
           </div>
-        </div>-->
+        </div>
         <div class="label">
           <label>数量:</label>
           <el-input-number v-model="productNum" :min="1" :step="1" label="数量" class="price_input"></el-input-number>
@@ -1430,6 +1456,22 @@ export default {
       this.productPricePopver = true;
     },
 
+    // 修改价格，计算折扣
+    changePrice(val) {
+      this.discountPrice = this.$calculate.accMul(
+        this.originalPrice,
+        this.discount
+      );
+    },
+
+    // 修改折扣，计算折后价
+    changeDiscount(val) {
+      this.discount = this.$calculate.accDiv(
+        this.discountPrice,
+        this.originalPrice
+      );
+    },
+
     // 确认修改已选择产品数量、价格
     handleChangeProduct() {
       if (this.productNum == undefined || this.productNum == "") {
@@ -1474,17 +1516,28 @@ export default {
 
     // 确认修改已选择项目数量、价格
     handleChangeService() {
-      if (this.productNum == undefined || this.productNum == "") {
+      if (this.discount === "") {
+        this.$message({
+          type: "warning",
+          message: "折扣不能为空"
+        });
+        return;
+      }
+      if (this.discountPrice === "") {
+        this.$message({
+          type: "warning",
+          message: "折后价不能为空"
+        });
+        return;
+      }
+
+      if (this.productNum === "") {
         this.$message({
           type: "warning",
           message: "数量不能为空"
         });
         return;
       } else {
-        this.discountPrice = this.$calculate.accMul(
-          this.originalPrice,
-          this.discount
-        );
         var params = {
           discount: this.discount,
           discountPrice: this.discountPrice,
@@ -1887,25 +1940,27 @@ export default {
         productStatus: 1,
         isHoutai: 0
       };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.serviceItems = res.data.result.list;
-          } else {
-            this.serviceItems = [];
+      if (this.searchKey != "") {
+        this.$https.fetchPost(url, params).then(
+          res => {
+            if (res.data.result) {
+              this.serviceItems = res.data.result.list;
+            } else {
+              this.serviceItems = [];
+              this.$message({
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "warning"
+              });
+            }
+          },
+          error => {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
+              type: "error",
+              message: error
             });
           }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
+        );
+      }
     },
 
     // 清空data必要对象和数组
@@ -2352,6 +2407,7 @@ export default {
 
     // 获取订单详细(根据订单状态)
     getOrder(item) {
+      console.log(item.orderStatus);
       // 已支付
       if (item.orderStatus == 2) {
         var url = this.$https.orderHost + "/order/selectOrderByNum";
@@ -2382,49 +2438,49 @@ export default {
       }
       if (item.orderStatus == 1) {
         this.payTypes = null;
-        if (item.cardNumber == "") {
-          this.orderInfo = item;
-          this.orderpayPopver = true;
-        } else {
-          var list = item.productOrderList;
-          var totalPrice = item.totalPrice;
-          var subclassIds = [];
-          for (var i = 0; i < list.length; i++) {
-            subclassIds.push(list[i].subclassID);
-          }
-          var newArr = subclassIds.join(",");
-          var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
-          var params = {
-            memberNum: item.cardNumber,
-            subClassId: newArr,
-            industryId: localStorage.getItem("industryID")
-          };
-          this.$https.fetchPost(url, params).then(
-            res => {
-              if (res.data.result) {
-                this.orderpayPopver = true;
-                this.orderInfo = item;
-                var list = res.data.result;
-                list.forEach(item => {
-                  item.checked = false;
-                  item.value = totalPrice;
-                });
-                this.payTypes = list;
-              } else {
-                this.$message({
-                  message: res.data.responseStatusType.error.errorMsg,
-                  type: "warning"
-                });
-              }
-            },
-            error => {
+        // if (item.cardNumber == "") {
+        //   this.orderInfo = item;
+        //   this.orderpayPopver = true;
+        // } else {
+        var list = item.productOrderList;
+        var totalPrice = item.totalPrice;
+        var subclassIds = [];
+        for (var i = 0; i < list.length; i++) {
+          subclassIds.push(list[i].subclassID);
+        }
+        var newArr = subclassIds.join(",");
+        var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+        var params = {
+          memberNum: item.cardNumber,
+          subClassId: newArr,
+          industryId: localStorage.getItem("industryID")
+        };
+        this.$https.fetchPost(url, params).then(
+          res => {
+            if (res.data.result) {
+              this.orderpayPopver = true;
+              this.orderInfo = item;
+              var list = res.data.result;
+              list.forEach(item => {
+                item.checked = false;
+                item.value = totalPrice;
+              });
+              this.payTypes = list;
+            } else {
               this.$message({
-                type: "error",
-                message: error
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "warning"
               });
             }
-          );
-        }
+          },
+          error => {
+            this.$message({
+              type: "error",
+              message: error
+            });
+          }
+        );
+        // }
       }
     },
 

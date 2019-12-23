@@ -6,6 +6,7 @@
     :placeholder="placeholder"
     v-model="inputData"
     @keydown="keydownFn"
+    @input="handleInput(inputData)"
   />
 </template>
 
@@ -116,6 +117,9 @@ export default {
       } else {
         this.keyDownDel = false;
       }
+    },
+    handleInput(val){
+      this.$emit("handelInput", val);
     }
   }
 };

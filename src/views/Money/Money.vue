@@ -427,10 +427,7 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
-              <div
-                class="value"
-                v-if="item.accountTypeAmount >= 0 "
-              >
+              <div class="value" v-if="item.accountTypeAmount >= 0 ">
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
@@ -1353,6 +1350,8 @@ export default {
 
     // 判断使用账户是否可打折
     checkDiscount(item) {
+      // console.log("serveBEF", this.serviceList);
+      // console.log("productBEF", this.productList);
       if (item.checked == true && item.discount != 1) {
         this.$confirm(
           "该账户不能用于结算打折类账户，且订单内所有项将按原价进行结算，是否继续?",
@@ -1367,6 +1366,23 @@ export default {
             item.checked = true;
             this.warnValue = true;
             this.realPrice = this.originalPrice;
+            this.serviceList.forEach(item => {
+              item.discount = 1;
+              item.discountPrice = this.$calculate.accMul(
+                item.originalPrice,
+                item.discount
+              );
+            });
+            this.productList.forEach(item => {
+              item.discount = 1;
+              item.discountPrice = this.$calculate.accMul(
+                item.originalPrice,
+                item.discount
+              );
+            });
+            // console.log("serveAFT", this.serviceList);
+            // console.log("productAFT", this.productList);
+            this.caculatePrice();
           })
           .catch(() => {
             item.checked = false;
@@ -1830,7 +1846,10 @@ export default {
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
-      var params = { subclassID: item.subClassId, storeId: localStorage.getItem("storeId") };
+      var params = {
+        subclassID: item.subClassId,
+        storeId: localStorage.getItem("storeId")
+      };
 
       if (item.stockNum == 0) {
         this.$message({

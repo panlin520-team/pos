@@ -317,23 +317,27 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
+          
 
-          if (this.stockNum == 0) {
+          if (this.stockNum !== 0 && this.productName !== value.productName) {
+            // this.$message({
+            //   message: "该商品没有库存",
+            //   type: "warning"
+            // });
+            this.tableDataList.push(res);
+          } else {
             this.$message({
-              message: "该商品没有库存",
+              message: "该商品已存在，可直接修改数量",
               type: "warning"
             });
-          } else {
-            if (res.productName !== value.productName) {
-              this.tableDataList.push(res);
-            } else {
-              this.$message({
-                message: "该商品已存在，可直接修改数量",
-                type: "warning"
-              });
-            }
           }
+          // else {
+          //   if (res.productName !== value.productName) {
+          //     this.tableDataList.push(res);
+          //   } else {
+          //
+          //   }
+          // }
 
           // else if (res.productName == value.productName) {
           //   if (res.productName == value.productName) {

@@ -1542,6 +1542,7 @@ export default {
     },
     //点击会员查看详情
     vipexamine(res) {
+      
       this.sex = res.sex;
       this.num = 0;
       this.dataChangeLastTime = res.dataChangeLastTime;

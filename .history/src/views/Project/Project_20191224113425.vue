@@ -317,13 +317,14 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
+          console.log(this.tableDataList);
 
-          if (this.stockNum == 0) {
-            this.$message({
-              message: "该商品没有库存",
-              type: "warning"
-            });
+          if (this.stockNum !== 0 && this.productName !== value.productName) {
+            // this.$message({
+            //   message: "该商品没有库存",
+            //   type: "warning"
+            // });
+              this.tableDataList.push(res);
           } else {
             if (res.productName !== value.productName) {
               this.tableDataList.push(res);

@@ -207,7 +207,7 @@
         <el-button @click="confirm_storage" type="success">确认购买</el-button>
       </div>
     </PopOver>
-    <MemberFrame ref="moduleName"></MemberFrame>
+    <MemberFrame></MemberFrame>
   </div>
 </template>
 
@@ -244,7 +244,6 @@ export default {
       totalPrice: "0",
       //水单号
       input_woreter: "",
-      payTypeName: "",
       //NAME
       commodityTypeName: "",
       //ID
@@ -317,35 +316,19 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
-
           if (this.stockNum == 0) {
             this.$message({
               message: "该商品没有库存",
               type: "warning"
             });
+          } else if (res.productName == value.productName) {
+            this.$message({
+              message: "该商品已存在，可直接修改数量",
+              type: "warning"
+            });
           } else {
-            if (res.productName !== value.productName) {
-              this.tableDataList.push(res);
-            } else {
-              this.$message({
-                message: "该商品已存在，可直接修改数量",
-                type: "warning"
-              });
-            }
+            this.tableDataList.push(res);
           }
-
-          // else if (res.productName == value.productName) {
-          //   if (res.productName == value.productName) {
-
-          //   }
-          //   this.$message({
-          //     message: "该商品已存在，可直接修改数量",
-          //     type: "warning"
-          //   });
-          // } else {
-          //   this.tableDataList.push(res);
-          // }
         });
       }
 
@@ -369,7 +352,6 @@ export default {
         if (this.input_cataly == value.payTypeId) {
           this.payTypeCategory = value.payTypeCategory;
           this.accountType = value.accountType;
-          this.payTypeName = value.payTypeName;
         }
       });
     },
@@ -427,10 +409,8 @@ export default {
         });
       } else if (this.input_present == this.totalPrice) {
         this.endOrder();
-        this.options = [];
         setTimeout(() => {
           this.projectsubsmall();
-          this.$refs.moduleName.memberbalance();
         }, 600);
         this.input_woreter = "";
         this.tableDataList = [];
@@ -474,7 +454,6 @@ export default {
             this.affirmplOrder();
           })
           .catch(() => {
-            this.options = [];
             this.$message({
               type: "info",
               message: "取消下单！"
@@ -499,11 +478,11 @@ export default {
                 this.options.push({
                   payTypeId: value.payTypeId,
                   payTypeCategory: value.payTypeCategory,
-                  payTypeName: value.payTypeName,
-                  accountType: value.accountType
+                  payTypeName: value.payTypeName
                 });
               }
             });
+            
           }
         })
         .catch(err => {});
@@ -637,7 +616,7 @@ export default {
       var arr = {
         payType: this.input_cataly,
         amount: this.input_present,
-        payTypeName: this.payTypeName,
+        payTypeName: this.input_cataly,
         accountType: this.accountType,
         payTypeCategory: this.payTypeCategory
       };
@@ -979,6 +958,7 @@ export default {
       .el-input {
         margin-top: 10px;
         width: 180px;
+        height: 45px;
         border-radius: 5px;
       }
       .el-radio {

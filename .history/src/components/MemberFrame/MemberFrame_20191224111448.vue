@@ -1086,6 +1086,8 @@ export default {
         .fetchPost(url, params)
         .then(res => {
           if (res.data.result) {
+            console.log(res.data.result);
+
             this.empSet = res.data.result.list[0].postCategoryVOList;
             this.empList =
               res.data.result.list[0].postCategoryVOList[0].beauticianList;
@@ -1093,6 +1095,7 @@ export default {
               res.data.result.list[0].postCategoryVOList[0].postCategoryId;
             this.currentServiceTitle =
               res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+            console.log(this.empSet);
           } else {
             this.empSet = [];
             this.$message({

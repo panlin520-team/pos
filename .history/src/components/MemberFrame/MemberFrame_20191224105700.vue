@@ -325,7 +325,6 @@ export default {
       accountType: "",
       //员工编号
       subClassId: "",
-      staffNumber: "",
       //会员卡号
       memberNum: "",
       cardName: "哈哈哈哈",
@@ -442,12 +441,14 @@ export default {
     // push已选择项目
     pushService() {
       var list = this.empSet;
+      console.log(em);
+      
       var arr = [];
       for (var i = 0; i < list.length; i++) {
         if (list[i].setEmpId != "" && list[i].setEmpId != undefined) {
           arr.push({
             postId: list[i].postId,
-            beauticianId: this.staffNumber,
+            beauticianId: list[i].setEmpId,
             beauticianName: list[i].setEmpName
           });
         }
@@ -541,7 +542,6 @@ export default {
     },
     // 对应选择项目工种下员工并修改对应服务项目工种菜单
     fetchServiceEmp(id, item) {
-      this.staffNumber = item.staffNumber;
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
         return item.postCategoryId == id;

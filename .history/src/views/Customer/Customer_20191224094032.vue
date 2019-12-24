@@ -1542,6 +1542,7 @@ export default {
     },
     //点击会员查看详情
     vipexamine(res) {
+      this.optionpeTylp = [];
       this.sex = res.sex;
       this.num = 0;
       this.dataChangeLastTime = res.dataChangeLastTime;
@@ -1568,7 +1569,7 @@ export default {
       this.cosmeticData();
       this.productData();
       this.rechargepeople();
-
+      this.paymentTalp();
       this.accounttypeData();
       //查询消费图表
       this.queryConsumption();
@@ -1895,16 +1896,24 @@ export default {
         pageSize: this.pageSize1,
         memberNum: this.cardNumber
       };
-      this.$https.fetchPost(url, params).then(res => {
-        if (res.data.result) {
-          this.accounts = res.data.result.list;
-        } else {
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.accounts = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
           this.$message({
-            message: res.data.responseStatusType.error.errorMsg,
-            type: "warning"
+            type: "error",
+            message: error
           });
         }
-      });
+      );
     },
     //护理记录
     nurserecordData() {
@@ -2050,7 +2059,7 @@ export default {
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.responseStatusType.message == "Success") {
           this.$message({
-            message: res.data.result,
+            message: res.data,
             type: "success",
             duration: 5000
           });
@@ -2264,7 +2273,6 @@ export default {
     },
     //点击充值
     show_recharge() {
-      this.optionpeTylp = [];
       this.value_tregion = "";
       this.form.money = "";
       this.form.gatheringp = "";
@@ -2276,8 +2284,6 @@ export default {
       this.form.desc = "";
 
       this.visible_recharge = true;
-
-      this.paymentTalp();
     },
     close_recharge() {
       // this.beauticianIds[0].amount = "";
@@ -2393,7 +2399,6 @@ export default {
           p {
             font-size: 20px;
             margin-bottom: 6px;
-            font-weight: 600;
           }
         }
       }

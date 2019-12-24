@@ -1542,6 +1542,7 @@ export default {
     },
     //点击会员查看详情
     vipexamine(res) {
+      this.optionpeTylp = [];
       this.sex = res.sex;
       this.num = 0;
       this.dataChangeLastTime = res.dataChangeLastTime;
@@ -1568,7 +1569,7 @@ export default {
       this.cosmeticData();
       this.productData();
       this.rechargepeople();
-
+      
       this.accounttypeData();
       //查询消费图表
       this.queryConsumption();
@@ -2264,7 +2265,6 @@ export default {
     },
     //点击充值
     show_recharge() {
-      this.optionpeTylp = [];
       this.value_tregion = "";
       this.form.money = "";
       this.form.gatheringp = "";
@@ -2276,8 +2276,6 @@ export default {
       this.form.desc = "";
 
       this.visible_recharge = true;
-
-      this.paymentTalp();
     },
     close_recharge() {
       // this.beauticianIds[0].amount = "";

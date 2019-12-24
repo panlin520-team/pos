@@ -1542,6 +1542,7 @@ export default {
     },
     //点击会员查看详情
     vipexamine(res) {
+      
       this.sex = res.sex;
       this.num = 0;
       this.dataChangeLastTime = res.dataChangeLastTime;
@@ -2264,7 +2265,6 @@ export default {
     },
     //点击充值
     show_recharge() {
-      this.optionpeTylp = [];
       this.value_tregion = "";
       this.form.money = "";
       this.form.gatheringp = "";

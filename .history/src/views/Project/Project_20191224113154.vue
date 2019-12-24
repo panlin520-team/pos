@@ -290,6 +290,8 @@ export default {
     },
     //点击添加订单
     car_smreos(res) {
+      console.log(res);
+
       this.serviceProductId = res.serviceProductId;
       this.stockNum = res.stockNum;
       var object = {
@@ -317,7 +319,7 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
+          console.log(this.tableDataList);
 
           if (this.stockNum == 0) {
             this.$message({

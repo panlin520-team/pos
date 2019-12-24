@@ -317,7 +317,7 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
+          console.log(this.tableDataList);
 
           if (this.stockNum == 0) {
             this.$message({

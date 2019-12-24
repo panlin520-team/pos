@@ -1093,6 +1093,7 @@ export default {
               res.data.result.list[0].postCategoryVOList[0].postCategoryId;
             this.currentServiceTitle =
               res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+            console.log(this.empSet);
           } else {
             this.empSet = [];
             this.$message({

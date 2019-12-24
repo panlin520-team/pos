@@ -317,8 +317,8 @@ export default {
         }
       } else {
         this.tableDataList.forEach(value => {
-          console.log(value.productName);
-
+          console.log(value);
+          
           if (this.stockNum == 0) {
             this.$message({
               message: "该商品没有库存",

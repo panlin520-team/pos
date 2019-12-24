@@ -2277,7 +2277,7 @@ export default {
 
       this.visible_recharge = true;
 
-      this.paymentTalp();
+      // this.paymentTalp();
     },
     close_recharge() {
       // this.beauticianIds[0].amount = "";

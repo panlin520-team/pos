@@ -325,7 +325,6 @@ export default {
       accountType: "",
       //员工编号
       subClassId: "",
-      staffNumber: "",
       //会员卡号
       memberNum: "",
       cardName: "哈哈哈哈",
@@ -447,7 +446,7 @@ export default {
         if (list[i].setEmpId != "" && list[i].setEmpId != undefined) {
           arr.push({
             postId: list[i].postId,
-            beauticianId: this.staffNumber,
+            beauticianId: list[i].setEmpId,
             beauticianName: list[i].setEmpName
           });
         }
@@ -541,7 +540,6 @@ export default {
     },
     // 对应选择项目工种下员工并修改对应服务项目工种菜单
     fetchServiceEmp(id, item) {
-      this.staffNumber = item.staffNumber;
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
         return item.postCategoryId == id;
@@ -568,11 +566,11 @@ export default {
       localStorage.setItem("remark", this.remark);
       if (localStorage.getItem("membership")) {
         this.rmarkMember();
-      } else {
+      }else{
         this.$message({
-          message: "请先选择会员",
-          type: "warning"
-        });
+              message: "请先选择会员",
+              type: "warning"
+            });
       }
     },
     // 服务项目工种菜单切换
@@ -955,7 +953,7 @@ export default {
         res => {
           if (res.data.responseStatusType.message == "Success") {
             this.$message({
-              message: res.data.result,
+              message: ,
               type: "success",
               duration: 5000
             });
@@ -1079,8 +1077,7 @@ export default {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
-        subclassID: this.subClassId,
-        storeId: localStorage.getItem("storeId")
+        subclassID: this.subClassId
       };
       this.$https
         .fetchPost(url, params)

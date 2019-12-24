@@ -541,6 +541,7 @@ export default {
     },
     // 对应选择项目工种下员工并修改对应服务项目工种菜单
     fetchServiceEmp(id, item) {
+      console.log("item", item);
       this.staffNumber = item.staffNumber;
       // 遍历寻找含指定id的某条数据
       var res = this.empSet.find(item => {
@@ -1086,6 +1087,8 @@ export default {
         .fetchPost(url, params)
         .then(res => {
           if (res.data.result) {
+            console.log(res.data.result);
+
             this.empSet = res.data.result.list[0].postCategoryVOList;
             this.empList =
               res.data.result.list[0].postCategoryVOList[0].beauticianList;
@@ -1093,6 +1096,7 @@ export default {
               res.data.result.list[0].postCategoryVOList[0].postCategoryId;
             this.currentServiceTitle =
               res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+            console.log(this.empSet);
           } else {
             this.empSet = [];
             this.$message({

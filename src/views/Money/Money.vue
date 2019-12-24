@@ -429,7 +429,7 @@
               <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
               <div
                 class="value"
-                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+                v-if="item.accountTypeAmount >= 0 "
               >
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
@@ -716,6 +716,7 @@
           <div class="price_input">
             <InputNumber
               placeholder="折后价"
+              :point="2"
               v-model.number="discountPrice"
               @handelInput="changeDiscount"
             ></InputNumber>
@@ -1829,7 +1830,7 @@ export default {
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
-      var params = { subclassID: item.subClassId };
+      var params = { subclassID: item.subClassId, storeId: localStorage.getItem("storeId") };
 
       if (item.stockNum == 0) {
         this.$message({
@@ -2093,7 +2094,8 @@ export default {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
-        commodityTypeID: id
+        commodityTypeID: id,
+        storeId: localStorage.getItem("storeId")
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -2407,7 +2409,6 @@ export default {
 
     // 获取订单详细(根据订单状态)
     getOrder(item) {
-      console.log(item.orderStatus);
       // 已支付
       if (item.orderStatus == 2) {
         var url = this.$https.orderHost + "/order/selectOrderByNum";

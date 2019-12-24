@@ -58,7 +58,7 @@
             ></el-switch>
           </div>-->
           <div style="flex:1">
-            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.beauticianId)">查看</el-button>
+            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.staffNumber)">查看</el-button>
             <el-button type="warning" size="mini" @click="delEmployees(item.beauticianId)">删除</el-button>
           </div>
         </div>
@@ -830,8 +830,6 @@ export default {
         createOperator: localStorage.getItem("trueName")
       };
 
-      console.log("params", params);
-
       if (params.name == "" || params.name == null) {
         this.$message({
           message: "请填写名称",
@@ -973,8 +971,6 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
-            console.log(res.data.result);
-
             this.dataTotal = res.data.result.total;
             this.emlpoyeesData = res.data.result;
           } else {

@@ -523,6 +523,7 @@
           <div class="price_input">
             <InputNumber
               placeholder="折后价"
+              :point="2"
               v-model.number="discountPrice"
               @handelInput="changeDiscount"
             ></InputNumber>
@@ -777,7 +778,8 @@ export default {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
-        commodityTypeID: id
+        commodityTypeID: id,
+        storeId: localStorage.getItem("storeId")
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -1372,7 +1374,7 @@ export default {
             postId: list[i].postId,
             beauticianName: list[i].staffNumber.name,
             beauticanJob: list[i].postName,
-            staffNumber: list[i].staffNumber.staffNumber,
+            beauticianId: list[i].staffNumber.staffNumber,
             nursingDate: list[i].nursingDate + " " + list[i].time,
             duration: list[i].duration
           });
@@ -1452,7 +1454,10 @@ export default {
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
-      var params = { subclassID: item.subClassId };
+      var params = {
+        subclassID: item.subClassId,
+        storeId: localStorage.getItem("storeId")
+      };
 
       if (item.stockNum == 0) {
         this.$message({

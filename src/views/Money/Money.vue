@@ -2155,6 +2155,7 @@ export default {
           }
         },
         error => {
+          this.menuItem = [];
           this.$message({
             type: "error",
             message: error

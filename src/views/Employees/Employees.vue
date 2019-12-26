@@ -25,7 +25,7 @@
         <div class="headerItem">性别</div>
         <!-- <div class="headerItem">分组</div> -->
         <div class="headerItem">职务</div>
-        <div class="headerItem">级别</div>
+        <!-- <div class="headerItem">级别</div> -->
         <div class="headerItem">目前状态</div>
         <div class="headerItem">操作</div>
       </div>
@@ -43,7 +43,7 @@
           >{{item.gender == 0 ? '女' : ''}}{{item.gender == 1 ? '男' : ''}}{{item.gender == null ? '未知' : ''}}</div>
           <!-- <div style="flex:1">{{item.groupName}}</div> -->
           <div style="flex:1">{{item.postName}}</div>
-          <div style="flex:1">{{item.postLevelName}}</div>
+          <!-- <div style="flex:1">{{item.postLevelName}}</div> -->
           <div
             style="flex:1"
           >{{item.workingState == 0 ? '离职' : ''}}{{item.workingState == 1 ? '在职' : ''}}{{item.workingState == null ? '未知' : ''}}</div>
@@ -58,7 +58,7 @@
             ></el-switch>
           </div>-->
           <div style="flex:1">
-            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.staffNumber)">查看</el-button>
+            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.staffNumber)">编辑</el-button>
             <el-button type="warning" size="mini" @click="delEmployees(item.beauticianId)">删除</el-button>
           </div>
         </div>
@@ -179,7 +179,7 @@
               </el-select>
             </div>
           </div>
-          <div class="item">
+          <!-- <div class="item">
             <label class="label-left">级别</label>
             <div class="value">
               <el-select v-model="employeesDetails.postLevel" placeholder="请选择级别">
@@ -191,7 +191,7 @@
                 ></el-option>
               </el-select>
             </div>
-          </div>
+          </div> -->
           <div class="item">
             <label class="label-left">入职时间</label>
             <div class="value">
@@ -604,8 +604,7 @@ export default {
     if (localStorage.getItem("storeId")) {
       this.$axios
         .all([
-          this.fetchPostNames(),
-          this.fetchLevel()
+          this.fetchPostNames()
         ])
         .then();
     }
@@ -702,7 +701,7 @@ export default {
         postId: this.employeesDetails.postId,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
-        postLevel: this.employeesDetails.postLevel,
+        // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
         introduction: this.employeesDetails.introduction,
         modifyOperator: localStorage.getItem("trueName"),
@@ -821,7 +820,7 @@ export default {
         postId: this.employeesDetails.postId,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
-        postLevel: this.employeesDetails.postLevel,
+        // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
         introduction: this.employeesDetails.introduction,
         modifyOperator: localStorage.getItem("trueName"),
@@ -990,29 +989,29 @@ export default {
     },
 
     // 员工级别
-    fetchLevel() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectPostLevelNoPage";
-      var params = {};
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.levels = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
+    // fetchLevel() {
+    //   var url =
+    //     this.$https.storeHost + "/manage/beautician/selectPostLevelNoPage";
+    //   var params = {};
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       if (res.data.result) {
+    //         this.levels = res.data.result;
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
 
     // 门店员工职务
     fetchPostNames() {

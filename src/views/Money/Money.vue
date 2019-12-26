@@ -509,7 +509,7 @@
               <el-checkbox v-model="item.checked"></el-checkbox>
               <div
                 class="value"
-                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+                v-if="item.accountTypeAmount >= 0"
               >
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>

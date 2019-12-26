@@ -122,7 +122,7 @@
               </el-table-column>
               <el-table-column label="数量" min-width="80">
                 <template slot-scope="scope">
-                  <div slot="reference" class="name-wrapper">
+                  <div slot="reference" class="name-wrapper wraperInput">
                     <input
                       @change="changeNumer(scope.row)"
                       type="number"
@@ -893,17 +893,13 @@ export default {
       margin: 0 auto;
       height: 470px;
       overflow: auto;
+      
       .table-box {
         min-width: 95%;
         margin: 20px auto 0 auto;
         box-shadow: 0px 0px 13px 3px rgba(221, 248, 229, 1);
         border-radius: 4px;
         position: relative;
-        input {
-          border: 1px solid rgb(189, 184, 184);
-          width: 60px;
-          height: 25px;
-        }
       }
     }
     .project-header {

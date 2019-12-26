@@ -1676,9 +1676,6 @@ export default {
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
     padding: 30px;
-    .projectcar{
-
-    }
   }
 }
 .storageblock3 {

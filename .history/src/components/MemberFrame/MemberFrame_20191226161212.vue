@@ -113,11 +113,11 @@
                     </template>
                   </el-table-column>
                 </el-table>-->
-                <div class="projectcar">
+                <div c>
                   <label>体验卡</label>
                   <el-button size="mini" type="success" @click="experienceCard">查看详情</el-button>
                 </div>
-                <div class="projectcar">
+                <div>
                   <label>项目定制</label>
                   <el-button size="mini" type="success" @click="experienization">查看详情</el-button>
                 </div>
@@ -1676,9 +1676,6 @@ export default {
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
     padding: 30px;
-    .projectcar{
-
-    }
   }
 }
 .storageblock3 {

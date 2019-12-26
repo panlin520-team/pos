@@ -113,13 +113,13 @@
                     </template>
                   </el-table-column>
                 </el-table>-->
-                <div class="projectcar">
+                <div>
                   <label>体验卡</label>
-                  <el-button size="mini" type="success" @click="experienceCard">查看详情</el-button>
+                  <el-button size="mini" type="success" @click="experienceCard(scope.row)">查看详情</el-button>
                 </div>
-                <div class="projectcar">
+                <div>
                   <label>项目定制</label>
-                  <el-button size="mini" type="success" @click="experienization">查看详情</el-button>
+                  <el-button size="mini" type="success" @click="vipecarLise(scope.row)">查看详情</el-button>
                 </div>
                 <PopOver
                   custom-class="storageblock3"
@@ -739,14 +739,6 @@ export default {
           type: "warning"
         });
       }
-    },
-    //查看体验卡详情
-    experienceCard(){
-
-    },
-    //查看项目定制详情
-    experienization(){
-
     },
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
@@ -1676,9 +1668,6 @@ export default {
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
     padding: 30px;
-    .projectcar{
-
-    }
   }
 }
 .storageblock3 {

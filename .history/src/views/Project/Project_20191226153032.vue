@@ -900,9 +900,7 @@ export default {
         border-radius: 4px;
         position: relative;
         input {
-          border: 1px solid rgb(189, 184, 184);
-          width: 60px;
-          height: 25px;
+          border: 1px solid red;
         }
       }
     }

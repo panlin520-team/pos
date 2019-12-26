@@ -1746,7 +1746,7 @@ export default {
         remark: this.ruleForm_addvip.remark,
         memberAddType: 1,
         idCard: this.ruleForm_addvip.identity,
-        wxOpenId: this.ruleForm_addvip.wxOpenId
+        wxOpenId: this.ruleForm_addvip.identity
       };
       this.$https.fetchPost(url, params).then(
         res => {

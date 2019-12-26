@@ -49,7 +49,7 @@
             <el-form-item label="会员手机号：" prop="pople">
               <el-input v-model="ruleForm_addvip.pople"></el-input>
             </el-form-item>
-            <el-form-item label="微信openId：">
+            <el-form-item label="微信openId：" prop="pople">
               <el-input v-model="ruleForm_addvip.wxOpenId"></el-input>
             </el-form-item>
             <el-form-item label="身份证号：">
@@ -750,7 +750,7 @@ export default {
         name: "",
         region: "",
         resource: "",
-        wxOpenId: "",
+        wxOpenId
         pople: "",
         identity: "",
         remark: "",
@@ -1039,6 +1039,7 @@ export default {
         this.imageUrl = res.data.src;
         this.zhterMember();
         localStorage.setItem("imageUrl", this.imageUrl);
+
       }, 200);
     },
     beforeAvatarUpload(file) {
@@ -1745,8 +1746,7 @@ export default {
         sex: this.ruleForm_addvip.sex,
         remark: this.ruleForm_addvip.remark,
         memberAddType: 1,
-        idCard: this.ruleForm_addvip.identity,
-        wxOpenId: this.ruleForm_addvip.wxOpenId
+        idCard: this.ruleForm_addvip.identity
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -2446,7 +2446,7 @@ export default {
       height: 100%;
       overflow: auto;
       background-color: #fff;
-      margin-left: 250px;
+      margin: auto;
       .personage {
         .rightTitle {
           width: 100%;

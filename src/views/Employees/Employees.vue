@@ -1016,7 +1016,7 @@ export default {
     // 门店员工职务
     fetchPostNames() {
       var url = this.$https.storeHost + "/manage/beautician/selectPost";
-      var params = { postIndustryIDSearch: 2 };
+      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {

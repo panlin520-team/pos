@@ -6,34 +6,34 @@
       <div class="elleft">
         <p class="title">收银产品</p>
         <!-- <div v-for="item in tableDataLists" :key="item.name" @click="clickitem(item)"> -->
-        <!-- <div style="width:100px;height:100px;border:1px solid red">{{item.productName}}</div> -->
-        <!-- 选择日期弹出框 -->
-        <PopOver
-          custom-class="storageblocks"
-          :visible.sync="visible_times"
-          @close="closeTime"
-          width="450px"
-        >
-          <div class="stgblcktop" slot="top">产品截止日期</div>
-          <div class="stgblcktopmain" slot="main">
-            <div class="optionDate">
-              <label>产品截止日期：</label>
-              <el-date-picker
-                format="yyyy-MM-dd HH:mm:ss"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                v-model="value_invenT"
-                type="date"
-                class="herderDatePicker"
-                placeholder="选择日期"
-                :picker-options="pickerOptions0"
-              ></el-date-picker>
+          <!-- <div style="width:100px;height:100px;border:1px solid red">{{item.productName}}</div> -->
+          <!-- 选择日期弹出框 -->
+          <PopOver
+            custom-class="storageblocks"
+            :visible.sync="visible_times"
+            @close="closeTime"
+            width="450px"
+          >
+            <div class="stgblcktop" slot="top">产品截止日期</div>
+            <div class="stgblcktopmain" slot="main">
+              <div class="optionDate">
+                <label>产品截止日期：</label>
+                <el-date-picker
+                  format="yyyy-MM-dd HH:mm:ss"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  v-model="value_invenT"
+                  type="date"
+                  class="herderDatePicker"
+                  placeholder="选择日期"
+                  :picker-options="pickerOptions0"
+                ></el-date-picker>
+              </div>
             </div>
-          </div>
-          <div class="stgblckbottom" slot="bottom">
-            <el-button @click="confirm_false" type="info">取消</el-button>
-            <el-button @click="confirm_true" type="success">确定</el-button>
-          </div>
-        </PopOver>
+            <div class="stgblckbottom" slot="bottom">
+              <el-button @click="confirm_false" type="info">取消</el-button>
+              <el-button @click="confirm_true" type="success">确定</el-button>
+            </div>
+          </PopOver>
         <!-- </div> -->
         <!-- 大类 -->
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -383,6 +383,7 @@ export default {
     },
     //点击添加订单
     car_smreos(res) {
+      
       this.visible_times = true;
       this.serviceProductId = res.serviceProductId;
       this.stockNum = res.stockNum;

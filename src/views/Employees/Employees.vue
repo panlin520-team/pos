@@ -601,13 +601,11 @@ export default {
     this.fetchEmployees();
   },
   mounted() {
-    // 请求并发处理
     if (localStorage.getItem("storeId")) {
       this.$axios
         .all([
           this.fetchPostNames(),
-          this.fetchLevel(),
-          this.fetchGroupLeader()
+          this.fetchLevel()
         ])
         .then();
     }
@@ -759,13 +757,13 @@ export default {
         return false;
       }
 
-      if (params.postLevel == undefined) {
-        this.$message({
-          message: "请选择级别",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.postLevel == undefined) {
+      //   this.$message({
+      //     message: "请选择级别",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
       if (params.workingState == undefined) {
         this.$message({
@@ -775,13 +773,13 @@ export default {
         return false;
       }
 
-      if (params.entryTime == undefined) {
-        this.$message({
-          message: "请选择入职时间",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.entryTime == undefined) {
+      //   this.$message({
+      //     message: "请选择入职时间",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
       var url = this.$https.storeHost + "/manage/beautician/updateBeautician";
       this.$https.fetchPost(url, params).then(
@@ -813,7 +811,7 @@ export default {
     // 新建成员
     newEmployees() {
       var params = {
-        beauticianId: this.employeesDetails.beauticianId,
+        // beauticianId: this.employeesDetails.beauticianId,
         headUrl: this.employeesDetails.headUrl,
         openId: this.employeesDetails.openId,
         name: this.employeesDetails.name,
@@ -830,7 +828,7 @@ export default {
         createOperator: localStorage.getItem("trueName")
       };
 
-      if (params.name == "" || params.name == null) {
+      if (params.name == "" || params.name == undefined) {
         this.$message({
           message: "请填写名称",
           type: "warning"
@@ -878,13 +876,13 @@ export default {
         return false;
       }
 
-      if (params.postLevel == undefined) {
-        this.$message({
-          message: "请选择级别",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.postLevel == undefined) {
+      //   this.$message({
+      //     message: "请选择级别",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
       if (params.workingState == undefined) {
         this.$message({
@@ -894,13 +892,13 @@ export default {
         return false;
       }
 
-      if (params.entryTime == undefined) {
-        this.$message({
-          message: "请选择入职时间",
-          type: "warning"
-        });
-        return false;
-      }
+      // if (params.entryTime == undefined) {
+      //   this.$message({
+      //     message: "请选择入职时间",
+      //     type: "warning"
+      //   });
+      //   return false;
+      // }
 
       var url = this.$https.storeHost + "/manage/beautician/insertBeautician";
       this.$https.fetchPost(url, params).then(
@@ -1019,7 +1017,7 @@ export default {
     // 门店员工职务
     fetchPostNames() {
       var url = this.$https.storeHost + "/manage/beautician/selectPost";
-      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
+      var params = { postIndustryIDSearch: 2 };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
@@ -1115,29 +1113,29 @@ export default {
     },
 
     // 获取分组组长可选列表
-    fetchGroupLeader() {
-      var url =
-        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
-      var params = { storeId: localStorage.getItem("storeId") };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.groupLeader = res.data.result;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
+    // fetchGroupLeader() {
+    //   var url =
+    //     this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+    //   var params = { storeId: localStorage.getItem("storeId") };
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       if (res.data.result) {
+    //         this.groupLeader = res.data.result;
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
 
     // 删除分组
     delGroup(item) {

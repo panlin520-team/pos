@@ -229,7 +229,10 @@
                     x{{item.productNum}}
                   </div>
                   <div class="price">
-                    <span class="discount" v-if="item.discount != 1">{{item.discount * 10}}折</span>
+                    <span
+                      class="discount"
+                      v-if="item.discount != 1"
+                    >{{$calculate.accMul(item.discount,10)}}折</span>
                     <span>¥ {{item.productNum * item.discountPrice}}</span>
                   </div>
                 </div>
@@ -1019,6 +1022,7 @@ export default {
         })
         .catch(() => {});
     },
+
     // 确认选择会员
     handleAffirm(row) {
       this.memberValue = true;
@@ -1029,6 +1033,7 @@ export default {
       };
       this.memberPopver = false;
     },
+
     // 根据姓名或电话获取会员信息
     selectStoreMember(i) {
       var url =
@@ -1461,6 +1466,18 @@ export default {
       // }
     },
 
+    // 打开修改已选择项目数量、价格
+    openChangeService(index, item) {
+      this.saveService = item;
+      this.serviceIndex = index;
+      this.productName = item.productName;
+      this.productNum = item.productNum;
+      this.originalPrice = item.originalPrice;
+      this.discount = item.discount;
+      this.discountPrice = item.discountPrice;
+      this.servicePricePopver = true;
+    },
+
     // 打开修改已选择产品数量、价格
     openChangeProduct(index, item) {
       this.saveProduct = item;
@@ -1491,7 +1508,22 @@ export default {
 
     // 确认修改已选择产品数量、价格
     handleChangeProduct() {
-      if (this.productNum == undefined || this.productNum == "") {
+      if (this.discount === "") {
+        this.$message({
+          type: "warning",
+          message: "折扣不能为空"
+        });
+        return;
+      }
+      if (this.discountPrice === "") {
+        this.$message({
+          type: "warning",
+          message: "折后价不能为空"
+        });
+        return;
+      }
+
+      if (this.productNum === "") {
         this.$message({
           type: "warning",
           message: "数量不能为空"
@@ -1517,18 +1549,6 @@ export default {
         this.productPricePopver = false;
         this.caculatePrice();
       }
-    },
-
-    // 打开修改已选择项目数量、价格
-    openChangeService(index, item) {
-      this.saveService = item;
-      this.serviceIndex = index;
-      this.productName = item.productName;
-      this.productNum = item.productNum;
-      this.originalPrice = item.originalPrice;
-      this.discount = item.discount;
-      this.discountPrice = item.discountPrice;
-      this.servicePricePopver = true;
     },
 
     // 确认修改已选择项目数量、价格

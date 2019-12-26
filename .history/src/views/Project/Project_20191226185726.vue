@@ -143,9 +143,8 @@
                 </template>
               </el-table-column>
               <el-table-column label="原价" min-width="80">
-                <template>
-                  <!-- <div slot="reference" class="name-wrapper">{{retailPricess}}</div> -->
-                  <el-input v-model="retailPricess" :disabled="true"></el-input>
+                <template slot-scope="scope">
+                  <div slot="reference" class="name-wrapper">{{ scope.row.retailPrice }}</div>
                 </template>
               </el-table-column>
               <el-table-column label="总价" min-width="80">
@@ -287,7 +286,6 @@ export default {
       activeName_common: "",
       //储蓄支付
       input_cataly: "",
-      retailPricess: "",
       //弹出框
       visible_examine: false,
       visible_merchande: false,
@@ -300,7 +298,6 @@ export default {
       options: [],
       //库存数量
       stockNum: "",
-      discounts: "",
       //商品ID
       serviceProductId: "",
       tableDataLists: [
@@ -340,14 +337,14 @@ export default {
     //选择时间后添加
     confirm_true() {
       let res = this.resList;
-      var object = {
-        useLimit: this.value_invenT
-      };
-      res = Object.assign(this.resList, object);
+      console.log(res);
+      console.log(this.resList);
+var object
+      res = Object.assign({}, object);
+
       if (this.value_invenT !== "") {
         this.visible_times = false;
         this.tableDataList.push(res);
-
         this.calcTotalPrice();
         this.value_invenT = "";
       } else {
@@ -386,14 +383,13 @@ export default {
       this.tableDataList.forEach((item, index) => {
         if (item) {
           this.totalPrice += item.amount * item.retailPrice; //累加的
-          // this.discounts =
         }
       });
     },
     //点击添加订单value_invenT
     car_smreos(res) {
       console.log(res);
-      this.retailPricess = res.retailPrice;
+
       this.serviceProductId = res.serviceProductId;
       this.stockNum = res.stockNum;
       var object = {
@@ -404,8 +400,8 @@ export default {
         productNum: this.amount,
         productName: res.productName,
         retailPrice: res.retailPrice,
-        originalPrice: this.retailPricess,
-        discount: res.retailPrice / this.retailPricess,
+        originalPrice: res.retailPrice,
+        discount: 1,
         discountPrice: res.retailPrice,
         serviceProductId: res.serviceProductId
       };
@@ -475,25 +471,14 @@ export default {
       if (res.amount < 1) {
         res.amount = 1;
       }
-
       //计算
       this.calcTotalPrice();
     },
-    //改变单价
+    //改变数量
     changeRefer(res) {
-      res.retailPrice = parseInt(res.retailPrice);
-
       if (res.retailPrice < 1) {
         res.retailPrice = 1;
       }
-      // this.tableDataList.discountPrices = res.retailPrice;
-      // this.tableDataList.discounts =
-      //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
-      console.log(res);
-      console.log(this.tableDataList);
-
       //计算
       this.calcTotalPrice();
     },

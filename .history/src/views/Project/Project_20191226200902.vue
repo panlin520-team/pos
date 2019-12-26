@@ -489,10 +489,9 @@ export default {
       // this.tableDataList.discountPrices = res.retailPrice;
       // this.tableDataList.discounts =
       //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
       console.log(res);
       console.log(this.tableDataList);
+      
 
       //计算
       this.calcTotalPrice();

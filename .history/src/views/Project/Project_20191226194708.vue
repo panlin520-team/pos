@@ -300,7 +300,6 @@ export default {
       options: [],
       //库存数量
       stockNum: "",
-      discounts: "",
       //商品ID
       serviceProductId: "",
       tableDataLists: [
@@ -481,18 +480,11 @@ export default {
     },
     //改变单价
     changeRefer(res) {
-      res.retailPrice = parseInt(res.retailPrice);
-
       if (res.retailPrice < 1) {
         res.retailPrice = 1;
       }
-      // this.tableDataList.discountPrices = res.retailPrice;
-      // this.tableDataList.discounts =
-      //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
-      console.log(res);
       console.log(this.tableDataList);
+      this.discounts = 
 
       //计算
       this.calcTotalPrice();

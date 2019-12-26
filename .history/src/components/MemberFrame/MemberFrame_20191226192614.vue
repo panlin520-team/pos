@@ -132,12 +132,18 @@
                     <el-table :data="tableData_rieniza" style="width: 100%">
                       <el-table-column label="项目名称">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.productName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="项目类型">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.productTypeName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="使用总数" width="80">
@@ -157,8 +163,8 @@
                       </el-table-column>
                       <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
-                          <el-button size="mini" type="danger" @click="rienizatails(scope.row)">划卡</el-button>
-                          <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                          <el-button size="mini" type="danger" @click="wwww(scope.row)">划卡</el-button>
+                          <el-button size="mini" type="success" @click="w(scope.row)">使用详情</el-button>
                         </template>
                       </el-table-column>
                     </el-table>
@@ -814,12 +820,6 @@ export default {
     show_stgbcar() {
       this.memberinformation();
       this.visible_care = true;
-    },
-    //项目定制划卡
-    rienizatails() {},
-    //项目定制详情
-    rienizauss() {
-      this.suserPopover = true;
     },
     //详情分页
     handleSizeChange(val) {},

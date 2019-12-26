@@ -132,12 +132,18 @@
                     <el-table :data="tableData_rieniza" style="width: 100%">
                       <el-table-column label="项目名称">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.productName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="项目类型">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.productTypeName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="使用总数" width="80">

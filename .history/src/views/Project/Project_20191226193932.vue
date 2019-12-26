@@ -145,7 +145,7 @@
               <el-table-column label="原价" min-width="80">
                 <template>
                   <!-- <div slot="reference" class="name-wrapper">{{retailPricess}}</div> -->
-                  <el-input v-model="retailPricess" :disabled="true"></el-input>
+                  
                 </template>
               </el-table-column>
               <el-table-column label="总价" min-width="80">
@@ -300,7 +300,6 @@ export default {
       options: [],
       //库存数量
       stockNum: "",
-      discounts: "",
       //商品ID
       serviceProductId: "",
       tableDataLists: [
@@ -386,7 +385,6 @@ export default {
       this.tableDataList.forEach((item, index) => {
         if (item) {
           this.totalPrice += item.amount * item.retailPrice; //累加的
-          // this.discounts =
         }
       });
     },
@@ -404,8 +402,8 @@ export default {
         productNum: this.amount,
         productName: res.productName,
         retailPrice: res.retailPrice,
-        originalPrice: this.retailPricess,
-        discount: res.retailPrice / this.retailPricess,
+        originalPrice: res.retailPrice,
+        discount: 1,
         discountPrice: res.retailPrice,
         serviceProductId: res.serviceProductId
       };
@@ -442,7 +440,7 @@ export default {
       this.visible_merchande = true;
       this.projectsubclass();
     },
-
+    
     //项目里面点击切换
     commonleClick(tab) {
       this.subclassID = tab.name;
@@ -475,25 +473,16 @@ export default {
       if (res.amount < 1) {
         res.amount = 1;
       }
-
+      console.log(this.tableDataList);
+      
       //计算
       this.calcTotalPrice();
     },
-    //改变单价
+    //改变数量
     changeRefer(res) {
-      res.retailPrice = parseInt(res.retailPrice);
-
       if (res.retailPrice < 1) {
         res.retailPrice = 1;
       }
-      // this.tableDataList.discountPrices = res.retailPrice;
-      // this.tableDataList.discounts =
-      //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
-      console.log(res);
-      console.log(this.tableDataList);
-
       //计算
       this.calcTotalPrice();
     },

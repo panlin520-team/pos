@@ -132,12 +132,23 @@
                     <el-table :data="tableData_rieniza" style="width: 100%">
                       <el-table-column label="项目名称">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.experiencecardProductName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品小类">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.subClassName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="项目类型">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.experiencecardProductTypeName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="使用总数" width="80">
@@ -155,12 +166,12 @@
                           <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="操作" width="180">
+                      <!-- <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
-                          <el-button size="mini" type="danger" @click="rienizatails(scope.row)">划卡</el-button>
-                          <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                          <el-button size="mini" type="danger" @click="vipexdetails(scope.row)">划卡</el-button>
+                          <el-button size="mini" type="success" @click="userdetails(scope.row)">使用详情</el-button>
                         </template>
-                      </el-table-column>
+                      </el-table-column>-->
                     </el-table>
                   </div>
                 </PopOver>
@@ -815,12 +826,6 @@ export default {
       this.memberinformation();
       this.visible_care = true;
     },
-    //项目定制划卡
-    rienizatails() {},
-    //项目定制详情
-    rienizauss() {
-      this.suserPopover = true;
-    },
     //详情分页
     handleSizeChange(val) {},
     handleCurrentChange(val) {
@@ -1054,7 +1059,7 @@ export default {
         } else {
           this.tableData_rieniza = [];
           this.$message({
-            message: res.data.responseStatusType.error.errorMsg,
+            message: "退货成功",
             type: "warning"
           });
         }

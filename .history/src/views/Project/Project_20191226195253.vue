@@ -136,7 +136,7 @@
                   <div slot="reference" class="name-wrapper">
                     <input
                       type="number"
-                      @change="changeRefer(scope.row)"
+                      @change="changeRefer(scope.row,index)"
                       v-model="scope.row.retailPrice"
                     />
                   </div>
@@ -481,17 +481,13 @@ export default {
     },
     //改变单价
     changeRefer(res) {
-      res.retailPrice = parseInt(res.retailPrice);
-
       if (res.retailPrice < 1) {
         res.retailPrice = 1;
       }
-      // this.tableDataList.discountPrices = res.retailPrice;
-      // this.tableDataList.discounts =
-      //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
-      console.log(res);
+      this.tableDataList.discountPrices = res.retailPrice;
+      this.tableDataList.discounts =
+        res.retailPrice / this.tableDataList.originalPrice;
+
       console.log(this.tableDataList);
 
       //计算

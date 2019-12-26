@@ -481,7 +481,7 @@ export default {
     },
     //改变单价
     changeRefer(res) {
-      res.retailPrice = parseInt(res.retailPrice);
+      res.retailPrice = parseInt(res.retailPrice)
 
       if (res.retailPrice < 1) {
         res.retailPrice = 1;
@@ -489,11 +489,9 @@ export default {
       // this.tableDataList.discountPrices = res.retailPrice;
       // this.tableDataList.discounts =
       //   res.retailPrice / this.tableDataList.originalPrice;
-      res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
       console.log(res);
       console.log(this.tableDataList);
-
+      
       //计算
       this.calcTotalPrice();
     },

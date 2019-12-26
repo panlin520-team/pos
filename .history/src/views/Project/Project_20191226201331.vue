@@ -490,7 +490,7 @@ export default {
       // this.tableDataList.discounts =
       //   res.retailPrice / this.tableDataList.originalPrice;
       res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
+      res.sss = res.retailPrice
       console.log(res);
       console.log(this.tableDataList);
 

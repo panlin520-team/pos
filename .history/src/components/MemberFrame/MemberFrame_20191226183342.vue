@@ -132,12 +132,23 @@
                     <el-table :data="tableData_rieniza" style="width: 100%">
                       <el-table-column label="项目名称">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.experiencecardProductName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品小类">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.subClassName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="项目类型">
                         <template slot-scope="scope">
-                          <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                          <div
+                            slot="reference"
+                            class="name-wrapper"
+                          >{{ scope.row.experiencecardProductTypeName }}</div>
                         </template>
                       </el-table-column>
                       <el-table-column label="使用总数" width="80">
@@ -155,12 +166,12 @@
                           <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="操作" width="180">
+                      <!-- <el-table-column label="操作" width="180">
                         <template slot-scope="scope">
-                          <el-button size="mini" type="danger" @click="rienizatails(scope.row)">划卡</el-button>
-                          <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                          <el-button size="mini" type="danger" @click="vipexdetails(scope.row)">划卡</el-button>
+                          <el-button size="mini" type="success" @click="userdetails(scope.row)">使用详情</el-button>
                         </template>
-                      </el-table-column>
+                      </el-table-column> -->
                     </el-table>
                   </div>
                 </PopOver>
@@ -574,7 +585,16 @@ export default {
       accounBalance: [],
       //查看体验卡详情
       tableData_details: [],
-      tableData_rieniza: [],
+      tableData_rieniza: [
+        {
+          experiencecardProductName: "哈哈",
+          subClassName: "小类",
+          experiencecardProductTypeName: "项目类型",
+          totalTimes: "1",
+          useTimes: "2",
+          useLimit: "有效期"
+        }
+      ],
 
       // 项目当前工种下已选员工id
       currentEmpId: null,
@@ -788,10 +808,10 @@ export default {
     //查看项目定制详情
     experienization() {
       this.visible_rieniza = true;
-      this.projectturnData();
     },
-    close_rieniza() {
+    close_rieniza(){
       this.visible_rieniza = false;
+
     },
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
@@ -814,12 +834,6 @@ export default {
     show_stgbcar() {
       this.memberinformation();
       this.visible_care = true;
-    },
-    //项目定制划卡
-    rienizatails() {},
-    //项目定制详情
-    rienizauss() {
-      this.suserPopover = true;
     },
     //详情分页
     handleSizeChange(val) {},
@@ -902,12 +916,13 @@ export default {
 
       if (res.headImgUrl) {
         console.log(233);
-
+        
         this.imageUrl = res.headImgUrl;
         localStorage.setItem("headImgUrl", res.headImgUrl);
       } else {
         this.imageUrl = this.imageUrls;
         localStorage.setItem("headImgUrl", this.imageUrl);
+
       }
 
       this.remark = res.remark;
@@ -1046,15 +1061,19 @@ export default {
     projectturnData() {
       var url = this.$https.orderHost + "/order/selectCustomProjectByMember";
       var params = {
-        memberNum: localStorage.getItem("membership")
+        isHuaKa: 1,
+         memberNum: localStorage.getItem("membership")
       };
       this.$https.fetchPost(url, params).then(res => {
-        if (res.data.result) {
-          this.tableData_rieniza = res.data.result;
-        } else {
-          this.tableData_rieniza = [];
+        if (res.data.responseStatusType.message == "Success") {
           this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+        } else {
+          this.$notify({
             message: res.data.responseStatusType.error.errorMsg,
+            position: "bottom-right",
             type: "warning"
           });
         }

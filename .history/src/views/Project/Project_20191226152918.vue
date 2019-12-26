@@ -899,10 +899,8 @@ export default {
         box-shadow: 0px 0px 13px 3px rgba(221, 248, 229, 1);
         border-radius: 4px;
         position: relative;
-        input {
-          border: 1px solid rgb(189, 184, 184);
-          width: 60px;
-          height: 25px;
+        .input {
+
         }
       }
     }

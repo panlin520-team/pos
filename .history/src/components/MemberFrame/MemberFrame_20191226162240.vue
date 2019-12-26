@@ -1662,7 +1662,7 @@ export default {
     }
   }
 }
-.storageblock2 {
+.storageblock2 {wxOpenId
   width: 100%;
   .stgblcktop {
     text-align: center;

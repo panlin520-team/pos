@@ -1745,8 +1745,7 @@ export default {
         sex: this.ruleForm_addvip.sex,
         remark: this.ruleForm_addvip.remark,
         memberAddType: 1,
-        idCard: this.ruleForm_addvip.identity,
-        wxOpenId: this.ruleForm_addvip.wxOpenId
+        idCard: this.ruleForm_addvip.identity
       };
       this.$https.fetchPost(url, params).then(
         res => {
@@ -2446,7 +2445,7 @@ export default {
       height: 100%;
       overflow: auto;
       background-color: #fff;
-      margin-left: 250px;
+      margin
       .personage {
         .rightTitle {
           width: 100%;

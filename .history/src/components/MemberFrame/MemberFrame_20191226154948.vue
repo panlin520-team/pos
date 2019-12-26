@@ -87,7 +87,7 @@
             </div>
             <!-- <div class="experienCards">
               <el-button type="warning" @click="show_customization">项目定制</el-button>
-            </div>-->
+            </div> -->
             <PopOver
               custom-class="storageblock2"
               :visible.sync="visible_carLise"
@@ -96,7 +96,7 @@
             >
               <div class="stgblcktop" slot="top">客户项目信息</div>
               <div class="stgblcktopmain" slot="main">
-                <!-- <el-table :data="tableData_carLise" style="width: 100%">
+                <el-table :data="tableData_carLise" style="width: 100%">
                   <el-table-column label="姓名" v-model="cardName">
                     <template slot-scope="scope">
                       <div slot="reference" class="name-wrapper">{{ scope.row.cardName }}</div>
@@ -112,15 +112,7 @@
                       <el-button size="mini" type="success" @click="vipecarLise(scope.row)">查看详情</el-button>
                     </template>
                   </el-table-column>
-                </el-table>-->
-                <div class="projectcar">
-                  <label>体验卡</label>
-                  <el-button size="mini" type="success" @click="experienceCard">查看详情</el-button>
-                </div>
-                <div class="projectcar">
-                  <label>项目定制</label>
-                  <el-button size="mini" type="success" @click="experienization">查看详情</el-button>
-                </div>
+                </el-table>
                 <PopOver
                   custom-class="storageblock3"
                   :visible.sync="visible_details"
@@ -309,8 +301,8 @@
               </el-table>
             </div>
             <div class="bottom" slot="bottom"></div>
-          </pop-over>-->
-          <!-- <pop-over
+          </pop-over> -->
+          <pop-over
             :visible.sync="visible_customs"
             @close="visible_customs = false"
             width="700px"
@@ -339,7 +331,7 @@
               </el-table>
             </div>
             <div class="bottom" slot="bottom"></div>
-          </pop-over>-->
+          </pop-over>
           <div class="accountBalance">
             <span class="spans">账户信息：</span>
             <div class="accountCenter">
@@ -739,14 +731,6 @@ export default {
           type: "warning"
         });
       }
-    },
-    //查看体验卡详情
-    experienceCard(){
-
-    },
-    //查看项目定制详情
-    experienization(){
-
     },
     // 服务项目工种菜单切换
     switchEmpList(index, curId, empId) {
@@ -1675,10 +1659,6 @@ export default {
     max-height: 465px;
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
-    padding: 30px;
-    .projectcar{
-
-    }
   }
 }
 .storageblock3 {

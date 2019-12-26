@@ -507,10 +507,7 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked"></el-checkbox>
-              <div
-                class="value"
-                v-if="item.accountTypeAmount >= 0"
-              >
+              <div class="value" v-if="item.accountTypeAmount >= 0">
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
@@ -2008,6 +2005,12 @@ export default {
       // 清空会员信息
       // this.memberValue = false;
       // this.member = {};
+      // 门店项目和产品
+      this.menu = [];
+      this.currentMenuId = "";
+      this.menuItem = [];
+      this.currentMenuItemId = "";
+      this.commodityItem = [];
       // 清空订单内项目、产品
       this.serviceList = [];
       this.productList = [];
@@ -2130,6 +2133,8 @@ export default {
     // 门店小类
     fetchMenuItem(id) {
       this.currentMenuId = id;
+      this.menuItem = [];
+      this.commodityItem = [];
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
@@ -2181,6 +2186,7 @@ export default {
           }
         },
         error => {
+          this.commodityItem = [];
           this.$message({
             type: "error",
             message: error

@@ -9,6 +9,9 @@ import '@/assets/scss/element-variables.scss'
 import '@/assets/scss/reset.scss'
 Vue.use(ElementUI)
 
+// IE兼容
+import 'babel-polyfill'
+
 // echarts
 import echarts from "echarts"
 Vue.prototype.$echarts = echarts

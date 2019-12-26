@@ -8,7 +8,7 @@ export default {
             el.disabled = true
             setTimeout(() => {
               el.disabled = false
-            }, binding.value || 1000)
+            }, binding.value || 3000)
           }
         })
       }

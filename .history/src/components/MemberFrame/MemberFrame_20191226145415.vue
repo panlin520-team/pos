@@ -600,6 +600,8 @@ export default {
       var arr = [];
       for (var i = 0; i < list.length; i++) {
         if (list[i].setEmpId != "" && list[i].setEmpId != undefined) {
+          console.log(list[i]);
+
           arr.push({
             postId: list[i].setEmpId,
             beauticianId: list[i].beauticianList[0].staffNumber,
@@ -917,7 +919,7 @@ export default {
             this.suserPopover = false;
             setTimeout(() => {
               this.memberdcarUser();
-            }, 200);
+            }, 300);
           })
           .catch(() => {
             this.$message({

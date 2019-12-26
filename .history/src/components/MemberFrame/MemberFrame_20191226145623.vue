@@ -917,7 +917,7 @@ export default {
             this.suserPopover = false;
             setTimeout(() => {
               this.memberdcarUser();
-            }, 200);
+            }, 300);
           })
           .catch(() => {
             this.$message({

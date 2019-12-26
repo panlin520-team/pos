@@ -340,7 +340,7 @@ export default {
       if (this.value_invenT !== "") {
         this.visible_times = false;
         this.tableDataList.push(res);
-        this.calcTotalPrice();
+        this.calcTotalPrice
         this.value_invenT = "";
       } else {
         this.$message({

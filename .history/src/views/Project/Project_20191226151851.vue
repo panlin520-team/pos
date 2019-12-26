@@ -340,7 +340,7 @@ export default {
       if (this.value_invenT !== "") {
         this.visible_times = false;
         this.tableDataList.push(res);
-        this.calcTotalPrice();
+        this.totalPrice = 100;
         this.value_invenT = "";
       } else {
         this.$message({
@@ -360,6 +360,7 @@ export default {
       var ress = this.tableDataList.find(item => {
         return item.productCode == res.productCode;
       });
+      console.log("ress", ress);
       if (ress == undefined) {
       } else {
         this.visible_times = false;
@@ -376,6 +377,8 @@ export default {
     calcTotalPrice: function() {
       this.totalPrice = 0; //总金额进行清零
       this.tableDataList.forEach((item, index) => {
+        console.log(item);
+
         if (item) {
           this.totalPrice += item.amount * item.retailPrice; //累加的
         }
@@ -402,7 +405,7 @@ export default {
       if (this.stockNum !== 0) {
         this.visible_times = true;
         this.resList = res;
-
+        
         // this.tableDataList.push(res);
         var ress = this.tableDataList.find(item => {
           return item.productCode == res.productCode;

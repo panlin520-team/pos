@@ -340,7 +340,7 @@ export default {
       if (this.value_invenT !== "") {
         this.visible_times = false;
         this.tableDataList.push(res);
-        this.calcTotalPrice();
+        this.totalPrice = 100;
         this.value_invenT = "";
       } else {
         this.$message({
@@ -360,6 +360,7 @@ export default {
       var ress = this.tableDataList.find(item => {
         return item.productCode == res.productCode;
       });
+      console.log("ress", ress);
       if (ress == undefined) {
       } else {
         this.visible_times = false;

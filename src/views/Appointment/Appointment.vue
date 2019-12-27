@@ -456,9 +456,10 @@
             format="yyyy-MM-dd"
             value-format="yyyy-MM-dd"
             class="setEmpDatePicker"
+            placeholder="预约日期"
             @change="judgeTime(items.nursingDate)"
           ></el-date-picker>
-          <el-select v-model="items.time" placeholder="请选择时间" class="setEmpPicker">
+          <el-select v-model="items.time" placeholder="预约时间" class="setEmpPicker">
             <el-option
               v-for="item in judgeTimeList"
               :key="item.value"
@@ -467,7 +468,7 @@
               :disabled="item.disabled"
             ></el-option>
           </el-select>
-          <el-select v-model="items.duration" placeholder="请选择时长" class="setEmpPicker">
+          <el-select v-model="items.duration" placeholder="预约时长" class="setEmpPicker">
             <el-option
               v-for="item in durations"
               :key="item.value"
@@ -1262,9 +1263,10 @@ export default {
 
     // 修改折扣，计算折后价
     changeDiscount(val) {
-      this.discount = this.$calculate.accDiv(
-        this.discountPrice,
-        this.originalPrice
+      this.discount = parseFloat(
+        this.$calculate
+          .accDiv(this.discountPrice, this.originalPrice)
+          .toFixed(2)
       );
     },
 
@@ -1741,6 +1743,7 @@ export default {
       this.member = {};
       // 清空预约内项目
       this.serviceList = [];
+      this.discount = 1;
       // 备注
       this.remark = "";
       // 会员输入框值

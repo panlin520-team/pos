@@ -430,7 +430,10 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked" @change="checkDiscount(item)"></el-checkbox>
-              <div class="value" v-if="item.accountTypeAmount >= 0 ">
+              <div
+                class="value"
+                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+              >
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
@@ -507,7 +510,10 @@
             ></InputNumber>
             <div class="account">
               <el-checkbox v-model="item.checked"></el-checkbox>
-              <div class="value" v-if="item.accountTypeAmount >= 0">
+              <div
+                class="value"
+                v-if="item.accountTypeAmount >= 0 && item.accountTypeAmount != null"
+              >
                 余额：
                 <span class="active">{{item.accountTypeAmount}}</span>
                 <span class="symbol">元</span>
@@ -1497,9 +1503,10 @@ export default {
 
     // 修改折扣，计算折后价
     changeDiscount(val) {
-      this.discount = this.$calculate.accDiv(
-        this.discountPrice,
-        this.originalPrice
+      this.discount = parseFloat(
+        this.$calculate
+          .accDiv(this.discountPrice, this.originalPrice)
+          .toFixed(2)
       );
     },
 
@@ -2014,6 +2021,7 @@ export default {
       // 清空订单内项目、产品
       this.serviceList = [];
       this.productList = [];
+      this.discount = 1;
       // 备注
       this.remark = "";
       // 会员输入框值

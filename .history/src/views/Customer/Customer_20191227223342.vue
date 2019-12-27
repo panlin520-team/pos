@@ -1428,9 +1428,6 @@ export default {
         if (this.form.desc !== "") {
           this.visible_recharge = false;
           this.rechargeList();
-          // setTimeout(() => {
-          //   this.$refs.moduleName.memberbalance();
-          // }, 400);
         } else {
           this.$message.error("请填写备注");
         }

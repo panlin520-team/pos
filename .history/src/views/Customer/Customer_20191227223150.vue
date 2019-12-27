@@ -1428,9 +1428,9 @@ export default {
         if (this.form.desc !== "") {
           this.visible_recharge = false;
           this.rechargeList();
-          // setTimeout(() => {
-          //   this.$refs.moduleName.memberbalance();
-          // }, 400);
+          setTimeout(() => {
+            this.$refs.moduleName.memberbalance();
+          }, 400);
         } else {
           this.$message.error("请填写备注");
         }
@@ -2042,14 +2042,14 @@ export default {
         amount: this.form.money,
         payTypeAndAmount: JSON.stringify(this.payTypeAndAmount),
         beauticianId: JSON.stringify(this.beauticianIds),
-        name: this.vipName,
+        name: this.form.gatheringp,
         isRoyalty: this.delivery,
         isintegral: this.rebate,
         rechargeChannel: 3,
         industryId: localStorage.getItem("industryID"),
         mobile: this.mobiles,
         payStatus: this.value_accountstates,
-        payee: this.vipName,
+        payee: this.input_name,
         isAbatementLadderDetailed: 1,
         remarks: this.form.desc
       };

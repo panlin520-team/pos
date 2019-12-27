@@ -417,7 +417,7 @@
                   id="pop"
                 >
                   <div class="top" slot="top">
-                    <div class="title">选择员工划卡</div>
+                    <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
                     <!-- 右边 -->
@@ -1200,14 +1200,8 @@ export default {
     },
     //搜索姓名
     show_stgbcar() {
-      if (this.input_name == "") {
-        this.input_number = "";
-        this.memberinformation();
-        this.visible_care = true;
-      } else {
-        this.memberinformation();
-        this.visible_care = true;
-      }
+      this.memberinformation();
+      this.visible_care = true;
     },
     servicePopovepop() {
       this.value_personal = "";
@@ -1303,7 +1297,6 @@ export default {
         this.experiencehaha = true;
         this.experienceheihei = false;
         this.visible_carLise = true;
-        this.memberdcarUser();
       } else {
         this.$message({
           type: "warning",

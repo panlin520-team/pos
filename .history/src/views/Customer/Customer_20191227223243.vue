@@ -2042,7 +2042,7 @@ export default {
         amount: this.form.money,
         payTypeAndAmount: JSON.stringify(this.payTypeAndAmount),
         beauticianId: JSON.stringify(this.beauticianIds),
-        name: this.vipName,
+        name: this.form.gatheringp,
         isRoyalty: this.delivery,
         isintegral: this.rebate,
         rechargeChannel: 3,

@@ -417,7 +417,7 @@
                   id="pop"
                 >
                   <div class="top" slot="top">
-                    <div class="title">选择员工划卡</div>
+                    <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
                     <!-- 右边 -->

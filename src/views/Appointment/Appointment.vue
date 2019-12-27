@@ -2144,6 +2144,11 @@ export default {
         .price {
           flex: 1;
           text-align: left;
+          width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
           span {
             font-size: 16px;
             color: #feb019;
@@ -2152,6 +2157,11 @@ export default {
         .stockNum {
           flex: 1;
           text-align: right;
+          width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
           span {
             font-size: 15px;
             color: #feb019;

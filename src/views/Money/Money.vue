@@ -3077,14 +3077,19 @@ export default {
         height: 50px;
         line-height: 50px;
         background: #f4f4f4;
+        padding: 0 5px;
         font-size: 14px;
-        padding: 0 15px;
         border-bottom-left-radius: 6px;
         border-bottom-right-radius: 6px;
 
         .price {
           flex: 1;
           text-align: left;
+          width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
           span {
             font-size: 16px;
             color: #feb019;
@@ -3093,6 +3098,11 @@ export default {
         .stockNum {
           flex: 1;
           text-align: right;
+          width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+
           span {
             font-size: 15px;
             color: #feb019;

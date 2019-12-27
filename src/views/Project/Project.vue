@@ -35,8 +35,8 @@
           </div>
         </PopOver>
         <!-- </div> -->
-        <!-- 大类 -->
-        <el-tabs v-model="activeName" @tab-click="handleClick">
+
+        <!-- <el-tabs v-model="activeName" @tab-click="handleClick">
           <el-tab-pane
             class="cashierTitle"
             v-for="(item) in editableTabs"
@@ -44,21 +44,18 @@
             :label="item.commodityTypeName"
             :name="item.commodityTypeID"
           >
-            <!-- 项目小类 -->
             <el-tabs
               type="border-card"
               v-if="visible_merchande == true"
               v-model="activeName_common"
               @tab-click="commonleClick"
             >
-              <!-- 项目盒子 -->
               <el-tab-pane
                 v-for="(item) in productbleTabs"
                 :key="item.subclassID2"
                 :label="item.subclassName"
                 :name="item.subclassID2"
               >
-                <!-- {{item.content}} -->
                 <el-row :gutter="20" class="el_carconnent">
                   <div class="carBox">
                     <div
@@ -87,8 +84,96 @@
               </el-tab-pane>
             </el-tabs>
           </el-tab-pane>
-        </el-tabs>
-        <el-pagination
+        </el-tabs>-->
+
+        <!-- 大类 -->
+        <div class="tab">
+          <div
+            class="tabItem btn-pointer"
+            v-for="item in menu"
+            v-if="item.isShowInPos == 1"
+            :class="item.commodityTypeID == currentMenuId ? 'active' : ''"
+            @click="fetchMenuItem(item.commodityTypeID)"
+          >{{item.commodityTypeName}}</div>
+        </div>
+
+        <!-- 小类 -->
+        <div class="submenu">
+          <div
+            class="submenuItem btn-pointer"
+            v-for="item in menuItem"
+            :key="item.subclassID"
+            :class="item.subclassID == currentMenuItemId ? 'active' : ''"
+            @click="fetchCommodity(item.subclassID)"
+          >{{item.subclassName}}</div>
+          <!-- 产品 currentMenuId == 2 -->
+          <!-- <div
+              class="submenuItem btn-pointer"
+              v-for="item in productMenu"
+              v-if="currentMenuId == 2"
+              :key="item.productKindId"
+              :class="item.productKindId == currentProductMenuId ? 'active' : ''"
+              @click="fetchProductItemsById(item.productKindId)"
+          >{{item.productTypeName}}</div>-->
+        </div>
+
+        <!-- 商品 -->
+        <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
+          <div
+            class="boxItem btn-pointer"
+            v-for="(item,index) in commodityItem"
+            @click="car_smreos(item)"
+          >
+            <div class="name">{{item.productName}}</div>
+            <div class="info">
+              <div class="price">
+                ¥:
+                <span>{{item.retailPrice}}</span>元
+              </div>
+              <div class="stockNum">
+                库存:
+                <span>{{item.stockNum}}</span>
+              </div>
+            </div>
+          </div>
+          <!-- <div
+              class="boxItem btn-pointer"
+              v-for="item in productItems"
+              @click="fetchProductParams(item)"
+              v-if="currentMenuId == 2"
+            >
+              <div class="name">{{item.productName}}</div>
+              <div class="info">
+                <div class="price">
+                  ¥:
+                  <span>{{item.retailPrice}}</span>元
+                </div>
+                <div class="stockNum">
+                  库存:
+                  <span>{{item.stockNum}}</span>
+                </div>
+              </div>
+          </div>-->
+        </div>
+
+        <!-- <div class="grid-content" v-for="(item,index) in commodityItem" @click="car_smreos(item)">
+          <div class="pd-content">
+            <span>{{item.productName}}</span>
+          </div>
+          <div class="bottom-content">
+            <span class="left-list">
+              <span class="figure-title">￥：</span>
+              <span class="figure">{{item.retailPrice}}</span>
+              元
+            </span>
+            <span class="right-list">
+              <span class="figure-title">库存：</span>
+              <span class="figure">{{item.stockNum}}</span>个
+            </span>
+          </div>
+        </div>-->
+
+        <!-- <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage3"
@@ -96,7 +181,7 @@
           background
           layout="total, prev, pager, next"
           :total="pageTotal"
-        ></el-pagination>
+        ></el-pagination>-->
       </div>
       <!-- 右边内容 -->
       <div class="elright">
@@ -318,6 +403,12 @@ export default {
       tableDataList: [],
       //收银产品项目
       editableTabs: [],
+      // 门店开单菜单
+      menu: [],
+      currentMenuId: "",
+      menuItem: [],
+      currentMenuItemId: "",
+      commodityItem: [],
       productbleTabs: [],
       //项目单个数据
       productmodel: [],
@@ -331,12 +422,108 @@ export default {
         disabledDate(time) {
           return time.getTime() < Date.now(); //如果没有后面的-8.64e7就是不可以选择今天的
         }
-      }
+      },
+      virtualHeight: window.innerHeight
     };
   },
   computed: {},
   watch: {},
   methods: {
+    // 门店大类
+    fetchMenu() {
+      var url = this.$https.dataHost + "/commodityType/selectCommodityTypeList";
+      var params = {
+        isDingzhi: 1,
+        commodityTypeIndustryID: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.menu = res.data.result.list;
+            this.currentMenuId = res.data.result.list[0].commodityTypeID;
+            this.fetchMenuItem(res.data.result.list[0].commodityTypeID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类
+    fetchMenuItem(id) {
+      this.currentMenuId = id;
+      this.menuItem = [];
+      this.commodityItem = [];
+      var url =
+        this.$https.dataHost + "/commodityType/selectSubclassByCondition";
+      var params = {
+        commodityTypeID: id,
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.menuItem = res.data.result.list;
+            this.currentMenuItemId = res.data.result.list[0].subclassID;
+            this.fetchCommodity(res.data.result.list[0].subclassID);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.menuItem = [];
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
+    // 门店小类商品
+    fetchCommodity(id) {
+      this.currentMenuItemId = id;
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        subClassId: id,
+        isHoutai: 0,
+        companyType: 3,
+        productStatus: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.commodityItem = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.commodityItem = [];
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     //选择时间后添加
     confirm_true() {
       let res = this.resList;
@@ -447,6 +634,7 @@ export default {
       this.subclassID = tab.name;
       this.projectsubsmall();
     },
+
     //下拉选择
     changeOpen() {
       this.options.forEach(value => {
@@ -457,6 +645,7 @@ export default {
         }
       });
     },
+
     //分页
     handleSizeChange(val) {
       setTimeout(() => {
@@ -489,7 +678,7 @@ export default {
       // this.tableDataList.discounts =
       //   res.retailPrice / this.tableDataList.originalPrice;
       res.discount = res.retailPrice / res.originalPrice;
-      res.discountPrice = res.retailPrice
+      res.discountPrice = res.retailPrice;
       console.log(res);
       console.log(this.tableDataList);
 
@@ -625,6 +814,7 @@ export default {
                   status: value.status
                 });
               }
+              this.currentMenuId = res.data.result.list[0].commodityTypeID;
             });
           } else {
             this.$message({
@@ -766,13 +956,14 @@ export default {
   },
   created() {
     //体验卡列表
-    this.PlacementPrivate();
+    // this.PlacementPrivate();
+    this.fetchMenu();
   },
   mounted() {}
 };
 </script>
 
-<style lang='scss'>
+<style lang='scss' scoped>
 .customization-page_root {
   position: relative;
   .title {
@@ -1133,6 +1324,123 @@ export default {
   }
   .stgblckbottom {
     text-align: center;
+  }
+}
+
+.tab {
+  position: relative;
+  background-color: #ffffff;
+  border-bottom: 1px solid #f8f8f8;
+
+  .tabItem {
+    font-size: 16px;
+    display: inline-block;
+    vertical-align: middle;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 20px;
+
+    &.active {
+      font-size: 18px;
+      font-weight: 700;
+    }
+  }
+}
+
+.submenu {
+  position: relative;
+  background-color: #f8f8f8;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  z-index: 10;
+  margin: 0 15px 15px;
+  font-size: 15px;
+
+  .submenuItem {
+    display: inline-block;
+    padding: 0 18px;
+
+    &.active {
+      color: #23a547;
+      font-weight: 700;
+    }
+  }
+}
+
+.box {
+  position: relative;
+  background-color: #ffffff;
+  overflow-x: hidden;
+  padding: 5px 15px 15px;
+  clear: both;
+  .boxItem {
+    position: relative;
+    float: left;
+    width: 160px;
+    height: 130px;
+    background-color: #f8f8f8;
+    border-radius: 6px;
+    text-align: center;
+    transition: 0.5s;
+    bottom: 0;
+    margin: 15px 15px 20px 0;
+    box-shadow: 0 2px 2px 1px #dddddd;
+
+    .name {
+      height: 80px;
+      font-size: 15px;
+      color: #28282d;
+      line-height: 20px;
+      padding: 30px 5px 0 5px;
+      overflow: hidden;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+    }
+
+    .info {
+      display: flex;
+      height: 50px;
+      line-height: 50px;
+      background: #f4f4f4;
+      font-size: 14px;
+      padding: 0 5px;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+
+      .price {
+        flex: 1;
+        text-align: left;
+        width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        span {
+          font-size: 16px;
+          color: #feb019;
+        }
+      }
+      .stockNum {
+        flex: 1;
+        text-align: right;
+        width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        span {
+          font-size: 15px;
+          color: #feb019;
+        }
+      }
+    }
+  }
+  .boxItem:hover {
+    cursor: pointer;
+    bottom: 10px;
+    box-shadow: 0px 0px 11px 2px #cfcfcf;
   }
 }
 </style>

@@ -446,6 +446,7 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
+                                @change="judgeTime(items.nursingDate)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"

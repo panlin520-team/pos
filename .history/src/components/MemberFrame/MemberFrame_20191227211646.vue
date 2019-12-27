@@ -346,6 +346,21 @@
                     <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
+                    <!-- <div class="empSet">
+                      <div
+                        v-for="(item,index) in empSet"
+                        :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
+                        :key="index"
+                        @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
+                      >
+                        <div class="default" v-if="item.setName==undefined || item.setName=='' ">
+                          <span>{{item.postCategoryName}}</span>
+                        </div>
+                        <div class="active" v-if="item.setName!=''">
+                          <span>{{item.setName}}</span>
+                        </div>
+                      </div>
+                    </div>-->
                     <!-- 右边 -->
                     <div class="empSelect">
                       <div class="tit">{{currentServiceTitle}}</div>
@@ -446,6 +461,7 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
+                                @change="judgeTime(items.nursingDate)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"
@@ -905,19 +921,23 @@ export default {
       var list = this.empsetlist;
       var arr = [];
       var str = [];
-      this.servicePopover = false;
-
+      arr.push({
+        beauticianName: this.proNmar,
+        beauticianId: this.personal,
+        nursingDate: this.valuexuaTime + " " + this.value_minute,
+        duration: this.duration
+        // value_minute: this.value_minute
+      });
+      str.push({
+        beauticianName: this.proNmars,
+        beauticianId: this.personals,
+        nursingDate: this.valuexuaTimes + " " + this.value_minutes,
+        duration: this.duratiot
+        // value_minute: this.value_minute
+      });
+      this.otp = arr.concat(str);
       console.log(this.empsetlist);
       if (this.empsetlist.length == 1) {
-        arr.push({
-          beauticianName: this.proNmar,
-          beauticianId: this.personal,
-          nursingDate: this.valuexuaTime + " " + this.value_minute,
-          duration: this.duration
-          // value_minute: this.value_minute
-        });
-        this.otp = arr.concat(str);
-
         if (
           this.value_personal &&
           this.valuexuaTime &&
@@ -935,45 +955,24 @@ export default {
             message: "请选择完员工时间"
           });
         }
-      } else {
-        arr.push({
-          beauticianName: this.proNmar,
-          beauticianId: this.personal,
-          nursingDate: this.valuexuaTime + " " + this.value_minute,
-          duration: this.duration
-          // value_minute: this.value_minute
-        });
-        str.push({
-          beauticianName: this.proNmars,
-          beauticianId: this.personals,
-          nursingDate: this.valuexuaTimes + " " + this.value_minutes,
-          duration: this.duratiot
-          // value_minute: this.value_minute
-        });
-        this.otp = arr.concat(str);
+      }else{
         if (
-          this.value_personal &&
-          this.valuexuaTime &&
-          this.value_minute &&
-          this.duration
+        this.value_personal &&
+        this.valuexuaTime &&
+        this.value_minute &&
+        this.duration
+      ) {
+        if (
+          this.value_personals &&
+          this.valuexuaTimes &&
+          this.value_minutes &&
+          this.durations
         ) {
-          if (
-            this.value_personals &&
-            this.valuexuaTimes &&
-            this.value_minutes &&
-            this.durations
-          ) {
-            this.servicePopover = false;
-            if (this.differentiate == 2) {
-              this.staffstampCard();
-            } else {
-              this.staffstampCardss();
-            }
+          this.servicePopover = false;
+          if (this.differentiate == 2) {
+            this.staffstampCard();
           } else {
-            this.$message({
-              type: "warning",
-              message: "请选择完员工时间"
-            });
+            this.staffstampCardss();
           }
         } else {
           this.$message({
@@ -981,7 +980,14 @@ export default {
             message: "请选择完员工时间"
           });
         }
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请选择完员工时间"
+        });
       }
+      }
+      
     },
     //使用详情
     pushUser() {
@@ -1117,6 +1123,28 @@ export default {
     valubss(res) {
       this.proNmars = res.name;
       this.personals = res.staffNumber;
+    },
+    // 服务项目工种菜单切换
+    switchEmpList(index, curId, empId) {
+      this.currentServiceTitle = this.empSet[index].postCategoryName;
+      this.empList = this.empSet[index].beauticianList;
+      this.optionpersonal = this.empSet[index].beauticianList;
+      this.currentServiceId = curId;
+      var str = [];
+      str.push({
+        beauticianName: this.personal,
+        beauticianId: this.proNmar,
+        nursingDate: this.valuexuaTime,
+        duration: this.duration,
+        value_minute: this.value_minute
+      });
+      this.value_personal = "";
+      this.valuexuaTime = "";
+      this.value_minute = "";
+      this.duration = "";
+      if (empId != undefined) {
+        this.currentEmpId = empId;
+      }
     },
     //项目定制划卡
     show_customization() {

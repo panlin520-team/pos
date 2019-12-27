@@ -807,6 +807,7 @@ export default {
       value_personal: "",
       value_personals: "",
       judgeTimeList: [],
+      judgeTimeList: [],
       //员工日期
       valuexuaTime: "",
       valuexuaTimes: "",

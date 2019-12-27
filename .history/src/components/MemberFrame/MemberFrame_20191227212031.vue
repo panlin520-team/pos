@@ -346,6 +346,21 @@
                     <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
+                    <!-- <div class="empSet">
+                      <div
+                        v-for="(item,index) in empSet"
+                        :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
+                        :key="index"
+                        @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
+                      >
+                        <div class="default" v-if="item.setName==undefined || item.setName=='' ">
+                          <span>{{item.postCategoryName}}</span>
+                        </div>
+                        <div class="active" v-if="item.setName!=''">
+                          <span>{{item.setName}}</span>
+                        </div>
+                      </div>
+                    </div>-->
                     <!-- 右边 -->
                     <div class="empSelect">
                       <div class="tit">{{currentServiceTitle}}</div>
@@ -446,6 +461,7 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
+                                @change="judgeTime(items.nursingDate)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"
@@ -1117,6 +1133,28 @@ export default {
     valubss(res) {
       this.proNmars = res.name;
       this.personals = res.staffNumber;
+    },
+    // 服务项目工种菜单切换
+    switchEmpList(index, curId, empId) {
+      this.currentServiceTitle = this.empSet[index].postCategoryName;
+      this.empList = this.empSet[index].beauticianList;
+      this.optionpersonal = this.empSet[index].beauticianList;
+      this.currentServiceId = curId;
+      var str = [];
+      str.push({
+        beauticianName: this.personal,
+        beauticianId: this.proNmar,
+        nursingDate: this.valuexuaTime,
+        duration: this.duration,
+        value_minute: this.value_minute
+      });
+      this.value_personal = "";
+      this.valuexuaTime = "";
+      this.value_minute = "";
+      this.duration = "";
+      if (empId != undefined) {
+        this.currentEmpId = empId;
+      }
     },
     //项目定制划卡
     show_customization() {

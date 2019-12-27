@@ -1724,7 +1724,6 @@ export default {
         }
       }
       this.judgeTimeList = arr;
-      console.log(this.judgeTimeList);
       
     },
 

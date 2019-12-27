@@ -1724,8 +1724,6 @@ export default {
         }
       }
       this.judgeTimeList = arr;
-      console.log(this.judgeTimeList);
-      
     },
 
     // 打开预约创建

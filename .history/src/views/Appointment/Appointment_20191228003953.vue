@@ -1703,7 +1703,8 @@ export default {
 
     // 可选时间判断
     judgeTime(date) {
-      console.log(date);
+      console.log(data);
+      
       var setTime = this.storeTimes;
       var arr = [];
       for (var i = 0; i < setTime.length; i++) {
@@ -1724,8 +1725,6 @@ export default {
         }
       }
       this.judgeTimeList = arr;
-      console.log(this.judgeTimeList);
-      
     },
 
     // 打开预约创建

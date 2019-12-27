@@ -539,7 +539,7 @@
                                 class="setEmpPicker"
                               >
                                 <el-option
-                                  v-for="item in judgeTimeLists"
+                                  v-for="item in judgeTimeList"
                                   :key="item.value"
                                   :label="item.label"
                                   :value="item.value"
@@ -875,7 +875,6 @@ export default {
       value_personal: "",
       value_personals: "",
       judgeTimeList: [],
-      judgeTimeLists: [],
       //员工日期
       valuexuaTime: "",
       valuexuaTimes: "",
@@ -1537,7 +1536,7 @@ export default {
           });
         }
       }
-      this.judgeTimeLists = arr;
+      this.judgeTimeList = arr;
     },
     // 显示截止时间线位置
     deadLinePos(start, end) {

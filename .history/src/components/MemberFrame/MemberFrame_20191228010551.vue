@@ -485,7 +485,6 @@
                                   :key="item.value"
                                   :label="item.label"
                                   :value="item.value"
-                                  :disabled="item.disabled"
                                 ></el-option>
                               </el-select>
                               <el-select
@@ -522,7 +521,6 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
-                                @change="judgeTimes(valuexuaTimes)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"
@@ -539,7 +537,7 @@
                                 class="setEmpPicker"
                               >
                                 <el-option
-                                  v-for="item in judgeTimeLists"
+                                  v-for="item in judgeTimeList"
                                   :key="item.value"
                                   :label="item.label"
                                   :value="item.value"
@@ -875,7 +873,6 @@ export default {
       value_personal: "",
       value_personals: "",
       judgeTimeList: [],
-      judgeTimeLists: [],
       //员工日期
       valuexuaTime: "",
       valuexuaTimes: "",
@@ -1474,9 +1471,9 @@ export default {
           .then(() => {
             this.salesReturnData();
             this.suserPopover = false;
-            // setTimeout(() => {
-            //   this.memberdcarUser();
-            // }, 300);
+            setTimeout(() => {
+              this.memberdcarUser();
+            }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1514,30 +1511,8 @@ export default {
         }
       }
       this.judgeTimeList = arr;
-    },
-    // 可选时间判断
-    judgeTimes(date) {
-      console.log(date);
-      var setTime = this.storeTimes;
-      var arr = [];
-      for (var i = 0; i < setTime.length; i++) {
-        var setting = Date.parse(date + " " + setTime[i]);
-        var nowTime = Date.parse(new Date());
-        if (setting < nowTime) {
-          arr.push({
-            value: setTime[i],
-            label: setTime[i],
-            disabled: true
-          });
-        } else {
-          arr.push({
-            value: setTime[i],
-            label: setTime[i],
-            disabled: false
-          });
-        }
-      }
-      this.judgeTimeLists = arr;
+      console.log(this.judgeTimeList);
+
     },
     // 显示截止时间线位置
     deadLinePos(start, end) {
@@ -1571,9 +1546,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
-            // setTimeout(() => {
-            //   this.projectturnData();
-            // }, 300);
+            setTimeout(() => {
+              this.projectturnData();
+            }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1724,7 +1699,6 @@ export default {
             type: "success",
             message: "退货成功"
           });
-          this.memberdcarUser();
         } else {
           this.$notify({
             message: res.data.responseStatusType.error.errorMsg,
@@ -1754,7 +1728,6 @@ export default {
             type: "success",
             message: "退货成功"
           });
-          this.projectturnData();
         } else {
           this.$notify({
             message: res.data.responseStatusType.error.errorMsg,

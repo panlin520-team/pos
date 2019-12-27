@@ -522,7 +522,6 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
-                                @change="judgeTimes(valuexuaTimes)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"
@@ -539,7 +538,7 @@
                                 class="setEmpPicker"
                               >
                                 <el-option
-                                  v-for="item in judgeTimeLists"
+                                  v-for="item in judgeTimeList"
                                   :key="item.value"
                                   :label="item.label"
                                   :value="item.value"
@@ -875,7 +874,6 @@ export default {
       value_personal: "",
       value_personals: "",
       judgeTimeList: [],
-      judgeTimeLists: [],
       //员工日期
       valuexuaTime: "",
       valuexuaTimes: "",
@@ -1515,30 +1513,7 @@ export default {
       }
       this.judgeTimeList = arr;
     },
-    // 可选时间判断
-    judgeTimes(date) {
-      console.log(date);
-      var setTime = this.storeTimes;
-      var arr = [];
-      for (var i = 0; i < setTime.length; i++) {
-        var setting = Date.parse(date + " " + setTime[i]);
-        var nowTime = Date.parse(new Date());
-        if (setting < nowTime) {
-          arr.push({
-            value: setTime[i],
-            label: setTime[i],
-            disabled: true
-          });
-        } else {
-          arr.push({
-            value: setTime[i],
-            label: setTime[i],
-            disabled: false
-          });
-        }
-      }
-      this.judgeTimeLists = arr;
-    },
+    
     // 显示截止时间线位置
     deadLinePos(start, end) {
       var date = new Date();

@@ -441,7 +441,7 @@
                               </el-select>
                             </div>
                             <!-- 下面 -->
-                            <div class="empLtlefts" v-if="values_truwes">
+                            <div class="empLtlefts">
                               <el-select
                                 v-model="value_personals"
                                 @change="valubss"
@@ -731,7 +731,6 @@ export default {
       suserPopover: false,
       visible_rieniza: false,
       suserPopovepo: false,
-      values_truwes: false,
       //会员等级
       grade: "",
       rotate: false,
@@ -1138,10 +1137,12 @@ export default {
       this.visible_rieniza = false;
     },
     valubs(res) {
+      console.log(res);
       this.proNmar = res.name;
       this.personal = res.staffNumber;
     },
     valubss(res) {
+      console.log(res);
       this.proNmars = res.name;
       this.personals = res.staffNumber;
     },
@@ -1159,6 +1160,7 @@ export default {
         duration: this.duration,
         value_minute: this.value_minute
       });
+      console.log(str);
       this.value_personal = "";
       this.valuexuaTime = "";
       this.value_minute = "";
@@ -1534,6 +1536,7 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
+            console.log(res);
             var times = res.data.result.shopBusinessTime;
             this.startTime = parseInt(times.split("-")[0]);
             this.endTime = parseInt(times.split("-")[1]);
@@ -2117,20 +2120,24 @@ export default {
         .fetchPost(url, params)
         .then(res => {
           if (res.data.result) {
+            // this.empSet = res.data.result.list[0].postCategoryVOList;
+            // this.empList =
+            //   res.data.result.list[0].postCategoryVOList[0].beauticianList;
+            // this.currentServiceId =
+            //   res.data.result.list[0].postCategoryVOList[0].postCategoryId;
+            // this.currentServiceTitle =
+            //   res.data.result.list[0].postCategoryVOList[0].postCategoryName;
+            // this.optionpersonal =
+            //   res.data.result.list[0].postCategoryVOList[0].beauticianList;
             this.empsetlist = res.data.result.list[0].postCategoryVOList;
-            if (this.empsetlist.length == 1) {
-              this.empsetlist.forEach(value => {
+            console.log(this.empsetlist);
+            this.empsetlist.forEach(value => {
+              if (value.postCategoryName == "") {
                 this.optionpersonal = value.beauticianList;
-              });
-            } else {
-              this.values_truwes = true;
-              this.empsetlist.forEach(value => {
-                if (value.postCategoryId == 7) {
-                  this.optionpersonal = value.beauticianList;
-                }
+              } else {
                 this.optionpersonals = value.beauticianList;
-              });
-            }
+              }
+            });
           } else {
             // this.empSet = [];
             this.$message({

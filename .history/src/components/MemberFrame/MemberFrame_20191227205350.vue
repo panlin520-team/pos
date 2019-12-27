@@ -1138,10 +1138,12 @@ export default {
       this.visible_rieniza = false;
     },
     valubs(res) {
+      console.log(res);
       this.proNmar = res.name;
       this.personal = res.staffNumber;
     },
     valubss(res) {
+      console.log(res);
       this.proNmars = res.name;
       this.personals = res.staffNumber;
     },
@@ -1159,6 +1161,7 @@ export default {
         duration: this.duration,
         value_minute: this.value_minute
       });
+      console.log(str);
       this.value_personal = "";
       this.valuexuaTime = "";
       this.value_minute = "";
@@ -1534,6 +1537,7 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
+            console.log(res);
             var times = res.data.result.shopBusinessTime;
             this.startTime = parseInt(times.split("-")[0]);
             this.endTime = parseInt(times.split("-")[1]);
@@ -2118,7 +2122,9 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.empsetlist = res.data.result.list[0].postCategoryVOList;
+            console.log(this.empsetlist);
             if (this.empsetlist.length == 1) {
+              console.log(123);
               this.empsetlist.forEach(value => {
                 this.optionpersonal = value.beauticianList;
               });
@@ -2131,6 +2137,25 @@ export default {
                 this.optionpersonals = value.beauticianList;
               });
             }
+            // if ((this.empsetlist.length = 2)) {
+            //   this.empsetlist.forEach(value => {
+            //   if (value.postCategoryName == "发型师") {
+            //     this.optionpersonal = value.beauticianList;
+            //   } else {
+            //     this.optionpersonals = value.beauticianList;
+            //   }
+            // });
+            //   this.values_truwes = true;
+            // } else {
+            //   this.empsetlist.forEach(value => {
+            //   if (value.postCategoryName == "美容师") {
+            //     this.optionpersonal = value.beauticianList;
+            //   } else {
+            //     this.optionpersonals = value.beauticianList;
+            //   }
+            // });
+            //   this.values_truwes = false;
+            // }
           } else {
             // this.empSet = [];
             this.$message({

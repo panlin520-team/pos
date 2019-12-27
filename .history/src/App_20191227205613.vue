@@ -66,7 +66,7 @@ export default {
             localStorage.removeItem("membership");
             localStorage.removeItem("grade");
             localStorage.removeItem("list");
-            localStorage.removeItem("headImgUrl");
+        localStorage.setItem("headImgUrl", res.headImgUrl);
 
             this.accounBalance = [];
           })

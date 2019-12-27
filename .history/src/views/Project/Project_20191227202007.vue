@@ -886,6 +886,7 @@ export default {
       height: 40px;
     }
     .right-list {
+      width: 100px;
       height: 40px;
     }
   }

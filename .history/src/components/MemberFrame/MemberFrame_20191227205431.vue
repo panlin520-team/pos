@@ -2118,6 +2118,7 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.empsetlist = res.data.result.list[0].postCategoryVOList;
+            console.log(this.empsetlist);
             if (this.empsetlist.length == 1) {
               this.empsetlist.forEach(value => {
                 this.optionpersonal = value.beauticianList;

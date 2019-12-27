@@ -1159,6 +1159,7 @@ export default {
         duration: this.duration,
         value_minute: this.value_minute
       });
+      console.log(str);
       this.value_personal = "";
       this.valuexuaTime = "";
       this.value_minute = "";
@@ -1534,6 +1535,7 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
+            console.log(res);
             var times = res.data.result.shopBusinessTime;
             this.startTime = parseInt(times.split("-")[0]);
             this.endTime = parseInt(times.split("-")[1]);
@@ -2118,6 +2120,7 @@ export default {
         .then(res => {
           if (res.data.result) {
             this.empsetlist = res.data.result.list[0].postCategoryVOList;
+            console.log(this.empsetlist);
             if (this.empsetlist.length == 1) {
               this.empsetlist.forEach(value => {
                 this.optionpersonal = value.beauticianList;

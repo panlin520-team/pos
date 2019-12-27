@@ -58,16 +58,6 @@
                         </template>
                       </el-table-column>
                     </el-table>
-                    <div class="pagination" v-if="memberDataTotal != 0">
-                      <el-pagination
-                        @current-change="memberPageHandleChange"
-                        :current-page.sync="memberCurrentPage"
-                        :page-size="memberPageSize"
-                        layout="total, prev, pager, next"
-                        :total="memberDataTotal"
-                        background
-                      ></el-pagination>
-                    </div>
                   </div>
                 </PopOver>
 
@@ -356,6 +346,21 @@
                     <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
+                    <!-- <div class="empSet">
+                      <div
+                        v-for="(item,index) in empSet"
+                        :class="['item',{'active' : currentServiceId==item.postCategoryId}]"
+                        :key="index"
+                        @click="switchEmpList(index,item.postCategoryId,item.setEmpId)"
+                      >
+                        <div class="default" v-if="item.setName==undefined || item.setName=='' ">
+                          <span>{{item.postCategoryName}}</span>
+                        </div>
+                        <div class="active" v-if="item.setName!=''">
+                          <span>{{item.setName}}</span>
+                        </div>
+                      </div>
+                    </div>-->
                     <!-- 右边 -->
                     <div class="empSelect">
                       <div class="tit">{{currentServiceTitle}}</div>
@@ -456,6 +461,7 @@
                                 type="date"
                                 placeholder="选择日期"
                                 :picker-options="pickerOptions0"
+                                @change="judgeTime(items.nursingDate)"
                               ></el-date-picker>
                               <!-- <el-time-select
                                 v-model="value_minutes"
@@ -880,25 +886,12 @@ export default {
       //时间段
       startTime: 9,
       endTime: 22,
-      storeTimes: [],
-
-      // 会员列表页码参数
-      // 当前页码
-      memberCurrentPage: 1,
-      // 每页显示个数
-      memberPageSize: 10,
-      // 总个数
-      memberDataTotal: null
+      storeTimes: []
     };
   },
   computed: {},
   watch: {},
   methods: {
-    memberPageHandleChange(val) {
-      this.memberCurrentPage = val;
-      // this.fetchOrder();
-      this.memberinformation();
-    },
     //分秒duan
     // 时长数组
     setDurations() {
@@ -928,7 +921,7 @@ export default {
       var list = this.empsetlist;
       var arr = [];
       var str = [];
-      this.servicePopover = false;
+            this.servicePopover = false;
 
       console.log(this.empsetlist);
       if (this.empsetlist.length == 1) {
@@ -1140,6 +1133,28 @@ export default {
     valubss(res) {
       this.proNmars = res.name;
       this.personals = res.staffNumber;
+    },
+    // 服务项目工种菜单切换
+    switchEmpList(index, curId, empId) {
+      this.currentServiceTitle = this.empSet[index].postCategoryName;
+      this.empList = this.empSet[index].beauticianList;
+      this.optionpersonal = this.empSet[index].beauticianList;
+      this.currentServiceId = curId;
+      var str = [];
+      str.push({
+        beauticianName: this.personal,
+        beauticianId: this.proNmar,
+        nursingDate: this.valuexuaTime,
+        duration: this.duration,
+        value_minute: this.value_minute
+      });
+      this.value_personal = "";
+      this.valuexuaTime = "";
+      this.value_minute = "";
+      this.duration = "";
+      if (empId != undefined) {
+        this.currentEmpId = empId;
+      }
     },
     //项目定制划卡
     show_customization() {
@@ -1774,25 +1789,19 @@ export default {
         "/manage/memberUser/selectStoreMemberByPhoneOrName";
       var params = {
         storeId: localStorage.getItem("storeId"),
-        name: this.input_name,
-        mobile: this.input_number,
-        pageNum: this.memberCurrentPage,
-        pageSize: this.memberPageSize
+        name: this.input_name
       };
       this.$https
         .fetchPost(url, params)
         .then(res => {
           if (res.data.result) {
-            this.memberDataTotal = res.data.result.total;
-            this.tableData_vippeple = res.data.result.list;
           } else {
-            this.memberDataTotal = null;
-            this.tableData_vippeple = [];
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
             });
           }
+          this.tableData_vippeple = res.data.result;
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");
@@ -1805,24 +1814,19 @@ export default {
         "/manage/memberUser/selectStoreMemberByPhoneOrName";
       var params = {
         storeId: localStorage.getItem("storeId"),
-        mobile: this.input_number,
-        pageNum: this.memberCurrentPage,
-        pageSize: this.memberPageSize
+        mobile: this.input_number
       };
       this.$https
         .fetchPost(url, params)
         .then(res => {
           if (res.data.result) {
-            this.memberDataTotal = res.data.result.total;
-            this.tableData_vippeple = res.data.result.list;
           } else {
-            this.memberDataTotal = null;
-            this.tableData_vippeple = [];
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
             });
           }
+          this.tableData_vippeple = res.data.result;
         })
         .catch(err => {
           //   this.$message.error("体验卡列表提交请求错误...");
@@ -2768,11 +2772,6 @@ export default {
 }
 .fade-leave-active {
   transition: opacity 1s;
-}
-// 页码
-.pagination {
-  text-align: right;
-  margin: 5px;
 }
 </style>
   <style >

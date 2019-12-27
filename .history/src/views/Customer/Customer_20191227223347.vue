@@ -1428,21 +1428,12 @@ export default {
         if (this.form.desc !== "") {
           this.visible_recharge = false;
           this.rechargeList();
-          // setTimeout(() => {
-          //   this.$refs.moduleName.memberbalance();
-          // }, 400);
         } else {
           this.$message.error("请填写备注");
         }
       } else {
         this.visible_recharge = false;
         this.rechargeList();
-        // setTimeout(() => {
-        //   this.$refs.moduleName.memberbalance();
-        // }, 400);
-        // setTimeout(() => {
-        //   this.savingAccount();
-        // }, 400);
       }
     },
     //修改密码

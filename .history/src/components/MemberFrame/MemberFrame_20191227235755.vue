@@ -417,7 +417,7 @@
                   id="pop"
                 >
                   <div class="top" slot="top">
-                    <div class="title">选择员工划卡</div>
+                    <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
                     <!-- 右边 -->
@@ -1203,10 +1203,7 @@ export default {
       if (this.input_name == "") {
         this.input_number = "";
         this.memberinformation();
-        this.visible_care = true;
-      } else {
-        this.memberinformation();
-        this.visible_care = true;
+      this.visible_care = true;
       }
     },
     servicePopovepop() {

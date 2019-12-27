@@ -108,7 +108,7 @@
               <div class="stgblcktopmain" slot="main">
                 <div class="projcttop">
                   <div class="projectcar">
-                    <el-button size="mini" type="warning" @click="experienceCard">体验卡</el-button>
+                    <el-button size="mini" type="success" @click="experienceCard">体验卡</el-button>
                   </div>
                   <div class="projectcars">
                     <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
@@ -196,7 +196,7 @@
                   </el-table>
                 </div>
                 <!-- 定制项目划卡 -->
-                <!-- <PopOver
+                <PopOver
                   custom-class="storagebl3"
                   :visible.sync="visible_rieniza"
                   @close="close_rieniza"
@@ -238,9 +238,9 @@
                       </el-table-column>
                     </el-table>
                   </div>
-                </PopOver>-->
+                </PopOver>
                 <!-- 体验卡划卡 -->
-                <!-- <PopOver
+                <PopOver
                   custom-class="storageblock3"
                   :visible.sync="visible_details"
                   @close="close_details"
@@ -293,7 +293,7 @@
                       </el-table-column>
                     </el-table>
                   </div>
-                </PopOver>-->
+                </PopOver>
                 <!-- 定制项目详情 -->
                 <pop-over
                   :visible.sync="suserPopovepo"
@@ -417,7 +417,7 @@
                   id="pop"
                 >
                   <div class="top" slot="top">
-                    <div class="title">选择员工划卡</div>
+                    <div class="title">洗剪吹</div>
                   </div>
                   <div class="main" slot="main">
                     <!-- 右边 -->
@@ -769,14 +769,14 @@ export default {
       //弹出框控制
       visible_care: false,
       visible_carLise: false,
-      // visible_details: false,
+      visible_details: false,
       // visible_vipexd: false,
       servicePopover: false,
       visible_recharge: false,
       visible_customization: false,
       visible_customs: false,
       suserPopover: false,
-      // visible_rieniza: false,
+      visible_rieniza: false,
       suserPopovepo: false,
       values_truwes: false,
       experiencehaha: true,
@@ -1179,9 +1179,9 @@ export default {
       this.experienceheihei = true;
       this.projectturnData();
     },
-    // close_rieniza() {
-    //   this.visible_rieniza = false;
-    // },
+    close_rieniza() {
+      this.visible_rieniza = false;
+    },
     valubs(res) {
       this.proNmar = res.name;
       this.personal = res.staffNumber;
@@ -1200,14 +1200,8 @@ export default {
     },
     //搜索姓名
     show_stgbcar() {
-      if (this.input_name == "") {
-        this.input_number = "";
-        this.memberinformation();
-        this.visible_care = true;
-      } else {
-        this.memberinformation();
-        this.visible_care = true;
-      }
+      this.memberinformation();
+      this.visible_care = true;
     },
     servicePopovepop() {
       this.value_personal = "";
@@ -1300,10 +1294,7 @@ export default {
     show_carLise() {
       if (this.input_name) {
         this.memberdetails();
-        this.experiencehaha = true;
-        this.experienceheihei = false;
         this.visible_carLise = true;
-        this.memberdcarUser();
       } else {
         this.$message({
           type: "warning",
@@ -1450,9 +1441,9 @@ export default {
       this.experiencehaha = true;
       this.experienceheihei = false;
     },
-    // close_details() {
-    //   this.visible_details = false;
-    // },
+    close_details() {
+      this.visible_details = false;
+    },
     //划卡退货
     salesReturnails(res) {
       this.recordId = res.recordId;
@@ -2489,19 +2480,12 @@ export default {
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
 
     .projcttop {
-      width: 100%;
-      height: 30px;
       display: flex;
-      position: relative;
       .projectcar {
         margin: 0 20px;
-        position: absolute;
-        right: 100px;
       }
       .projectcars {
         height: 30px;
-        position: absolute;
-        right: 10px;
       }
     }
 

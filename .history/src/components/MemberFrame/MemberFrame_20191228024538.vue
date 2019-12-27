@@ -668,7 +668,7 @@
                 <el-input v-model="form.money" @blur="changemoney" placeholder="请输入充值金额"></el-input>
               </el-form-item>
               <el-form-item label="录单人" prop="collectoneeys">
-                <el-input v-model="form.input_people" placeholder="请输入录单人"></el-input>
+                <el-input v-model="form.input_people" :disabled="true"></el-input>
               </el-form-item>
               <el-form-item label="业务员" prop="employee">
                 <el-select v-model="value_tpeple" @change="changepeople" placeholder="请选择充值员工">
@@ -857,7 +857,7 @@ export default {
         region: "",
         gatheringp: "",
         desc: "",
-        input_people: "",
+        value_tpeple: "",
         moneeys: "",
         collectoneeys: "",
         employee: "",
@@ -1116,8 +1116,8 @@ export default {
         this.$message.error("请输入充值金额");
       } else if (this.form.input_people == "") {
         this.$message.error("请输入录单人");
-      } else if (this.value_tpeple == "") {
-        this.$message.error("请选择业务员");
+      }else if (this.value_tpeple == "") {
+        this.$message.error("请选择员工");
       } else if (this.value_accounTelp == "") {
         this.$message.error("请选择支付类型");
       } else if (this.value_accountstate == "") {
@@ -1982,14 +1982,14 @@ export default {
         amount: this.form.money,
         payTypeAndAmount: JSON.stringify(this.payTypeAndAmount),
         beauticianId: JSON.stringify(this.beauticianIds),
-        name: this.form.input_people,
+        name: this.input_name,
         isRoyalty: this.delivery,
         isintegral: this.rebate,
         rechargeChannel: 3,
         industryId: localStorage.getItem("industryID"),
         mobile: this.input_number,
         payStatus: this.value_accountstate,
-        payee: this.form.input_people,
+        payee: this.input_name,
         isAbatementLadderDetailed: 1,
         remarks: this.form.desc
       };

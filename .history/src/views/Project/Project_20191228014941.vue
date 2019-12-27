@@ -5,6 +5,7 @@
       <!-- 左边 -->
       <div class="elleft">
         <p class="title">收银产品</p>
+        <!-- <div style="width:100px;height:100px;border:1px solid red">{{item.productName}}</div> -->
         <!-- 选择日期弹出框 -->
         <PopOver
           custom-class="storageblocks"
@@ -116,7 +117,7 @@
         </div>
 
         <!-- 商品 -->
-        <div class="box scrollY">
+        <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
           <div
             class="boxItem btn-pointer"
             v-for="(item,index) in commodityItem"
@@ -130,7 +131,7 @@
               </div>
               <div class="stockNum">
                 库存:
-                <span>{{item.stockNum}}</span>个
+                <span>{{item.stockNum}}</span>
               </div>
             </div>
           </div>
@@ -677,6 +678,9 @@ export default {
       //   res.retailPrice / this.tableDataList.originalPrice;
       res.discount = res.retailPrice / res.originalPrice;
       res.discountPrice = res.retailPrice;
+      console.log(res);
+      console.log(this.tableDataList);
+
       //计算
       this.calcTotalPrice();
     },
@@ -1373,8 +1377,8 @@ export default {
   .boxItem {
     position: relative;
     float: left;
-    width: 200px;
-    height: 150px;
+    width: 160px;
+    height: 130px;
     background-color: #f8f8f8;
     border-radius: 6px;
     text-align: center;
@@ -1384,11 +1388,11 @@ export default {
     box-shadow: 0 2px 2px 1px #dddddd;
 
     .name {
-      height: 100px;
+      height: 80px;
       font-size: 15px;
       color: #28282d;
       line-height: 20px;
-      padding: 45px 5px 0 5px;
+      padding: 30px 5px 0 5px;
       overflow: hidden;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;

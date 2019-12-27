@@ -192,7 +192,7 @@
                 <el-input v-model="form.money" @blur="changemoney" placeholder="请输入充值金额"></el-input>
               </el-form-item>
               <el-form-item label="录单人" prop="collectoneeys">
-                <el-input v-model="form.input_people" placeholder="请输入录单人"></el-input>
+                <el-input v-model="form.input_people" :disabled="true"></el-input>
               </el-form-item>
               <el-form-item label="业务员" prop="employee">
                 <el-select v-model="value_tpeple" @change="changepeople" placeholder="请选择充值员工">

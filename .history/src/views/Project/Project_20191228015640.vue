@@ -116,7 +116,7 @@
         </div>
 
         <!-- 商品 -->
-        <div class="box scrollY">
+        <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
           <div
             class="boxItem btn-pointer"
             v-for="(item,index) in commodityItem"
@@ -677,6 +677,9 @@ export default {
       //   res.retailPrice / this.tableDataList.originalPrice;
       res.discount = res.retailPrice / res.originalPrice;
       res.discountPrice = res.retailPrice;
+      console.log(res);
+      console.log(this.tableDataList);
+
       //计算
       this.calcTotalPrice();
     },
@@ -1384,11 +1387,11 @@ export default {
     box-shadow: 0 2px 2px 1px #dddddd;
 
     .name {
-      height: 100px;
+      height: 80px;
       font-size: 15px;
       color: #28282d;
       line-height: 20px;
-      padding: 45px 5px 0 5px;
+      padding: 30px 5px 0 5px;
       overflow: hidden;
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;

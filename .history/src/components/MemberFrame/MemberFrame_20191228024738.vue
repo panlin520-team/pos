@@ -1989,7 +1989,7 @@ export default {
         industryId: localStorage.getItem("industryID"),
         mobile: this.input_number,
         payStatus: this.value_accountstate,
-        payee: this.form.input_people,
+        payee: this.input_name,
         isAbatementLadderDetailed: 1,
         remarks: this.form.desc
       };

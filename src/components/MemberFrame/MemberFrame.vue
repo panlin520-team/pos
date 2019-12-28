@@ -1098,6 +1098,7 @@ export default {
       this.value_tpeple = "";
       this.delivery = "0";
       this.rebate = "0";
+      this.form.input_people = "";
       this.value_accounTelp = "";
       this.value_accountstate = "";
       this.form.desc = "";
@@ -1208,15 +1209,6 @@ export default {
       this.input_number = "";
       this.memberinformation();
       this.visible_care = true;
-
-      // if (this.input_name == "") {
-      //   this.input_number = "";
-      //   this.memberinformation();
-      //   this.visible_care = true;
-      // } else {
-      //   this.memberinformation();
-      //   this.visible_care = true;
-      // }
     },
     servicePopovepop() {
       this.value_personal = "";
@@ -1868,7 +1860,7 @@ export default {
         }
       );
     },
-    //获取会员电话
+    //获取会员
     memberinformation() {
       var url =
         this.$https.accountHost +
@@ -1886,6 +1878,7 @@ export default {
           if (res.data.result) {
             this.memberDataTotal = res.data.result.total;
             this.tableData_vippeple = res.data.result.list;
+            this.grade = res.data.result.list[0].membershipLevelName;
           } else {
             this.memberDataTotal = null;
             this.tableData_vippeple = [];
@@ -1974,6 +1967,17 @@ export default {
           //   this.$message.error("体验卡列表提交请求错误...");
         });
     },
+    //充值星级
+    staCardxins() {
+      var url = this.$https.accountHost + "/manage/member/memberUserUpdate";
+      var params = {
+        memberNumber: localStorage.getItem("membership")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {})
+        .catch(err => {});
+    },
     //充值
     rechargeList() {
       var url =
@@ -2006,6 +2010,10 @@ export default {
               duration: 5000
             });
             this.memberbalance();
+            this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -2028,7 +2036,8 @@ export default {
       var url =
         this.$https.accountHost + "/manage/memberUser/listMemberAccount";
       var params = {
-        memberNum: this.$store.state.member.userNumber
+        memberNum: this.$store.state.member.userNumber,
+        industry: localStorage.getItem("industryID")
       };
       this.$https
         .fetchPost(url, params)

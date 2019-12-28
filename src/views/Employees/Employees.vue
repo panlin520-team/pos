@@ -25,6 +25,7 @@
         <div class="headerItem">性别</div>
         <!-- <div class="headerItem">分组</div> -->
         <div class="headerItem">职务</div>
+        <div class="headerItem">计算底薪</div>
         <!-- <div class="headerItem">级别</div> -->
         <div class="headerItem">目前状态</div>
         <div class="headerItem">操作</div>
@@ -44,6 +45,9 @@
           <!-- <div style="flex:1">{{item.groupName}}</div> -->
           <div style="flex:1">{{item.postName}}</div>
           <!-- <div style="flex:1">{{item.postLevelName}}</div> -->
+          <div
+            style="flex:1"
+          >{{item.isBasicSalary == 0 ? '否' : ''}}{{item.isBasicSalary == 1 ? '是' : ''}}{{item.isBasicSalary == null ? '未知' : ''}}</div>
           <div
             style="flex:1"
           >{{item.workingState == 0 ? '离职' : ''}}{{item.workingState == 1 ? '在职' : ''}}{{item.workingState == null ? '未知' : ''}}</div>
@@ -179,6 +183,19 @@
               </el-select>
             </div>
           </div>
+          <div class="item">
+            <label class="label-left">计算底薪</label>
+            <div class="value">
+              <el-select v-model="employeesDetails.isBasicSalary" placeholder="是否计算底薪">
+                <el-option
+                  v-for="item in isBasicSalary"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
           <!-- <div class="item">
             <label class="label-left">级别</label>
             <div class="value">
@@ -191,7 +208,7 @@
                 ></el-option>
               </el-select>
             </div>
-          </div> -->
+          </div>-->
           <div class="item">
             <label class="label-left">入职时间</label>
             <div class="value">
@@ -568,6 +585,17 @@ export default {
           name: "在职"
         }
       ],
+      // 是否计算底薪
+      isBasicSalary: [
+        {
+          value: 0,
+          label: "否"
+        },
+        {
+          value: 1,
+          label: "是"
+        }
+      ],
 
       // 某些元素的显示
       selectStatus: null,
@@ -602,11 +630,7 @@ export default {
   },
   mounted() {
     if (localStorage.getItem("storeId")) {
-      this.$axios
-        .all([
-          this.fetchPostNames()
-        ])
-        .then();
+      this.$axios.all([this.fetchPostNames()]).then();
     }
   },
   computed: {
@@ -699,6 +723,7 @@ export default {
         gender: this.employeesDetails.gender,
         storeId: this.employeesDetails.storeId,
         postId: this.employeesDetails.postId,
+        isBasicSalary: this.employeesDetails.isBasicSalary,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,
@@ -818,6 +843,7 @@ export default {
         gender: this.employeesDetails.gender,
         storeId: localStorage.getItem("storeId"),
         postId: this.employeesDetails.postId,
+        isBasicSalary: this.employeesDetails.isBasicSalary,
         workingState: this.employeesDetails.workingState,
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,

@@ -457,7 +457,7 @@
             value-format="yyyy-MM-dd"
             class="setEmpDatePicker"
             placeholder="预约日期"
-            @change="judgeTime(items.nursingDate)"
+            :picker-options="pickerOptions"
           ></el-date-picker>
           <el-select v-model="items.time" placeholder="预约时间" class="setEmpPicker">
             <el-option
@@ -640,6 +640,8 @@ export default {
       discountPrice: 0,
       // 折扣
       discount: 1,
+      // 折扣度
+      disountLevel: 1,
       // 正修改的服务项目数据
       saveService: null,
       // 正修改的服务项目索引位置
@@ -654,6 +656,12 @@ export default {
       cashOption: 3,
       // 预约账户信息
       accountInfo: {},
+      // 可选日期
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7;
+        }
+      },
 
       // 对话框
       // 预约详细
@@ -937,6 +945,7 @@ export default {
       this.payTypes = null;
       this.remark = "";
       var realPrice = item.totalDiscount;
+      var totalPrice = item.totalPrice;
       // if (item.cardNumber == "" || item.cardNumber == null) {
       //   this.accountPopver = true;
       //   this.accountInfo = {
@@ -976,9 +985,13 @@ export default {
               orderNumber: item.orderNumber
             };
             var list = res.data.result;
-            list.forEach(item => {
-              item.checked = false;
-              item.value = realPrice;
+            list.forEach(e => {
+              e.checked = false;
+              if (e.discount != 1) {
+                e.value = totalPrice;
+              } else {
+                e.value = realPrice;
+              }
             });
             this.payTypes = list;
           } else {
@@ -1343,6 +1356,26 @@ export default {
         .catch(() => {});
     },
 
+    // 会员折扣度
+    fetchDiscount(id) {
+      var url =
+        this.$https.accountHost + "/manage/member/selectMemberShipLevelList";
+      var params = {
+        membershipLevelId: id
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          this.disountLevel = res.data.result.list[0].membershipDiscount;
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     // push已选择项目
     pushService() {
       var isEmpty,
@@ -1393,9 +1426,12 @@ export default {
           // 原价
           originalPrice: this.productPrice,
           // 折扣
-          discount: this.discount,
+          discount: this.disountLevel,
           // 折后价
-          discountPrice: this.productPrice,
+          discountPrice: this.$calculate.accMul(
+            this.productPrice,
+            this.disountLevel
+          ),
           // 所属id
           subclassId: this.subclassID,
           // 项目名称
@@ -1453,6 +1489,9 @@ export default {
       this.subclassID = item.subClassId;
       this.productCode = item.productCode;
       this.productNum = 1;
+      if (localStorage.getItem("membershipLevelId") != "null") {
+        this.fetchDiscount(localStorage.getItem("membershipLevelId"));
+      }
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
@@ -1475,7 +1514,7 @@ export default {
               var arr = res.data.result.list[0].postCategoryVOList;
               arr.forEach(item => {
                 item.staffNumber = null;
-                item.nursingDate = this.currentDate;
+                item.nursingDate = null;
                 item.time = null;
                 item.duration = 30;
                 item.beauticianName = null;
@@ -1703,7 +1742,6 @@ export default {
 
     // 可选时间判断
     judgeTime(date) {
-      console.log(date);
       var setTime = this.storeTimes;
       var arr = [];
       for (var i = 0; i < setTime.length; i++) {
@@ -1724,8 +1762,6 @@ export default {
         }
       }
       this.judgeTimeList = arr;
-      console.log(this.judgeTimeList);
-      
     },
 
     // 打开预约创建

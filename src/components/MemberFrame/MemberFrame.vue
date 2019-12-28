@@ -1383,6 +1383,7 @@ export default {
         // this.visible_vipexd = true;
       }
     },
+
     //选中会员
     vipexamine(res) {
       // this.imageUrl = res.headImgUrl;
@@ -1409,6 +1410,8 @@ export default {
       localStorage.setItem("memberNumber", this.input_number);
       localStorage.setItem("membership", this.memberNum);
       localStorage.setItem("grade", this.grade);
+      localStorage.setItem("membershipLevelId", res.membershipLevelId);
+      
       var params = {
         // 会员名称
         userName: res.name,
@@ -1448,6 +1451,7 @@ export default {
           localStorage.removeItem("membership");
           localStorage.removeItem("grade");
           localStorage.removeItem("list");
+          localStorage.removeItem("membershipLevelId");
           // localStorage.removeItem("imageUrl");
           this.accounBalance = [];
         })

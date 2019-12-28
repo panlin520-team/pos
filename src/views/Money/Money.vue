@@ -50,14 +50,10 @@
         <div class="headerItem">应付金额</div>
         <div class="headerItem">已付金额</div>
         <div class="headerItem">状态</div>
+        <div class="headerItem">操作</div>
       </div>
       <div class="list">
-        <div
-          class="listItem"
-          v-for="(item,index) in orderDataFilter"
-          :key="item.orderNumber"
-          @click="getOrder(item)"
-        >
+        <div class="listItem" v-for="(item,index) in orderDataFilter" :key="item.orderNumber">
           <!-- <div class="listItem" v-for="(item,index) in orderDataFilter" :key="item.orderNumber"> -->
           <div style="flex:1" class="overflow">{{item.orderNumber}}</div>
           <div style="flex:1" class="overflow" v-if="item.cardNumber !=''">
@@ -84,8 +80,30 @@
             class="overflow"
             :class="[item.orderStatus=='1'? 'topay': '',item.orderStatus=='2'? 'payed': '',item.orderStatus=='3'? 'inservice': '',item.orderStatus=='4'? 'backed': '',item.orderStatus=='5'? 'cancel': '']"
           >{{item.orderStatus | filterOrderStatus(item.orderStatus)}}</div>
+          <div style="flex: 1 1 0%;white-space: nowrap;">
+            <el-button size="mini" @click="getOrder(item)">查看</el-button>
+            <el-button
+              size="mini"
+              @click="payOrder(item)"
+              type="primary"
+              v-if="item.orderStatus == 1"
+            >支付</el-button>
+            <!-- <el-button
+              size="mini"
+              @click="cancelOrder(item)"
+              type="danger"
+              v-if="item.orderStatus == 1"
+            >取消</el-button>-->
+            <el-button
+              size="mini"
+              @click="rebackOrder(item)"
+              type="danger"
+              v-if="item.orderStatus != 1 && item.orderStatus != 4 && item.orderStatus != 5"
+            >退货</el-button>
+          </div>
         </div>
       </div>
+
       <!-- 分页 -->
       <div class="pagination" v-if="dataTotal != 0">
         <el-pagination
@@ -276,7 +294,9 @@
               @click="orderDetailsPage = false;emptyData"
             ></div>
           </div>
-          <div class="title">已结账</div>
+          <div
+            class="title"
+          >{{orderDetails.orderStatus | filterOrderStatus(orderDetails.orderStatus)}}</div>
           <div class="btns btnsRight">
             <div class="btn btn-delete el-icon-delete"></div>
           </div>
@@ -342,11 +362,6 @@
             </div>
             <div class="types">
               <div class="typeItem" v-for="payValue in orderDetails.payTypeAndAmountArray">
-                <span class="iconfont icon-vip"></span>
-                <span>{{payValue.payTypeName}}</span>
-                <label class="amount">¥ {{payValue.amount}}</label>
-              </div>
-              <div class="typeItem" v-for="payValue in orderDetails.memberPay">
                 <span class="iconfont icon-vip"></span>
                 <span>{{payValue.payTypeName}}</span>
                 <label class="amount">¥ {{payValue.amount}}</label>
@@ -904,6 +919,8 @@ export default {
       discountPrice: 0,
       // 折扣
       discount: 1,
+      // 折扣度
+      disountLevel: 1,
       // 正修改的服务项目数据
       saveService: null,
       // 正修改的产品数据
@@ -1449,7 +1466,11 @@ export default {
             var list = res.data.result;
             list.forEach(item => {
               item.checked = false;
-              item.value = this.realPrice;
+              if (item.discount != 1) {
+                item.value = this.originalPrice;
+              } else {
+                item.value = this.realPrice;
+              }
             });
             this.payTypes = list;
           } else {
@@ -1657,6 +1678,26 @@ export default {
         .catch(() => {});
     },
 
+    // 会员折扣度
+    fetchDiscount(id) {
+      var url =
+        this.$https.accountHost + "/manage/member/selectMemberShipLevelList";
+      var params = {
+        membershipLevelId: id
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          this.disountLevel = res.data.result.list[0].membershipDiscount;
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     // push已选择项目
     pushService() {
       var isEmpty,
@@ -1698,9 +1739,12 @@ export default {
           // 原价
           originalPrice: this.productPrice,
           // 折扣
-          discount: this.discount,
+          discount: this.disountLevel,
           // 折后价
-          discountPrice: this.productPrice,
+          discountPrice: this.$calculate.accMul(
+            this.productPrice,
+            this.disountLevel
+          ),
           // 所属id
           subclassId: this.subclassID,
           // 项目名称
@@ -1756,9 +1800,12 @@ export default {
           // 原价
           originalPrice: this.productPrice,
           // 折扣
-          discount: this.discount,
+          discount: this.disountLevel,
           // 折后价
-          discountPrice: this.productPrice,
+          discountPrice: this.$calculate.accMul(
+            this.productPrice,
+            this.disountLevel
+          ),
           // 产品所属id
           subclassId: this.subclassID,
           // 产品名称
@@ -1867,6 +1914,9 @@ export default {
       this.productCode = item.productCode;
       this.productNum = 1;
       this.currentEmpId = null;
+      if (localStorage.getItem("membershipLevelId") != "null") {
+        this.fetchDiscount(localStorage.getItem("membershipLevelId"));
+      }
 
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
@@ -1939,6 +1989,9 @@ export default {
 
     // 产品选择
     fetchProductParams(item) {
+      if (localStorage.getItem("membershipLevelId") != "null") {
+        this.fetchDiscount(localStorage.getItem("membershipLevelId"));
+      }
       if (item.stockNum == 0) {
         this.$message({
           type: "warning",
@@ -2461,82 +2514,181 @@ export default {
       );
     },
 
+    // 取消待支付订单
+    cancelOrder(item) {
+      var list = item.productOrderList;
+      var arr = [];
+      for (var i = 0; i < list.length; i++) {
+        arr.push({
+          productCode: list[i].productCode,
+          productName: list[i].productName
+        });
+      }
+      var url = this.$https.orderHost + "/order/payOrderRefund ";
+      var params = {
+        isHuaKa: 0,
+        payTypeAndAmount: item.payTypeAndAmount,
+        memberNum: item.cardNumber,
+        orderNumber: item.orderNumber,
+        stockCode: localStorage.getItem("stockCode"),
+        storeName: localStorage.getItem("storeName"),
+        products: JSON.stringify(arr)
+      };
+      this.$msgbox({
+        title: "提示",
+        message: "确认取消该订单吗?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(() => {
+          this.$https.fetchPost(url, params).then(
+            res => {
+              if (res.data.responseStatusType.message == "Success") {
+                this.$message({
+                  type: "success",
+                  message: "取消成功"
+                });
+                this.fetchOrder();
+              } else {
+                this.$message({
+                  type: "error",
+                  message: res.data.responseStatusType.error.errorMsg
+                });
+              }
+            },
+            error => {
+              this.$message({
+                type: "error",
+                message: error
+              });
+            }
+          );
+        })
+        .catch(() => {});
+    },
+
+    // 订单退货
+    rebackOrder(item) {
+      var list = item.productOrderList;
+      var arr = [];
+      for (var i = 0; i < list.length; i++) {
+        arr.push({
+          productCode: list[i].productCode,
+          productName: list[i].productName
+        });
+      }
+      var url = this.$https.orderHost + "/order/payOrderRefund ";
+      var params = {
+        isHuaKa: 0,
+        payTypeAndAmount: item.payTypeAndAmount,
+        memberNum: item.cardNumber,
+        orderNumber: item.orderNumber,
+        stockCode: localStorage.getItem("stockCode"),
+        storeName: localStorage.getItem("storeName"),
+        products: JSON.stringify(arr)
+      };
+      this.$msgbox({
+        title: "提示",
+        message: "确认对该订单退货吗?",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消"
+      })
+        .then(() => {
+          this.$https.fetchPost(url, params).then(
+            res => {
+              if (res.data.responseStatusType.message == "Success") {
+                this.$message({
+                  type: "success",
+                  message: "取消成功"
+                });
+                this.fetchOrder();
+              } else {
+                this.$message({
+                  type: "error",
+                  message: res.data.responseStatusType.error.errorMsg
+                });
+              }
+            },
+            error => {
+              this.$message({
+                type: "error",
+                message: error
+              });
+            }
+          );
+        })
+        .catch(() => {});
+    },
+
+    payOrder(item) {
+      this.payTypes = null;
+      var list = item.productOrderList;
+      var totalPrice = item.totalPrice;
+      var subclassIds = [];
+      for (var i = 0; i < list.length; i++) {
+        subclassIds.push(list[i].subclassID);
+      }
+      var newArr = subclassIds.join(",");
+      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var params = {
+        memberNum: item.cardNumber,
+        subClassId: newArr,
+        industryId: localStorage.getItem("industryID")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.orderpayPopver = true;
+            this.orderInfo = item;
+            var list = res.data.result;
+            list.forEach(item => {
+              item.checked = false;
+              item.value = totalPrice;
+            });
+            this.payTypes = list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+
     // 获取订单详细(根据订单状态)
     getOrder(item) {
-      // 已支付
-      if (item.orderStatus == 2) {
-        var url = this.$https.orderHost + "/order/selectOrderByNum";
-        var params = { orderNumbers: item.orderNumber };
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result) {
-              this.orderDetailsPage = true;
-              this.orderDetails = res.data.result[0];
-              if (res.data.result[0].payTypeAndAmountArray.length > 1) {
-                this.orderDetails.memberPay =
-                  res.data.result[0].payTypeAndAmountArray[1].accountType;
-              }
-            } else {
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
+      var url = this.$https.orderHost + "/order/selectOrderByNum";
+      var params = { orderNumbers: item.orderNumber };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.orderDetailsPage = true;
+            this.orderDetails = res.data.result[0];
+          } else {
             this.$message({
-              type: "error",
-              message: error
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
             });
           }
-        );
-      }
-      if (item.orderStatus == 1) {
-        this.payTypes = null;
-        // if (item.cardNumber == "") {
-        //   this.orderInfo = item;
-        //   this.orderpayPopver = true;
-        // } else {
-        var list = item.productOrderList;
-        var totalPrice = item.totalPrice;
-        var subclassIds = [];
-        for (var i = 0; i < list.length; i++) {
-          subclassIds.push(list[i].subclassID);
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
         }
-        var newArr = subclassIds.join(",");
-        var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
-        var params = {
-          memberNum: item.cardNumber,
-          subClassId: newArr,
-          industryId: localStorage.getItem("industryID")
-        };
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result) {
-              this.orderpayPopver = true;
-              this.orderInfo = item;
-              var list = res.data.result;
-              list.forEach(item => {
-                item.checked = false;
-                item.value = totalPrice;
-              });
-              this.payTypes = list;
-            } else {
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
-            this.$message({
-              type: "error",
-              message: error
-            });
-          }
-        );
-        // }
-      }
+      );
     },
 
     // 门店项目与产品菜单显示切换
@@ -2648,7 +2800,7 @@ export default {
   position: relative;
   display: flex;
   margin: 20px 20px 0 20px;
-  padding-right: 30px;
+  // padding-right: 30px;
 
   .headerItem {
     flex: 1;
@@ -2668,21 +2820,21 @@ export default {
     line-height: 50px;
     font-size: 14px;
     text-align: center;
-    padding-right: 30px;
-    cursor: pointer;
+    // padding-right: 30px;
+    // cursor: pointer;
 
-    &:after {
-      content: "";
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      background: url("../../assets/images/icon-right.png") right center / 28px
-        no-repeat;
-      width: 28px;
-      height: 28px;
-      margin: auto;
-    }
+    // &:after {
+    //   content: "";
+    //   position: absolute;
+    //   top: 0;
+    //   right: 0;
+    //   bottom: 0;
+    //   background: url("../../assets/images/icon-right.png") right center / 28px
+    //     no-repeat;
+    //   width: 28px;
+    //   height: 28px;
+    //   margin: auto;
+    // }
 
     .topay {
       color: #f4444a;

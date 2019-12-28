@@ -1,0 +1,191 @@
+<!-- 店铺设置 -->
+
+<template>
+  <div class="Salesreturn">
+    <div class="SalesreTop">
+      <div class="searchBoxs">
+        <label>姓名：</label>
+        <el-input v-model="input_name" @blur="blurName" placeholder="请输入姓名"></el-input>
+      </div>
+      <div class="searchBoxs">
+        <label>电话号码：</label>
+        <el-input v-model="input_numBer" @blur="blurNumber" placeholder="请输入电话号码"></el-input>
+      </div>
+      <div class="searchBoxs">
+        <label>时间：</label>
+        <el-date-picker
+          v-model="value_tinemve"
+          @blur="searchTime"
+          format="yyyy-MM-dd"
+          value-format="yyyy-MM-dd"
+          type="daterange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
+      </div>
+    </div>
+    <div class="salereBottom" :style="{'height': (virtualHeight-213)+'px'}">
+      <el-table :data="tableData" style="width: 100%">
+        <el-table-column label="单号">
+          <template slot-scope="scope">
+            <span>{{ scope.row.memberNum }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column label="姓名">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.name }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="手机号">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.mobile }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="金额">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.membershipLevelName }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="时间">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.membershipLevelName }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button size="mini" type="danger" @click="vipexamine(scope.row)">退款</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </div>
+    <!-- 退货弹出框 -->
+    <PopOver
+      custom-class="storageblock"
+      :visible.sync="visible_VIP"
+      @close="close_stgbVip"
+      width="430px"
+    >
+      <div class="stgblcktop" slot="top">会员标签</div>
+      <div class="stgblcktopmain" style="height:240px" slot="main">
+        <div class="stgbListtallyVip">
+          <div class="stgbLisarea">
+            <textarea rows="10" v-model="remark" class="textarea" cols="30"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="stgblckbottom" slot="bottom">
+        <el-button type="info" @click="VipClick">确定</el-button>
+      </div>
+    </PopOver>
+  </div>
+</template>
+
+<script>
+export default {
+  components: {},
+  data() {
+    return {
+      //浏览器高度
+      virtualHeight: window.innerHeight,
+      //搜索姓名
+      input_name: "",
+      //电话号码
+      input_numBer: "",
+      //搜索时间段
+      value_tinemve: "",
+      visible_VIP
+      //退货列表
+      tableData: [
+        {
+          memberNum: "2016-05-02",
+          name: "王小虎",
+          mobile: "213411412",
+          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          memberNum: "2016-05-02",
+          name: "王小虎",
+          mobile: "213411412",
+          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
+        },
+        {
+          memberNum: "2016-05-02",
+          name: "王小虎",
+          mobile: "213411412",
+          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
+        }
+      ]
+    };
+  },
+
+  computed: {},
+  watch: {},
+  methods: {
+    //退货操作
+    vipexamine(res) {
+      console.log(res);
+    },
+    //搜索名字
+    blurName() {},
+    //搜索号码
+    blurNumber() {},
+    //搜索时间
+    searchTime() {
+      console.log(this.value_tinemve);
+    }
+  }
+};
+</script>
+
+<style lang='scss' scoped>
+.Salesreturn {
+  width: 100%;
+  height: 100%;
+  .SalesreTop {
+    width: 100%;
+    height: 115px;
+    margin-left: 2px;
+    display: flex;
+    .searchBoxs {
+      height: 50px;
+      margin: 30px;
+      label {
+        font-size: 18px;
+        font-weight: 550;
+      }
+      .el-input {
+        width: 210px;
+      }
+    }
+  }
+  .salereBottom {
+    width: 100%;
+    padding: 0 20px;
+  }
+}
+//退货弹出框
+.storageblock {
+  .recharge_top {
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(231, 228, 228, 0.5);
+  }
+  .recharge_main {
+    .el-input {
+      width: 215px;
+    }
+    .textarea {
+      width: 250px;
+      height: 100px;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    .el-textarea__inner {
+      width: 215px;
+    }
+  }
+}
+</style>

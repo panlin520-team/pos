@@ -923,7 +923,7 @@ export default {
     },
     //入库采购列表
     purchinstorage() {
-      // this.tableData_enterpurchase = [];
+      this.tableData_enterpurchase = [];
       var url = this.$https.productHost + "/stock/selectInstorageList";
       var params = {
         inventoryGroup: localStorage.getItem("stockCode"),

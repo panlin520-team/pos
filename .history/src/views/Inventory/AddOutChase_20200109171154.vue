@@ -309,7 +309,7 @@ export default {
           {
             type: "number",
             min: 1,
-            max: 500,
+            max: 125,
             message: "数量在1--500之间",
             trigger: "blur"
           }

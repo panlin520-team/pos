@@ -49,9 +49,22 @@
         </el-table-column>
         <el-table-column label="操作" min-width="280">
           <template slot-scope="scope">
-            <el-button size="mini" @click="showPopOver(scope.row)">查看</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">作废</el-button>
-            <el-button size="mini" @click="confirmPopOver(scope.row)" type="success">确认收货</el-button>
+            <div class="InventryOperation">
+              <div class="inventsome1" @click="showPopOver(scope.row)">查看</div>
+              <div
+                class="inventsome2"
+                @click="handleDelete(scope.row)"
+                :class="scope.row.invalidStatus == '未作废' && scope.row.confirmStatus == '待收货' ? 'active' : 'acc'"
+              >作废</div>
+              <div
+                class="inventsome3"
+                :class="scope.row.confirmStatus == '待收货' && scope.row.invalidStatus == '未作废' ? 'active' : 'acc'"
+                @click="confirmPopOver(scope.row)"
+              >确认收货</div>
+            </div>
+            <!-- <el-button size="mini">查看</el-button>
+            <el-button size="mini" type="danger">作废</el-button>
+            <el-button size="mini" type="success">确认收货</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -77,7 +90,7 @@
             </el-table-column>
             <el-table-column label="单位">
               <template slot-scope="scope">
-                <div slot="reference" class="name-wrapper">{{ scope.row.unit }}</div>
+                <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
             <el-table-column label="入库日期">
@@ -88,7 +101,7 @@
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
-          <el-button type="info" @click="tallyClick">确认</el-button>
+          <el-button type="info" size="small" @click="tallyClick">确认</el-button>
         </div>
       </PopOver>
     </div>
@@ -132,10 +145,10 @@
               <div class="stgblcktop" slot="top"></div>
               <div class="stgblcktopmain" slot="main">
                 <el-form :model="addruleForm" :rules="rules" ref="addruleForm" label-width="100px">
-                  <el-form-item label="产品名称：" prop="name">
+                  <el-form-item label="产品名称：">
                     <el-input @focus="seekproductName" v-model="addruleForm.name"></el-input>
                     <div class="seekprbox" v-show="class_seekbox == true">
-                      <ul v-for="itemsk in seekList" :key="itemsk.index">
+                      <ul v-for="itemsk in seekListFilter" :key="itemsk.index">
                         <li @click="selcommodity(itemsk)">
                           <span>{{itemsk.name}}</span>
                         </li>
@@ -158,13 +171,12 @@
                       ></el-date-picker>
                     </div>
                   </el-form-item>
-                  <el-form-item>
-                    <el-button type="primary" @click="submitForm('addruleForm')">确定</el-button>
-                    <el-button @click="resetForm('addruleForm')">取消</el-button>
-                  </el-form-item>
                 </el-form>
               </div>
-              <div class="stgblckbottom" slot="bottom"></div>
+              <div class="stgblckbottom" slot="bottom">
+                <el-button type="primary" size="medium" @click="submitForm('addruleForm')">确定</el-button>
+                <el-button size="medium" @click="resetForm('addruleForm')">取消</el-button>
+              </div>
             </PopOver>
           </div>
           <div class="wareLists">
@@ -267,7 +279,7 @@ export default {
       //仓库名
       stockType: "",
       //获取人名币
-      moneypeople: "",
+      // moneypeople: "",
       //供应商类型
       supplierCode: [],
       //页数
@@ -319,7 +331,6 @@ export default {
       // receivedNumber: "",
       //添加产品方法
       rules: {
-        name: [{ required: true, message: "请选择产品", trigger: "blur" }],
         receivedNumber: [
           { required: true, message: "请输入数量", trigger: "blur" },
           {
@@ -530,7 +541,20 @@ export default {
       ]
     };
   },
-  computed: {},
+  computed: {
+    //模糊查询商品
+    seekListFilter: function() {
+      const input_nurse = this.addruleForm.name;
+      if (input_nurse) {
+        return this.seekList.filter(item => {
+          return Object.keys(item).some(key => {
+            return String(item[key]).indexOf(input_nurse) > -1;
+          });
+        });
+      }
+      return this.seekList;
+    }
+  },
   watch: {},
   methods: {
     //弹出详情切换
@@ -540,26 +564,34 @@ export default {
       this.totalSize = this.storageList.length + 1;
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.addruleForm.curIndex == undefined) {
-            this.addruleForm.totalPrice =
-              this.unitPrice * this.addruleForm.receivedNumber;
-            this.addruleForm.endDate = this.addruleForm.repervalidity;
-            this.addruleForm.inShelfDate = this.createTime;
-            this.addruleForm.receivableNumber = this.addruleForm.receivedNumber;
-            // this.addruleForm.productionDate = new Date();
-            this.storageList.unshift(this.addruleForm);
+          if (this.class_seekbox == false && this.addruleForm.name) {
+            if (this.addruleForm.curIndex == undefined) {
+              this.addruleForm.totalPrice =
+                this.unitPrice * this.addruleForm.receivedNumber;
+              this.addruleForm.endDate = this.addruleForm.repervalidity;
+              this.addruleForm.inShelfDate = this.createTime;
+              this.addruleForm.receivableNumber = this.addruleForm.receivedNumber;
+              // this.addruleForm.productionDate = new Date();
+              this.storageList.unshift(this.addruleForm);
+            } else {
+              this.storageList.splice(
+                this.addruleForm.curIndex,
+                1,
+                this.addruleForm
+              );
+            }
+            this.$message({
+              message: "添加成功...",
+              type: "success"
+            });
+            this.class_seekbox = false;
+            this.visible_orderfrom = false;
           } else {
-            this.storageList.splice(
-              this.addruleForm.curIndex,
-              1,
-              this.addruleForm
-            );
+            this.$message({
+              message: "请选择正确商品...",
+              type: "warning"
+            });
           }
-          this.$message({
-            message: "添加成功...",
-            type: "success"
-          });
-          this.visible_orderfrom = false;
         } else {
           return false;
         }
@@ -595,6 +627,7 @@ export default {
     resetForm(formName) {
       this.$refs[formName].resetFields();
       this.visible_orderfrom = false;
+      this.class_seekbox = false;
     },
     //修改商品验证
     submitamend(formName) {
@@ -784,6 +817,7 @@ export default {
     },
     closeorderfrom(formName) {
       this.visible_orderfrom = false;
+      this.class_seekbox = false;
     },
     //确认添加订单
     tallyorderfrom() {
@@ -889,9 +923,10 @@ export default {
     },
     //入库采购列表
     purchinstorage() {
+      this.tableData_enterpurchase
       var url = this.$https.productHost + "/stock/selectInstorageList";
       var params = {
-        storeId: localStorage.getItem("storeId"),
+        inventoryGroup: localStorage.getItem("stockCode"),
         pageNum: this.currentPage1,
         pageSize: this.pageSize1,
         inStorageType: this.inStorageType,
@@ -902,27 +937,29 @@ export default {
           if (res.data.result) {
             this.totalSizes = res.data.result.total;
             this.tableData_enterpurchase = res.data.result.list;
+            res.data.result.list.forEach(function(value) {
+              if (value.invalidStatus == 0) {
+                value.invalidStatus = "作废";
+              } else {
+                value.invalidStatus = "未作废";
+              }
+              if (value.confirmStatus == 0) {
+                value.confirmStatus = "待收货";
+              } else {
+                value.confirmStatus = "已收货";
+              }
+            });
           } else {
+            this.totalSizes = 0;
             this.tableData_enterpurchase = [];
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
             });
           }
-          res.data.result.list.forEach(function(value) {
-            if (value.invalidStatus == 0) {
-              value.invalidStatus = "作废";
-            } else {
-              value.invalidStatus = "未作废";
-            }
-            if (value.confirmStatus == 0) {
-              value.confirmStatus = "待收货";
-            } else {
-              value.confirmStatus = "已收货";
-            }
-          });
+
           //获取人名币
-          this.moneypeople = res.data.result.list[0].settlementCurrency;
+          // this.moneypeople = res.data.result.list[0].settlementCurrency;
         },
         error => {
           this.$message({
@@ -1003,14 +1040,16 @@ export default {
         res => {
           if (res.data.result.list) {
             res.data.result.list.forEach(value => {
-              this.seekList.push({
-                name: value.productName,
-                id: value.productId,
-                productSpecification: value.productSpecification,
-                unitPrice: value.unionPrice,
-                productCode: value.productCode,
-                unit: value.unitId
-              });
+              if (value.productSubordinate == 0) {
+                this.seekList.push({
+                  name: value.productName,
+                  id: value.productId,
+                  productSpecification: value.productSpecification,
+                  unitPrice: value.unionPrice,
+                  productCode: value.productCode,
+                  unit: value.unitId
+                });
+              }
             });
           } else {
             this.$message({
@@ -1277,16 +1316,58 @@ export default {
   .clienList {
     width: 80%;
     min-width: 1024px;
-    // overflow: auto;
     box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
     padding: 10px 50px 20px 50px;
     margin: 0 auto;
     border-radius: 6px;
+    .InventryOperation {
+      display: flex;
+      width: 235px;
+      justify-content: space-between;
+      .inventsome1 {
+        padding: 0 15px;
+        height: 28px;
+        line-height: 25px;
+        border: 1px solid rgb(187, 181, 181);
+        text-align: center;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .inventsome2 {
+        height: 28px;
+        padding: 0 15px;
+        line-height: 26px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #ec2323;
+        }
+        &.acc {
+          background-color: #a39898;
+        }
+      }
+      .inventsome3 {
+        height: 28px;
+        padding: 2px 15px;
+        line-height: 25px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #67c23a;
+        }
+        &.acc {
+          background-color: #a39898;
+        }
+      }
+    }
   }
   .paging {
     width: 100%;
     height: 100px;
-    margin-top: 35px;
     text-align: center;
     .pagingbanner {
       .block {
@@ -1321,21 +1402,21 @@ export default {
     }
     .wareBottom {
       width: 100%;
-      height: 100%;
+      margin-top: 40px;
       display: flex;
 
       .wareBright {
         flex: 1;
         position: relative;
-        .warebrTitles {
-          width: 100%;
-          height: 60px;
-          display: flex;
-          font-size: 20px;
-          line-height: 70px;
-          justify-content: space-between;
-          padding: 0 20px;
-        }
+        // .warebrTitles {
+        //   width: 100%;
+        //   height: 60px;
+        //   display: flex;
+        //   font-size: 20px;
+        //   line-height: 70px;
+        //   justify-content: space-between;
+        //   padding: 0 20px;
+        // }
         .warenavigation {
           text-align: center;
           width: 100%;
@@ -1352,17 +1433,20 @@ export default {
         box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
       }
       .waresupplier {
-        width: 230px;
+        width: 280px;
         height: 50px;
         border-radius: 4px;
         // border: 1px solid rgb(167, 158, 158);
         position: fixed;
         bottom: 200px;
         left: 300px;
+        .el-cascader {
+          width: 100%;
+        }
       }
       .waresubmit {
-        position: absolute;
-        bottom: 285px;
+        position: fixed;
+        bottom: 200px;
         right: 250px;
         padding: 10px;
       }
@@ -1372,7 +1456,7 @@ export default {
         position: fixed;
         bottom: 200px;
         border-radius: 4px;
-        left: 600px;
+        left: 650px;
         .el-date-editor {
           width: 230px;
         }
@@ -1392,7 +1476,6 @@ export default {
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
     .el-input {
       width: 230px;
-      // border: 1px solid rgb(184, 178, 178);
       border-radius: 5px;
     }
     .el-cascader {
@@ -1411,6 +1494,7 @@ export default {
         width: 100%;
         height: 20px;
         margin-left: 10px;
+        cursor: pointer;
       }
     }
     .block {

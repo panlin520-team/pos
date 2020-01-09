@@ -80,7 +80,7 @@
             class="overflow"
             :class="[item.orderStatus=='1'? 'topay': '',item.orderStatus=='2'? 'payed': '',item.orderStatus=='3'? 'inservice': '',item.orderStatus=='4'? 'backed': '',item.orderStatus=='5'? 'cancel': '']"
           >{{item.orderStatus | filterOrderStatus(item.orderStatus)}}</div>
-          <div style="flex: 1 1 0%;white-space: nowrap;">
+          <div style="flex: 1 1 0%;white-space: nowrap;min-width:250px">
             <el-button size="mini" @click="getOrder(item)">查看</el-button>
             <el-button
               size="mini"
@@ -100,6 +100,12 @@
               type="danger"
               v-if="item.orderStatus != 1 && item.orderStatus != 4 && item.orderStatus != 5"
             >退货</el-button>
+            <el-button
+              size="mini"
+              @click="cancellationorder(item)"
+              type="primary"
+              v-if="item.orderStatus == 1"
+            >取消订单</el-button>
           </div>
         </div>
       </div>
@@ -866,6 +872,7 @@ export default {
       currentProductMenuId: "",
       // 项目下列表
       serviceItems: [],
+      isTiYanKaOrDingzhi: "",
       // 产品下列表
       productItems: [],
       // 产品下员工
@@ -890,7 +897,9 @@ export default {
       productCode: null,
       // 待支付订单信息
       orderInfo: {},
-
+      //取消当前订单
+      orderStatusorder: "",
+      orderNumberorder: "",
       // 项目或产品可选工位与可选员工
       empSet: [],
       // 当前项目或产品已选工位下可选员工列表
@@ -947,7 +956,7 @@ export default {
       billOpen: false,
       // 订单详细
       orderDetailsPage: false,
-
+      isTiYanKaOrDingzhi: "",
       // 对话框
       // 结算
       accountPopver: false,
@@ -1042,6 +1051,26 @@ export default {
         })
         .catch(() => {});
     },
+    //取消订单
+    cancellationorder(res) {
+      this.orderStatusorder = res.orderStatus;
+      this.orderNumberorder = res.orderNumber;
+
+      this.$confirm("是否取消订单", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.ordercances();
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "未取消"
+          });
+        });
+    },
 
     // 确认选择会员
     handleAffirm(row) {
@@ -1052,6 +1081,28 @@ export default {
         memberNum: row.memberNum
       };
       this.memberPopver = false;
+    },
+    //取消订单
+    ordercances() {
+      var url = this.$https.orderHost + "/order/cancelOrder";
+      var params = {
+        orderNumbers: this.orderNumberorder,
+        orderStatus: this.orderStatusorder
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "取消成功!"
+          });
+          this.fetchOrder();
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
     },
 
     // 根据姓名或电话获取会员信息
@@ -1375,8 +1426,6 @@ export default {
 
     // 判断使用账户是否可打折
     checkDiscount(item) {
-      // console.log("serveBEF", this.serviceList);
-      // console.log("productBEF", this.productList);
       if (item.checked == true && item.discount != 1) {
         this.$confirm(
           "该账户不能用于结算打折类账户，且订单内所有项将按原价进行结算，是否继续?",
@@ -2041,9 +2090,9 @@ export default {
         this.$https.fetchPost(url, params).then(
           res => {
             if (res.data.result) {
-              this.commodityItem = res.data.result.list;
+              this.serviceItems = res.data.result.list;
             } else {
-              this.commodityItem = [];
+              this.serviceItems = [];
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
                 type: "warning"
@@ -2524,8 +2573,9 @@ export default {
           productName: list[i].productName
         });
       }
-      var url = this.$https.orderHost + "/order/payOrderRefund ";
+      var url = this.$https.orderHost + "/order/payOrderRefund";
       var params = {
+        isTiYanKa: 0,
         isHuaKa: 0,
         payTypeAndAmount: item.payTypeAndAmount,
         memberNum: item.cardNumber,
@@ -2571,6 +2621,12 @@ export default {
 
     // 订单退货
     rebackOrder(item) {
+      if (item.orderType == 4) {
+        this.isTiYanKaOrDingzhi = 1;
+      } else {
+        this.isTiYanKaOrDingzhi = 0;
+      }
+
       var list = item.productOrderList;
       var arr = [];
       for (var i = 0; i < list.length; i++) {
@@ -2582,7 +2638,9 @@ export default {
       var url = this.$https.orderHost + "/order/payOrderRefund ";
       var params = {
         isHuaKa: 0,
+        isTiYanKa: 0,
         payTypeAndAmount: item.payTypeAndAmount,
+        isTiYanKaOrDingzhi: this.isTiYanKaOrDingzhi,
         memberNum: item.cardNumber,
         orderNumber: item.orderNumber,
         stockCode: localStorage.getItem("stockCode"),

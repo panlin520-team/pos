@@ -857,9 +857,9 @@ export default {
         this.$https.fetchPost(url, params).then(
           res => {
             if (res.data.result) {
-              this.commodityItem = res.data.result.list;
+              this.serviceItems = res.data.result.list;
             } else {
-              this.commodityItem = [];
+              this.serviceItems = [];
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
                 type: "warning"

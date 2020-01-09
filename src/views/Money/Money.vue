@@ -2090,9 +2090,9 @@ export default {
         this.$https.fetchPost(url, params).then(
           res => {
             if (res.data.result) {
-              this.serviceItems = res.data.result.list;
+              this.commodityItem = res.data.result.list;
             } else {
-              this.serviceItems = [];
+              this.commodityItem = [];
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
                 type: "warning"

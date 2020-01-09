@@ -1122,13 +1122,13 @@ export default {
       }
     },
     //查看项目定制详情
-    // experienization() {
-    //   this.differentiate = 1;
-    //   this.visible_rieniza = true;
-    //   this.experiencehaha = false;
-    //   this.experienceheihei = true;
-    //   this.projectturnData();
-    // },
+    experienization() {
+      this.differentiate = 1;
+      // this.visible_rieniza = true;
+      this.experiencehaha = false;
+      this.experienceheihei = true;
+      this.projectturnData();
+    },
     // close_rieniza() {
     //   this.visible_rieniza = false;
     // },
@@ -1386,14 +1386,14 @@ export default {
         .catch(() => {});
     },
     //查看体验卡详情vipecarLise
-    // experienceCard(res) {
-      // this.differentiate = 2;
-      // this.memberdcarUser();
+    experienceCard(res) {
+      this.differentiate = 2;
+      this.memberdcarUser();
       // this.cardNum = res.cardNum;
       // this.visible_details = true;
-      // this.experiencehaha = true;
-      // this.experienceheihei = false;
-    // },
+      this.experiencehaha = true;
+      this.experienceheihei = false;
+    },
     // close_details() {
     //   this.visible_details = false;
     // },
@@ -1411,6 +1411,9 @@ export default {
           .then(() => {
             this.salesReturnData();
             this.suserPopover = false;
+            // setTimeout(() => {
+            //   this.memberdcarUser();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1503,6 +1506,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
+            // setTimeout(() => {
+            //   this.projectturnData();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1941,6 +1947,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

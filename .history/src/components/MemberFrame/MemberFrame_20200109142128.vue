@@ -1503,6 +1503,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
+            // setTimeout(() => {
+            //   this.projectturnData();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1941,6 +1944,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

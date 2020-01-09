@@ -107,23 +107,14 @@
               <div class="stgblcktop" slot="top">客户项目信息</div>
               <div class="stgblcktopmain" slot="main">
                 <div class="projcttop">
-                  <div class="projtright">
-                    <div
-                      class="someprojts"
-                      @click="closeClick(item)"
-                      v-for="item in someData"
-                      :class="item.index == someIndex ? 'active' : ''"
-                      :key="item.index"
-                    >{{item.name}}</div>
-                  </div>
-                  <!-- <div class="projectcar">
+                  <div class="projectcar">
                     <el-button size="mini" type="warning" @click="experienceCard">体验卡</el-button>
                   </div>
                   <div class="projectcars">
                     <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
-                  </div>-->
+                  </div>
                 </div>
-                <div class="projctbottom" v-show="experiencehaha">
+                <div class="projctbottom" v-if="experiencehaha">
                   <el-table :data="tableData_details" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -169,7 +160,7 @@
                     </el-table-column>
                   </el-table>
                 </div>
-                <div class="projctbottom" v-show="experienceheihei">
+                <div class="projctbottom" v-if="experienceheihei">
                   <el-table :data="tableData_rieniza" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -709,17 +700,6 @@ export default {
       //查看体验卡
       tableData_carLise: [],
       optionpersonals: [],
-      //体验卡定制项目按钮
-      someData: [
-        {
-          index: 1,
-          name: "体验卡"
-        },
-        {
-          index: 2,
-          name: "定制项目"
-        }
-      ],
       //退货ID
       recordId: "",
       //区分体验卡和定制项目
@@ -838,8 +818,6 @@ export default {
       personal: "",
       proNmars: "",
       personals: "",
-      //体验卡定制项目切换
-      someIndex: "",
       //充值员工
       value_tpeple: "",
       //支付类型
@@ -889,21 +867,7 @@ export default {
       // this.fetchOrder();
       this.memberinformation();
     },
-    //切换体验卡定制项目
-    closeClick(res) {
-      this.someIndex = res.index;
-      if (res.index == 1) {
-        this.differentiate = 2;
-        this.memberdcarUser();
-        this.experiencehaha = true;
-        this.experienceheihei = false;
-      } else {
-        this.differentiate = 1;
-        this.projectturnData();
-        this.experiencehaha = false;
-        this.experienceheihei = true;
-      }
-    },
+    //分秒duan
     // 时长数组
     setDurations() {
       var res = [];
@@ -1122,13 +1086,13 @@ export default {
       }
     },
     //查看项目定制详情
-    // experienization() {
-    //   this.differentiate = 1;
-    //   this.visible_rieniza = true;
-    //   this.experiencehaha = false;
-    //   this.experienceheihei = true;
-    //   this.projectturnData();
-    // },
+    experienization() {
+      this.differentiate = 1;
+      // this.visible_rieniza = true;
+      this.experiencehaha = false;
+      this.experienceheihei = true;
+      this.projectturnData();
+    },
     // close_rieniza() {
     //   this.visible_rieniza = false;
     // },
@@ -1192,6 +1156,10 @@ export default {
         })
           .then(() => {
             this.pojectCared();
+            // this.visible_rieniza = false;
+            //   setTimeout(() => {
+            //     this.projectturnData();
+            //   }, 400);
           })
           .catch(() => {
             this.$message({
@@ -1240,7 +1208,6 @@ export default {
     },
     //搜索客户项目
     show_carLise() {
-      this.someIndex = 1;
       if (this.input_name) {
         this.memberdetails();
         this.experiencehaha = true;
@@ -1386,14 +1353,14 @@ export default {
         .catch(() => {});
     },
     //查看体验卡详情vipecarLise
-    // experienceCard(res) {
-      // this.differentiate = 2;
-      // this.memberdcarUser();
+    experienceCard(res) {
+      this.differentiate = 2;
+      this.memberdcarUser();
       // this.cardNum = res.cardNum;
       // this.visible_details = true;
-      // this.experiencehaha = true;
-      // this.experienceheihei = false;
-    // },
+      this.experiencehaha = true;
+      this.experienceheihei = false;
+    },
     // close_details() {
     //   this.visible_details = false;
     // },
@@ -1411,6 +1378,9 @@ export default {
           .then(() => {
             this.salesReturnData();
             this.suserPopover = false;
+            // setTimeout(() => {
+            //   this.memberdcarUser();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1503,6 +1473,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
+            // setTimeout(() => {
+            //   this.projectturnData();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1941,6 +1914,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -2467,44 +2443,20 @@ export default {
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
 
-    // .projcttop {
-    //   width: 100%;
-    //   height: 30px;
-    //   display: flex;
-    //   position: relative;
-    //   .projectcar {
-    //     margin: 0 20px;
-    //     position: absolute;
-    //     right: 100px;
-    //   }
-    //   .projectcars {
-    //     height: 30px;
-    //     position: absolute;
-    //     right: 10px;
-    //   }
-    // }
     .projcttop {
       width: 100%;
       height: 30px;
-      .projtright {
-        width: 550px;
+      display: flex;
+      position: relative;
+      .projectcar {
+        margin: 0 20px;
+        position: absolute;
+        right: 100px;
+      }
+      .projectcars {
         height: 30px;
-        display: flex;
-        .someprojts {
-          width: 76px;
-          height: 28px;
-          line-height: 28px;
-          text-align: center;
-          background-color: #23a547;
-          border-radius: 4px;
-          margin-left: 5px;
-          color: #fff;
-          cursor: pointer;
-          &.active {
-            background-color: rgb(252, 137, 7);
-            font-weight: 700;
-          }
-        }
+        position: absolute;
+        right: 10px;
       }
     }
 

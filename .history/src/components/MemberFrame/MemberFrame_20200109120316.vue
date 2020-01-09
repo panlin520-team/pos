@@ -107,23 +107,14 @@
               <div class="stgblcktop" slot="top">客户项目信息</div>
               <div class="stgblcktopmain" slot="main">
                 <div class="projcttop">
-                  <div class="projtright">
-                    <div
-                      class="someprojts"
-                      @click="closeClick(item)"
-                      v-for="item in someData"
-                      :class="item.index == someIndex ? 'active' : ''"
-                      :key="item.index"
-                    >{{item.name}}</div>
-                  </div>
-                  <!-- <div class="projectcar">
+                  <div class="projectcar">
                     <el-button size="mini" type="warning" @click="experienceCard">体验卡</el-button>
                   </div>
                   <div class="projectcars">
                     <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
-                  </div>-->
+                  </div>
                 </div>
-                <div class="projctbottom" v-show="experiencehaha">
+                <div class="projctbottom" v-if="experiencehaha">
                   <el-table :data="tableData_details" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -169,7 +160,7 @@
                     </el-table-column>
                   </el-table>
                 </div>
-                <div class="projctbottom" v-show="experienceheihei">
+                <div class="projctbottom" v-if="experienceheihei">
                   <el-table :data="tableData_rieniza" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -330,6 +321,8 @@
                     <div class="title">选择员工划卡</div>
                   </div>
                   <div class="main" slot="main">
+                    <div id="nc_1_nc-canvas" class="nc-canvas" style="width: 300px; height: 100px;"><div id="nc_1_bg" class="nc-bg" style="width: 300px; height: 100px; background: url(&quot;//img.alicdn.com/tps/TB1skE5SFXXXXb3XXXXXXXXXXXX-100-80.png&quot;);"><img src="//img.alicdn.com/tfs/TB1NYk7SFXXXXcWaXXXXXXXXXXX-57-69.png" class="nc-scrape-icon" style="left:10px;top:14px;">
+<img src="//img.alicdn.com/tfs/TB12q8sSVXXXXcSXFXXXXXXXXXX-57-67.png" class="nc-scrape-icon" style="left:169px;top:12px;"></div><div id="nc_1_cover" class="nc-cover" style="width: 300px; height: 100px;"><canvas id="nc_1_canvas" class="nc-canvas-node" width="300" height="100"></canvas><div id="nc_1_canvas-dg" class="nc-canvas-dg" unselectable="on" style="user-select: none; display: none;" onselectstart="return false"></div><div id="nc_1_ok" class="nc-verify-ok"><img src="//img.alicdn.com/tfs/TB1OLQ7SFXXXXaoapXXXXXXXXXX-57-70.png" alt=""><div><i class="ncpc_iconfont icon_success"></i><span id="nc_1_ok-msg"></span></div></div><div id="nc_1_fail" class="nc-verify-fail"><img id="nc_1_fail-icon" src="//img.alicdn.com/tfs/TB1N4lDSVXXXXcFXpXXXXXXXXXX-57-66.png" alt=""><div><i class="ncpc_iconfont icon_error"></i><span id="nc_1_fail-msg"></span></div></div><div id="nc_1_loading" class="nc-loading" style="display: none;"><div id="nc-loading-circle" class="nc-loading-circle"><div class="sk-circle1 sk-circle"></div><div class="sk-circle2 sk-circle"></div><div class="sk-circle3 sk-circle"></div><div class="sk-circle4 sk-circle"></div><div class="sk-circle5 sk-circle"></div><div class="sk-circle6 sk-circle"></div><div class="sk-circle7 sk-circle"></div><div class="sk-circle8 sk-circle"></div><div class="sk-circle9 sk-circle"></div><div class="sk-circle10 sk-circle"></div><div class="sk-circle11 sk-circle"></div><div class="sk-circle12 sk-circle"></div></div><span><span class="nc-lang-cnt" data-nc-lang="_ggk_loading">加载中</span></span></div><div id="nc_1_inform" class="nc-inform" style="display: block;"><span class="nc-lang-cnt" data-nc-lang="_ggk_start"></span></div><div id="nc_1_load-error" class="nc-load-error" style="display: none;"><img id="nc_1_load-error-icon" src="//img.alicdn.com/tfs/TB1N4lDSVXXXXcFXpXXXXXXXXXX-57-66.png" alt=""><div><i class="ncpc_iconfont icon_error"></i><span id="nc_1_load-error-msg">Load Error!</span></div></div></div><div id="nc_1_show-how" class="nc-show-how" style="display: none; left: 247px; top: 14px;"></div></div>
                     <!-- 右边 -->
                     <div class="empSelect">
                       <div class="tit">{{currentServiceTitle}}</div>
@@ -709,17 +702,6 @@ export default {
       //查看体验卡
       tableData_carLise: [],
       optionpersonals: [],
-      //体验卡定制项目按钮
-      someData: [
-        {
-          index: 1,
-          name: "体验卡"
-        },
-        {
-          index: 2,
-          name: "定制项目"
-        }
-      ],
       //退货ID
       recordId: "",
       //区分体验卡和定制项目
@@ -838,8 +820,6 @@ export default {
       personal: "",
       proNmars: "",
       personals: "",
-      //体验卡定制项目切换
-      someIndex: "",
       //充值员工
       value_tpeple: "",
       //支付类型
@@ -889,21 +869,7 @@ export default {
       // this.fetchOrder();
       this.memberinformation();
     },
-    //切换体验卡定制项目
-    closeClick(res) {
-      this.someIndex = res.index;
-      if (res.index == 1) {
-        this.differentiate = 2;
-        this.memberdcarUser();
-        this.experiencehaha = true;
-        this.experienceheihei = false;
-      } else {
-        this.differentiate = 1;
-        this.projectturnData();
-        this.experiencehaha = false;
-        this.experienceheihei = true;
-      }
-    },
+    //分秒duan
     // 时长数组
     setDurations() {
       var res = [];
@@ -1122,13 +1088,13 @@ export default {
       }
     },
     //查看项目定制详情
-    // experienization() {
-    //   this.differentiate = 1;
-    //   this.visible_rieniza = true;
-    //   this.experiencehaha = false;
-    //   this.experienceheihei = true;
-    //   this.projectturnData();
-    // },
+    experienization() {
+      this.differentiate = 1;
+      // this.visible_rieniza = true;
+      this.experiencehaha = false;
+      this.experienceheihei = true;
+      this.projectturnData();
+    },
     // close_rieniza() {
     //   this.visible_rieniza = false;
     // },
@@ -1192,6 +1158,10 @@ export default {
         })
           .then(() => {
             this.pojectCared();
+            // this.visible_rieniza = false;
+            //   setTimeout(() => {
+            //     this.projectturnData();
+            //   }, 400);
           })
           .catch(() => {
             this.$message({
@@ -1240,7 +1210,6 @@ export default {
     },
     //搜索客户项目
     show_carLise() {
-      this.someIndex = 1;
       if (this.input_name) {
         this.memberdetails();
         this.experiencehaha = true;
@@ -1386,14 +1355,14 @@ export default {
         .catch(() => {});
     },
     //查看体验卡详情vipecarLise
-    // experienceCard(res) {
-      // this.differentiate = 2;
-      // this.memberdcarUser();
+    experienceCard(res) {
+      this.differentiate = 2;
+      this.memberdcarUser();
       // this.cardNum = res.cardNum;
       // this.visible_details = true;
-      // this.experiencehaha = true;
-      // this.experienceheihei = false;
-    // },
+      this.experiencehaha = true;
+      this.experienceheihei = false;
+    },
     // close_details() {
     //   this.visible_details = false;
     // },
@@ -1411,6 +1380,9 @@ export default {
           .then(() => {
             this.salesReturnData();
             this.suserPopover = false;
+            // setTimeout(() => {
+            //   this.memberdcarUser();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1503,6 +1475,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
+            // setTimeout(() => {
+            //   this.projectturnData();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1941,6 +1916,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -2467,44 +2445,20 @@ export default {
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
 
-    // .projcttop {
-    //   width: 100%;
-    //   height: 30px;
-    //   display: flex;
-    //   position: relative;
-    //   .projectcar {
-    //     margin: 0 20px;
-    //     position: absolute;
-    //     right: 100px;
-    //   }
-    //   .projectcars {
-    //     height: 30px;
-    //     position: absolute;
-    //     right: 10px;
-    //   }
-    // }
     .projcttop {
       width: 100%;
       height: 30px;
-      .projtright {
-        width: 550px;
+      display: flex;
+      position: relative;
+      .projectcar {
+        margin: 0 20px;
+        position: absolute;
+        right: 100px;
+      }
+      .projectcars {
         height: 30px;
-        display: flex;
-        .someprojts {
-          width: 76px;
-          height: 28px;
-          line-height: 28px;
-          text-align: center;
-          background-color: #23a547;
-          border-radius: 4px;
-          margin-left: 5px;
-          color: #fff;
-          cursor: pointer;
-          &.active {
-            background-color: rgb(252, 137, 7);
-            font-weight: 700;
-          }
-        }
+        position: absolute;
+        right: 10px;
       }
     }
 

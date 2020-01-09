@@ -123,7 +123,7 @@
                     <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
                   </div>-->
                 </div>
-                <div class="projctbottom" v-show="experiencehaha">
+                <div class="projctbottom" v-if="experiencehaha">
                   <el-table :data="tableData_details" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -169,7 +169,7 @@
                     </el-table-column>
                   </el-table>
                 </div>
-                <div class="projctbottom" v-show="experienceheihei">
+                <div class="projctbottom" v-if="experienceheihei">
                   <el-table :data="tableData_rieniza" style="width: 100%">
                     <el-table-column label="项目名称">
                       <template slot-scope="scope">
@@ -890,7 +890,7 @@ export default {
       this.memberinformation();
     },
     //切换体验卡定制项目
-    closeClick(res) {
+    closeClick() {
       this.someIndex = res.index;
       if (res.index == 1) {
         this.differentiate = 2;
@@ -1122,13 +1122,13 @@ export default {
       }
     },
     //查看项目定制详情
-    // experienization() {
-    //   this.differentiate = 1;
-    //   this.visible_rieniza = true;
-    //   this.experiencehaha = false;
-    //   this.experienceheihei = true;
-    //   this.projectturnData();
-    // },
+    experienization() {
+      this.differentiate = 1;
+      // this.visible_rieniza = true;
+      this.experiencehaha = false;
+      this.experienceheihei = true;
+      this.projectturnData();
+    },
     // close_rieniza() {
     //   this.visible_rieniza = false;
     // },
@@ -1240,7 +1240,6 @@ export default {
     },
     //搜索客户项目
     show_carLise() {
-      this.someIndex = 1;
       if (this.input_name) {
         this.memberdetails();
         this.experiencehaha = true;
@@ -1386,14 +1385,14 @@ export default {
         .catch(() => {});
     },
     //查看体验卡详情vipecarLise
-    // experienceCard(res) {
-      // this.differentiate = 2;
-      // this.memberdcarUser();
+    experienceCard(res) {
+      this.differentiate = 2;
+      this.memberdcarUser();
       // this.cardNum = res.cardNum;
       // this.visible_details = true;
-      // this.experiencehaha = true;
-      // this.experienceheihei = false;
-    // },
+      this.experiencehaha = true;
+      this.experienceheihei = false;
+    },
     // close_details() {
     //   this.visible_details = false;
     // },
@@ -1411,6 +1410,9 @@ export default {
           .then(() => {
             this.salesReturnData();
             this.suserPopover = false;
+            // setTimeout(() => {
+            //   this.memberdcarUser();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1503,6 +1505,9 @@ export default {
           .then(() => {
             this.salesReturnDatas();
             this.suserPopovepo = false;
+            // setTimeout(() => {
+            //   this.projectturnData();
+            // }, 300);
           })
           .catch(() => {
             this.$message({
@@ -1941,6 +1946,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

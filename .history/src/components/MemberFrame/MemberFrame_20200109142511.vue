@@ -1941,6 +1941,9 @@ export default {
             });
             this.memberbalance();
             this.staCardxins();
+            // setTimeout(() => {
+            //   this.memberinformation();
+            // }, 200);
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

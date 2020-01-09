@@ -1,0 +1,713 @@
+<!-- 定制-->
+<template>
+  <div class="AddMerchandise">
+    <h1>即时库存</h1>
+    <div class="merchantitle">
+      <el-select v-model="value_project" @change="selectpoject" placeholder="请选择">
+        <el-option
+          v-for="item in option_project"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>
+      <!-- <el-select v-model="value_online" @change="selectwire" placeholder="请选择">
+        <el-option
+          v-for="item in option_online"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        ></el-option>
+      </el-select>-->
+    </div>
+    <div class="merchantList">
+      <el-table :data="storageList">
+        <el-table-column label="名称">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="编号">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.productCode }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scope">
+            <el-button size="mini" type="success" @click="showpoject(scope.row)">查看</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <div class="block">
+        <el-pagination
+          @size-change="handleSizeChangeside"
+          @current-change="handleCurrentChangeside"
+          :current-page.sync="currentPage2"
+          :page-size="pagesize2"
+          background
+          layout="total, prev, pager, next"
+          :total="pagetotal2"
+        ></el-pagination>
+        <PopOver
+          custom-class="storageblockcard"
+          :visible.sync="visible_card"
+          @close="closePopcard"
+          width="800px"
+        >
+          <div class="stgblcktop" slot="top">{{vardName}}</div>
+          <div class="stgblcktopmain" slot="main">
+           <PopOver
+              custom-class="storageblock2"
+              :visible.sync="visible_carLise"
+              @close="close_carLise"
+              width="900px"
+            >
+              <div class="stgblcktop" slot="top">客户项目信息</div>
+              <div class="stgblcktopmain" slot="main">
+                <div class="projcttop">
+                  <div class="projectcar">
+                    <el-button size="mini" type="warning" @click="experienceCard">体验卡</el-button>
+                  </div>
+                  <div class="projectcars">
+                    <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
+                  </div>
+                </div>
+                <div class="projctbottom" v-if="experiencehaha">
+                  <el-table :data="tableData_details" style="width: 100%">
+                    <el-table-column label="项目名称">
+                      <template slot-scope="scope">
+                        <div
+                          slot="reference"
+                          class="name-wrapper"
+                        >{{ scope.row.experiencecardProductName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="商品小类">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.subClassName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="项目类型">
+                      <template slot-scope="scope">
+                        <div
+                          slot="reference"
+                          class="name-wrapper"
+                        >{{ scope.row.experiencecardProductTypeName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用总数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.totalTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用次数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="有效期" width="180">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="180">
+                      <template slot-scope="scope">
+                        <el-button size="mini" type="danger" @click="vipexdetails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="success" @click="userdetails(scope.row)">使用详情</el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <div class="projctbottom" v-if="experienceheihei">
+                  <el-table :data="tableData_rieniza" style="width: 100%">
+                    <el-table-column label="项目名称">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="项目类型">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用总数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.totalTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用次数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="有效期" width="180">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="180">
+                      <template slot-scope="scope">
+                        <el-button size="mini" type="danger" @click="rienizatails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <!-- 定制项目详情 -->
+                <pop-over
+                  :visible.sync="suserPopovepo"
+                  @close="suserPopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="User_custopention" style="width: 100%">
+                      <el-table-column label="姓名">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品名称">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用日期">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用状态">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="操作">
+                        <template slot-scope="scope">
+                          <div
+                            class="inventsome2"
+                            :class="scope.row.recordStatus == '未退货' ? 'active' : 'acc'"
+                            @click="salesReturnal(scope.row)"
+                          >退货</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChange2"
+                      @current-change="handleCurrentChange2"
+                      :current-page.sync="currentPage2"
+                      :page-size="pageSize2"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz2"
+                      background
+                    ></el-pagination>
+                  </div>
+                  <div class="stgblcktopbottom" slot="bottom">
+                    <el-button size="mini" type="success" @click="pushUseropovepo">确定</el-button>
+                  </div>
+                </pop-over>
+                <!-- 体验卡详情 -->
+                <pop-over
+                  :visible.sync="suserPopover"
+                  @close="suserPopover = false"
+                  width="960px"
+                  custom-class="serviceUser"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">使用详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="User_customization" style="width: 100%">
+                      <el-table-column label="姓名">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品名称">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用日期">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用状态">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="操作">
+                        <template slot-scope="scope">
+                          <div
+                            class="inventsome1"
+                            :class="scope.row.recordStatus == '未退货' ? 'active' : 'acc'"
+                            @click="salesReturnails(scope.row)"
+                          >退货</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page.sync="currentPage1"
+                      :page-size="pageSize"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz"
+                      background
+                    ></el-pagination>
+                  </div>
+                  <div class="stgblcktopbottom" slot="bottom">
+                    <el-button size="mini" type="success" @click="pushUser">确定</el-button>
+                  </div>
+                </pop-over>
+                <!-- //选择员工划卡 -->
+                <pop-over
+                  :visible.sync="servicePopover"
+                  @close="servicePopovepop"
+                  width="1200px"
+                  custom-class="servicePop"
+                  id="pop"
+                >
+                  <div class="top" slot="top">
+                    <div class="title">选择员工划卡</div>
+                  </div>
+                  <div class="main" slot="main">
+                    <!-- 右边 -->
+                    <div class="empSelect">
+                      <div class="tit">{{currentServiceTitle}}</div>
+                      <div class="empList scrollY">
+                        <!-- <div
+                          class="item"
+                          v-for="(item,index) in empList"
+                          :key="index"
+                          :class="['item',currentEmpId==item.beauticianId ?'active':'']"
+                          @click="fetchServiceEmp(currentServiceId,item)"
+                        >
+                          <div class="name">{{item.name}}</div>
+                          <div class="id">工号：{{item.beauticianId}}</div>
+                        </div>-->
+                        <div class="empLtleft">
+                          <div class="namelefse">
+                            <div
+                              class="name"
+                              v-for="item in empsetlist"
+                              :key="item.postCategoryId"
+                            >{{item.postCategoryName}}：</div>
+                          </div>
+                          <div>
+                            <!-- 上面 -->
+                            <div style="padding-left: 20px;">
+                              <el-select
+                                v-model="value_personal"
+                                @change="valubs"
+                                placeholder="请选择员员工"
+                              >
+                                <el-option
+                                  v-for="item in optionpersonal"
+                                  :key="item.staffNumber"
+                                  :label="item.name"
+                                  :value="item"
+                                ></el-option>
+                              </el-select>
+                              <el-date-picker
+                                v-model="valuexuaTime"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                type="date"
+                                :picker-options="pickerOptions1"
+                                placeholder="选择日期"
+                                @change="judgeTime(valuexuaTime)"
+                              ></el-date-picker>
+                              <!-- <el-time-select
+                                v-model="value_minute"
+                                :picker-options="{
+                              start: '09:30',
+                              step: '00:30',
+                              end: '22:30'
+                            }"
+                                placeholder="选择时间"
+                              ></el-time-select>-->
+                              <el-select
+                                v-model="value_minute"
+                                placeholder="请选择时间"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in judgeTimeList"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                  :disabled="item.disabled"
+                                ></el-option>
+                              </el-select>
+                              <el-select
+                                v-model="duration"
+                                placeholder="请选择时长"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in durations"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                ></el-option>
+                              </el-select>
+                            </div>
+                            <!-- 下面 -->
+                            <div class="empLtlefts" v-if="values_truwes">
+                              <el-select
+                                v-model="value_personals"
+                                @change="valubss"
+                                placeholder="请选择员员工"
+                              >
+                                <el-option
+                                  v-for="item in optionpersonals"
+                                  :key="item.staffNumber"
+                                  :label="item.name"
+                                  :value="item"
+                                ></el-option>
+                              </el-select>
+                              <el-date-picker
+                                v-model="valuexuaTimes"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                type="date"
+                                placeholder="选择日期"
+                                :picker-options="pickerOptions0"
+                                @change="judgeTimes(valuexuaTimes)"
+                              ></el-date-picker>
+                              <!-- <el-time-select
+                                v-model="value_minutes"
+                                :picker-options="{
+                              start: '10:00',
+                              step: '00:30',
+                              end: '22:30'
+                            }"
+                                placeholder="选择时间"
+                              ></el-time-select>-->
+                              <el-select
+                                v-model="value_minutes"
+                                placeholder="请选择时间"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in judgeTimeLists"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                  :disabled="item.disabled"
+                                ></el-option>
+                              </el-select>
+                              <el-select
+                                v-model="duratiot"
+                                placeholder="请选择时长"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in durationss"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                ></el-option>
+                              </el-select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bottom" slot="bottom">
+                    <div class="btn btn-submit" @click="pushService">确认</div>
+                  </div>
+                </pop-over>
+              </div>
+            </PopOver>
+          </div>
+          <div class="stgblckbottom" slot="bottom"></div>
+        </PopOver>
+      </div>
+    </div>
+
+    <MemberFrame></MemberFrame>
+  </div>
+</template>
+
+<script>
+import MemberFrame from "@/components/MemberFrame/MemberFrame";
+
+export default {
+  name: "AddMerchandise",
+  components: { MemberFrame },
+
+  data() {
+    return {
+      multipleSelection: [],
+      //外面产品列表
+      storageList: [],
+      //弹出框
+      visible_examine: false,
+      flag: true,
+      //里面类
+      value_somepojiet: "1",
+
+      //外面翻页
+      currentPage2: 1,
+      pagesize2: 10,
+      pagetotal2: 0,
+      //当前商品productCode
+      productCode: "",
+      //线上线下
+      value_online2: "2",
+      //外面产品类型
+      option_project: [
+        {
+          value: "1",
+          label: "产品"
+        },
+        {
+          value: "2",
+          label: "服务"
+        }
+      ],
+      value_project: "1",
+      //线上线下
+      option_online: [
+        {
+          value: "1",
+          label: "上架"
+        },
+        {
+          value: "2",
+          label: "下架"
+        }
+      ],
+      value_online: "1",
+      //新数组
+      multiplelist: [],
+      //下架
+      btnText: "下架",
+      productCods: ""
+    };
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
+    //外面翻页
+    handleSizeChangeside(val) {
+      setTimeout(() => {
+        this.commodityoutData();
+      }, 300);
+    },
+    handleCurrentChangeside(val) {
+      setTimeout(() => {
+        this.commodityoutData();
+      }, 300);
+    },
+    //选中外面类
+    selectpoject() {
+      this.commodityoutData();
+    },
+    //查看
+    showpoject(res) {
+      this.productCods = res.productCode;
+      this.commodityose();
+    },
+    //提取选中商品
+    extractchans() {
+      this.multiplelist = [];
+      if (this.multipleSelection.length !== 0) {
+        this.multipleSelection.forEach(value => {
+          this.multiplelist.push(value.productCode);
+        });
+        //获取选中商品
+        this.extractData();
+      } else {
+        this.$message({
+          message: "请选择商品",
+          type: "warning"
+        });
+      }
+    },
+    //查看即时库存
+    commodityose() {
+      var url = this.$https.productHost + "/stock/selectProductNumber";
+      var params = {
+        stock: localStorage.getItem("stockCode"),
+        productCode: this.productCods
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result !== null) {
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //获取外面商品数据
+    commodityoutData() {
+      var url = this.$https.productHost + "/manage/product/selectProductList";
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        page: this.currentPage2,
+        limit: this.pagesize2,
+        type: this.value_project,
+        productStatus: this.value_online,
+        keyWord: "",
+        companyType: 3,
+        isHoutai: 1
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result !== null) {
+            this.storageList = res.data.result.list;
+            this.pagetotal2 = res.data.result.total;
+            this.pagesize2 = res.data.result.size;
+          } else {
+            this.storageList = [];
+            this.pagetotal2 = 0;
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //下架
+    soldOut() {
+      var url = this.$https.productHost + "/manage/product/onOffSale";
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        productCode: this.productCode,
+        productStatus: this.value_online2,
+        companyType: 3
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.commodityoutData();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //提交商品
+    extractData() {
+      var url = this.$https.productHost + "/manage/product/addProductStore";
+      var params = {
+        storeId: localStorage.getItem("storeId"),
+        productCode: JSON.stringify(this.multiplelist),
+        type: this.value_somepojiet
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result == null) {
+            this.$message({
+              message: "添加成功",
+              type: "success"
+            });
+            this.visible_examine = false;
+            // location.reload();
+            this.commodityoutData();
+          } else {
+            this.$message({
+              message:
+                "提取成功！但是以下商品已经存在无法提取" +
+                JSON.stringify(res.data.result),
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    }
+  },
+  created() {},
+  mounted() {
+    this.commodityoutData();
+  }
+};
+</script>
+
+<style lang='scss'>
+.AddMerchandise {
+  width: 100%;
+  h1 {
+    padding: 50px 0 0 50px;
+  }
+  .merchantitle {
+    width: 100%;
+    height: 100px;
+    padding-top: 40px;
+    margin-bottom: 30px;
+
+    .el-select {
+      margin-left: 70px;
+    }
+    .el-button {
+      margin-left: 50px;
+    }
+  }
+  .merchantList {
+    width: 100%;
+    height: 100%;
+    .block {
+      text-align: center;
+      margin-top: 20px;
+    }
+    .el-table {
+      width: 90%;
+      margin: 0 auto;
+      border-radius: 6px;
+      box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    }
+  }
+}
+//出入库弹出框
+.storageblock {
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    padding-top: 10px;
+  }
+  .stgblcktopmain {
+    padding: 15px 0 0 20px;
+    height: 100%;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .merchansomelist {
+      width: 100%;
+      height: 300px;
+      overflow: auto;
+      margin-top: 15px;
+    }
+    .el-button {
+      margin-left: 30px;
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+</style>

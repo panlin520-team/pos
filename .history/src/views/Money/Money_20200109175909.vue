@@ -1036,7 +1036,6 @@ export default {
   methods: {
     // 删除会员
     deleteMember() {
-      
       this.$msgbox({
         title: "提示",
         message: "确认放弃使用会员卡吗？",

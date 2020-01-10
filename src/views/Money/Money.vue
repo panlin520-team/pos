@@ -1036,7 +1036,6 @@ export default {
   methods: {
     // 删除会员
     deleteMember() {
-      
       this.$msgbox({
         title: "提示",
         message: "确认放弃使用会员卡吗？",
@@ -1056,7 +1055,6 @@ export default {
     cancellationorder(res) {
       this.orderStatusorder = res.orderStatus;
       this.orderNumberorder = res.orderNumber;
-
       this.$confirm("是否取消订单", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -1072,7 +1070,6 @@ export default {
           });
         });
     },
-
     // 确认选择会员
     handleAffirm(row) {
       this.memberValue = true;
@@ -1105,7 +1102,6 @@ export default {
         }
       });
     },
-
     // 根据姓名或电话获取会员信息
     selectStoreMember(i) {
       var url =

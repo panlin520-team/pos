@@ -50,7 +50,7 @@ router.beforeEach((to, from, next) => {
       document.title = "俪凝美聚"
     }
 
-    if (localStorage.getItem('isLogin') == 'false' || localStorage.getItem('isLogin') == '' || localStorage.getItem('isLogin') == null || localStorage.getItem('isLogin') == 'undefined') {
+    if (localStorage.getItem('isLogin') == null) {
       next({
         path: '/login'
       })

@@ -192,8 +192,8 @@
                 </el-form>
               </div>
               <div class="stgblckbottom" slot="bottom">
-                 <el-button type="primary" @click="submitForm('addruleForm')">确定</el-button>
-                    <el-button @click="resetForm('addruleForm')">取消</el-button>
+                <el-button type="primary" @click="submitForm('addruleForm')">确定</el-button>
+                <el-button @click="resetForm('addruleForm')">取消</el-button>
               </div>
             </PopOver>
           </div>

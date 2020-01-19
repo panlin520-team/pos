@@ -59,14 +59,15 @@ export default {
         })
           .then(() => {
             this.$router.push({ path: "/login" });
-            localStorage.removeItem("member");
-            localStorage.removeItem("remark");
-            localStorage.removeItem("memberName");
-            localStorage.removeItem("memberNumber");
-            localStorage.removeItem("membership");
-            localStorage.removeItem("grade");
-            localStorage.removeItem("list");
-            localStorage.removeItem("headImgUrl");
+            // localStorage.removeItem("member");
+            // localStorage.removeItem("remark");
+            // localStorage.removeItem("memberName");
+            // localStorage.removeItem("memberNumber");
+            // localStorage.removeItem("membership");
+            // localStorage.removeItem("grade");
+            // localStorage.removeItem("list");
+            // localStorage.removeItem("headImgUrl");
+            localStorage.clear();
 
             this.accounBalance = [];
           })

@@ -102,18 +102,15 @@
         ></el-pagination>
       </div>
     </div>
-
     <MemberFrame></MemberFrame>
   </div>
 </template>
 
 <script>
 import MemberFrame from "@/components/MemberFrame/MemberFrame";
-
 export default {
   name: "AddMerchandise",
   components: { MemberFrame },
-
   data() {
     return {
       //里面产品列表
@@ -382,7 +379,6 @@ export default {
   }
 };
 </script>
-
 <style lang='scss'>
 .AddMerchandise {
   width: 100%;
@@ -394,7 +390,6 @@ export default {
     height: 100px;
     padding-top: 40px;
     margin-bottom: 30px;
-
     .el-select {
       margin-left: 70px;
     }

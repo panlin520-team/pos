@@ -241,7 +241,7 @@ const routes = [
         name: 'AddPurchase',
         component: AddPurchase,
         meta: {
-          title: '添加入库采购',
+          title: '采购入库',
           requiresAuth: true,
           menubar: true,
           navbar: true
@@ -254,7 +254,7 @@ const routes = [
         name: 'AddOutChase',
         component: AddOutChase,
         meta: {
-          title: '添加出库采购',
+          title: '销售出库',
           requiresAuth: true,
           menubar: true,
           navbar: true

@@ -19,7 +19,7 @@
           :value="item.value"
         ></el-option>
       </el-select>
-      <el-button type="success" @click="showchans">查看子公司产品池</el-button>
+      <!-- <el-button type="success" @click="showchans">查看子公司产品池</el-button> -->
       <PopOver
         custom-class="storageblock"
         :visible.sync="visible_examine"
@@ -177,11 +177,11 @@ export default {
   watch: {},
   methods: {
     //点击选择商品
-    showchans() {
-      this.value_somepojiet = "1";
-      this.commoditysideData();
-      this.visible_examine = true;
-    },
+    // showchans() {
+    //   this.value_somepojiet = "1";
+    //   this.commoditysideData();
+    //   this.visible_examine = true;
+    // },
     closePopOver() {
       this.visible_examine = false;
     },

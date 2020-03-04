@@ -995,7 +995,7 @@ export default {
         res => {
           if (res.data.result) {
             this.dataTotal = res.data.result.total;
-            this.emlpoyeesData = res.data.result;
+            this.emlpoyeesData = res.data.result.list;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

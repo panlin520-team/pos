@@ -97,7 +97,7 @@ export default {
   width: 170px;
   white-space: pre-wrap;
   height: 80px;
-  padding-top: 20px;
+  padding-top: 28px;
   font-size: 14px;
   font-weight: 700;
   color: #ffffff;

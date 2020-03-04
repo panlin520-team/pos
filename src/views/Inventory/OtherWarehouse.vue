@@ -230,7 +230,7 @@
             <el-button type="success" size="medium" @click="opencommodity">提交</el-button>
           </div>
           <div class="waresupplier">
-            <el-cascader
+            <!--  <el-cascader
               v-model="supplierCategoryName"
               placeholder="请选择供应商"
               :options="option_supplier"
@@ -238,8 +238,17 @@
               ref="myCascader"
               :show-all-levels="false"
               @change="onProvincesChange"
-            ></el-cascader>
+            ></el-cascader>-->
+            <el-select v-model="valueshop" placeholder="请选择部门">
+              <el-option
+                v-for="item in optionsShops"
+                :key="item.k3Number"
+                :label="item.name"
+                :value="item.k3Number"
+              ></el-option>
+            </el-select>
           </div>
+
           <div class="timebox">
             <el-date-picker
               v-model="createTime"
@@ -394,6 +403,9 @@ export default {
           }
         ]
       },
+      //门店选择
+      valueshop: "",
+      optionsShops: [],
       //入库列表
       storageList: [],
       //入库菜单
@@ -592,7 +604,9 @@ export default {
       //请求仓库
       this.requestwarehouse();
       //请求供应商
-      this.supplierList();
+      // this.supplierList();
+      //请求门店
+      this.Requeststores();
       //请求公司
       this.requestcompany();
       this.groupOpen = true;
@@ -613,6 +627,7 @@ export default {
         }
       });
     },
+
     //确认收货
     confirmPopOver(res) {
       this.inStorageId = res.inStorageId;
@@ -731,9 +746,16 @@ export default {
           message: "请选择入库商品",
           type: "warning"
         });
-      } else if (this.supplierCategoryName == "") {
+      }
+      // else if (this.supplierCategoryName == "") {
+      //   this.$message({
+      //     message: "请选择供应商",
+      //     type: "warning"
+      //   });
+      // }
+      else if (this.valueshop == "") {
         this.$message({
-          message: "请选择供应商",
+          message: "请选择部门",
           type: "warning"
         });
       } else if (this.createTime == "") {
@@ -744,13 +766,9 @@ export default {
       } else {
         this.submitindent();
         this.groupOpen = false;
-        this.$message({
-          message: "提交成功",
-          type: "success"
-        });
-        setTimeout(() => {
-          this.otherinstorage();
-        }, 300);
+        // setTimeout(() => {
+        //   this.otherinstorage();
+        // }, 300);
       }
     },
 
@@ -797,7 +815,6 @@ export default {
     tallyorderfrom() {
       this.visible_orderfrom = false;
     },
-
     //分页
     handleSizeChange(val) {},
     handleCurrentChange(val) {
@@ -857,6 +874,28 @@ export default {
           this.$message({
             type: "error",
             message: error
+          });
+        }
+      );
+    },
+    //请求门店
+    Requeststores() {
+      var url =
+        this.$https.storeHost + "/manage/department/listDepartmentNoPage";
+      var params = {
+        companyType: 3,
+        companyId: localStorage.getItem("storeId")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.optionsShops = res.data.result;
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: "门店请求失败"
           });
         }
       );
@@ -1000,35 +1039,35 @@ export default {
         .catch(err => {});
     },
     //请求第三供应商列表
-    supplierList() {
-      var url = this.$https.storeHost + "/manage/supplier/listSupplier ";
-      var params = {
-        storeId: localStorage.getItem("storeId"),
-        supplierCategoryId: 1
-      };
-      this.$https
-        .fetchPost(url, params)
-        .then(res => {
-          if (res.data.result) {
-            res.data.result.list.forEach(value => {
-              this.option_supplier[0].children.push({
-                label: value.supplierName,
-                value: value.supplierId,
-                supplierId: value.supplierId,
-                supplierName: value.supplierName,
-                supplierCategoryName: value.supplierCategoryName,
-                supplierCode: value.supplierCode
-              });
-            });
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        })
-        .catch(err => {});
-    },
+    // supplierList() {
+    //   var url = this.$https.storeHost + "/manage/supplier/listSupplier ";
+    //   var params = {
+    //     storeId: localStorage.getItem("storeId"),
+    //     supplierCategoryId: 1
+    //   };
+    //   this.$https
+    //     .fetchPost(url, params)
+    //     .then(res => {
+    //       if (res.data.result) {
+    //         res.data.result.list.forEach(value => {
+    //           this.option_supplier[0].children.push({
+    //             label: value.supplierName,
+    //             value: value.supplierId,
+    //             supplierId: value.supplierId,
+    //             supplierName: value.supplierName,
+    //             supplierCategoryName: value.supplierCategoryName,
+    //             supplierCode: value.supplierCode
+    //           });
+    //         });
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     })
+    //     .catch(err => {});
+    // },
     //请求公司
     requestcompany() {
       var url = this.$https.storeHost + "/manage/store/selectStoreById";
@@ -1066,9 +1105,12 @@ export default {
         inStorageDate: this.createTime, //入库日期
         //purchaseBranch: $("#instorage input[name='purchaseBranch']").val(), 入库部门
         stockGroup: this.warehouses, //仓库CK001
-        shipperType: "第三方供应商", //货主类型（供应商
-        shipper: this.supplierName, //货主
-        shipperCode: this.supplierCodes, //货主编码
+        shipperType: "业务组织", //货主类型（供应商
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
+        branch: this.valueshop,
+        shipper: localStorage.getItem("storeName"), //货主
+        shipperCode: localStorage.getItem("storeId"), //货主编码
         inventoryGroup: this.warehouses, //库存组织
         inventoryWay: "普通", //库存方向（1普通、2退货）
         inStorageProductJson: text,
@@ -1080,6 +1122,11 @@ export default {
         .then(res => {
           if (res.data.result !== null) {
             this.tableData_enterpurchase.push(res.data.result);
+            this.$message({
+              message: res.data.result,
+              type: "success"
+            });
+            this.otherinstorage();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

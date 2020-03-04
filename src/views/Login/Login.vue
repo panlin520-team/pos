@@ -115,6 +115,8 @@ export default {
             localStorage.setItem("trueName", res.data.result.trueName);
             localStorage.setItem("storeName", res.data.result.companyName);
             localStorage.setItem("stockCode", res.data.result.stockCode);
+            localStorage.setItem("orgK3Number", res.data.result.orgK3Number);
+            localStorage.setItem("stockId", res.data.result.stockId);
             this.$store.commit("setTrueName", res.data.result.trueName);
             this.$store.commit("setStoreName", res.data.result.companyName);
             localStorage.setItem("isLogin", "true");

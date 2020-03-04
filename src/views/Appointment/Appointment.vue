@@ -458,6 +458,7 @@
             class="setEmpDatePicker"
             placeholder="预约日期"
             :picker-options="pickerOptions"
+            @change="judgeTime(items.nursingDate)"
           ></el-date-picker>
           <el-select v-model="items.time" placeholder="预约时间" class="setEmpPicker">
             <el-option
@@ -539,7 +540,7 @@
         <div class="btn btn-submit" @click="handleChangeService" v-debounce>确认</div>
       </div>
     </pop-over>
-    <MemberFrame></MemberFrame>
+    <MemberFrame ref="moduleName"></MemberFrame>
   </div>
 </template>
 
@@ -1015,7 +1016,6 @@ export default {
     settleAccounts(params) {
       var payObj,
         payTypeAndAmount = [];
-
       // if (this.accountInfo.memoNum == "") {
       //   this.$message({
       //     type: "error",
@@ -1023,7 +1023,6 @@ export default {
       //   });
       //   return;
       // }
-
       var totalPrice = 0;
       // var cashType = { payType: this.cashOption, amount: this.cashValue };
 
@@ -1135,6 +1134,9 @@ export default {
           if (res.data.responseStatusType.message == "Success") {
             this.accountPopver = false;
             this.appointmentDetailsPop = false;
+            setTimeout(() => {
+              this.$refs.moduleName.memberbalance();
+            }, 600);
             this.emptyData();
             this.fetchEmpAndAppointment();
             this.$notify({
@@ -1671,8 +1673,8 @@ export default {
           this.appointmentList = [];
           if (res.data.result) {
             // 门店员工
-            this.storeEmployeesList = res.data.result;
-            var list = res.data.result;
+            this.storeEmployeesList = res.data.result.list;
+            var list = res.data.result.list;
             for (var i = 0; i < list.length; i++) {
               if (list[i].appointmentList != null) {
                 var list2 = list[i].appointmentList;
@@ -1979,12 +1981,12 @@ export default {
 
       &.reserved {
         border-color: rgb(82, 189, 58);
-        color: rgb(82, 189, 58);
+        color: rgb(88, 104, 84);
         background: rgba(82, 189, 58, 0.3);
       }
       &.bill {
         border-color: rgb(237, 179, 57);
-        color: rgb(237, 179, 57);
+        color: rgb(196, 151, 55);
         background: rgba(237, 179, 57, 0.3);
       }
     }

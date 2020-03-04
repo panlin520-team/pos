@@ -733,6 +733,13 @@ export default {
       currentPage2: 1,
       pageSize2: 10,
       totalPasz2: 0,
+      //退货商品
+      projectsuder: [
+        {
+          productCode: "",
+          productName: ""
+        }
+      ],
       //账户信息余额
       accounBalance: [],
       //查看体验卡详情
@@ -1488,6 +1495,8 @@ export default {
     },
     //定制项目划卡退货
     salesReturnal(res) {
+      this.projectsuder[0].productCode = res.productCode;
+      this.projectsuder[0].productName = res.productName;
       this.recordIds = res.recordId;
       this.productCodenal = res.productCode;
       this.productNamenal = res.productName;
@@ -1669,7 +1678,10 @@ export default {
         storeName: localStorage.getItem("storeName"),
         productCode: this.productCodenal,
         productName: this.productNamenal,
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
         expUseRecordId: this.recordIds,
+        products: JSON.stringify(this.projectsuder),
         experiencecardProductUserId: this.rienizauID,
         modifyOperator: localStorage.getItem("trueName"),
         orderNumber: this.orderNumber
@@ -1941,7 +1953,6 @@ export default {
             setTimeout(() => {
               this.memberinformation();
             }, 300);
-            
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

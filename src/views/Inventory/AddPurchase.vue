@@ -124,7 +124,7 @@
     <!-- 入库 -->
     <div class="warehousing" v-if="groupOpen == true">
       <div class="wareTitle">
-        <div @click="groupOpen = false">
+        <div @click="getware_back">
           <img src="../../assets/images/icon-left.png" alt />
         </div>
         <h2>添加采购订单</h2>
@@ -519,25 +519,25 @@ export default {
       appear_remarkConnet: "这是一个入库",
       //供应商
       option_supplier: [
-        {
-          value: "0",
-          label: "子公司",
-          children: [
-            {
-              value: "0",
-              label: "",
-              supplierCode: "",
-              supplierId: "",
-              supplierName: "",
-              supplierCategoryName: ""
-            }
-          ]
-        },
-        {
-          value: "1",
-          label: "第三方供应商",
-          children: []
-        }
+        // {
+        //   value: "0",
+        //   label: "子公司",
+        //   children: [
+        //     {
+        //       value: "0",
+        //       label: "",
+        //       supplierCode: "",
+        //       supplierId: "",
+        //       supplierName: "",
+        //       supplierCategoryName: ""
+        //     }
+        //   ]
+        // },
+        // {
+        //   value: "1",
+        //   label: "第三方供应商",
+        //   children: []
+        // }
       ]
     };
   },
@@ -581,14 +581,14 @@ export default {
               );
             }
             this.$message({
-              message: "添加成功...",
+              message: "添加成功",
               type: "success"
             });
             this.class_seekbox = false;
             this.visible_orderfrom = false;
           } else {
             this.$message({
-              message: "请选择正确商品...",
+              message: "请选择正确商品",
               type: "warning"
             });
           }
@@ -607,16 +607,16 @@ export default {
     virtures() {
       //时间
       this.seekList = [];
-      this.option_supplier[1].children = [];
+      this.option_supplier = [];
 
       this.createTime = "";
       this.supplierCategoryName = "";
       //子公司
       this.totalSize = 0;
       this.storageList = [];
-      this.requcompany();
+      // this.requcompany();
       //请求供应商
-      this.supplierList();
+      // this.supplierList();
       //请求商品
       this.requestcommodity();
       //请求第三供应商
@@ -686,6 +686,10 @@ export default {
       this.addruleForm.addrepertory = res.name;
       this.class_selckbox = false;
     },
+    //返回
+    getware_back() {
+      this.groupOpen = false;
+    },
 
     //入库保存
     opencommodity() {
@@ -693,12 +697,12 @@ export default {
       this.receivedNumber = this.createTime;
       if (this.storageList.length == 0) {
         this.$message({
-          message: "请选择采购商品...",
+          message: "请选择采购商品",
           type: "warning"
         });
       } else if (this.supplierCategoryName == "") {
         this.$message({
-          message: "请选择供应商...",
+          message: "请选择供应商",
           type: "warning"
         });
       } else if (this.createTime == "") {
@@ -709,13 +713,14 @@ export default {
       } else {
         this.submitindent();
         this.groupOpen = false;
-        this.$message({
-          message: "提交成功",
-          type: "success"
-        });
-        setTimeout(() => {
-          this.purchinstorage();
-        }, 300);
+        // this.option_supplier = [];
+        // this.$message({
+        //   message: "提交成功",
+        //   type: "success"
+        // });
+        // setTimeout(() => {
+        //   this.purchinstorage();
+        // }, 300);
       }
     },
     //点击修改入库订单
@@ -1068,76 +1073,78 @@ export default {
     },
 
     //请求子公司
-    requcompany() {
-      var url = this.$https.storeHost + "/manage/company/selectSubsidiaryByID";
-      var params = {
-        subsidiaryId: this.subCompanyId
-      };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.option_supplier[0].children[0].supplierCode =
-              res.data.result.subsidiaryId;
-            this.subsidiaryName = res.data.result.subsidiaryName;
-            this.option_supplier[0].children[0].supplierName = this.subsidiaryName;
-            this.option_supplier[0].children[0].supplierId =
-              res.data.result.subsidiaryId;
-            this.option_supplier[0].children[0].label =
-              res.data.result.subsidiaryName;
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
+    // requcompany() {
+    //   var url = this.$https.storeHost + "/manage/company/selectSubsidiaryByID";
+    //   var params = {
+    //     subsidiaryId: this.subCompanyId
+    //   };
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       if (res.data.result) {
+    //         this.option_supplier[0].children[0].supplierCode =
+    //           res.data.result.subsidiaryId;
+    //         this.subsidiaryName = res.data.result.subsidiaryName;
+    //         this.option_supplier[0].children[0].supplierName = this.subsidiaryName;
+    //         this.option_supplier[0].children[0].supplierId =
+    //           res.data.result.subsidiaryId;
+    //         this.option_supplier[0].children[0].label =
+    //           res.data.result.subsidiaryName;
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
     //请求第三供应商列表
-    supplierList() {
-      var url = this.$https.storeHost + "/manage/supplier/listSupplier";
-      var params = {
-        storeId: localStorage.getItem("storeId"),
-        supplierCategoryId: 1
-      };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result !== null) {
-          } else {
-            this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
-            });
-          }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
-    },
+    // supplierList() {
+    //   var url = this.$https.storeHost + "/manage/supplier/listSupplier";
+    //   var params = {
+    //     storeId: localStorage.getItem("storeId"),
+    //     supplierCategoryId: 1
+    //   };
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       if (res.data.result !== null) {
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
     //请求供应商列表
     goyisList() {
       var url =
         this.$https.storeHost + "/manage/supplier/listSupplierCategoryNoPage";
-      var params = {};
+      var params = {
+        companyType: 3,
+        companyId: localStorage.getItem("storeId")
+      };
       this.$https.fetchPost(url, params).then(
         res => {
           var data2 = [];
           if (res.data.result) {
             res.data.result.forEach(value => {
-              this.option_supplier[1].children.push({
+              this.option_supplier.push({
+                value: value.supplierCategoryId,
                 label: value.supplierCategoryName,
-                supplierCategoryId: value.supplierCategoryId,
-                value: value.supplierCategoryName,
                 children: value.supplierList
               });
               data2.push({
@@ -1151,10 +1158,32 @@ export default {
               var child = data2[i].children;
               for (var j = 0; j < child.length; j++) {
                 child[j].label = child[j].supplierName;
-                child[j].supplierId = child[j].supplierId;
-                child[j].value = child[j].supplierId;
+                child[j].supplierId = child[j].supplierCode;
+                child[j].value = child[j].supplierCode;
               }
             }
+            // res.data.result.forEach(value => {
+            //   this.option_supplier[1].children.push({
+            //     label: value.supplierCategoryName,
+            //     supplierCategoryId: value.supplierCategoryId,
+            //     value: value.supplierCategoryName,
+            //     children: value.supplierList
+            //   });
+            //   data2.push({
+            //     label: value.supplierCategoryName,
+            //     supplierCategoryId: value.supplierCategoryId,
+            //     value: value.supplierCategoryName,
+            //     children: value.supplierList
+            //   });
+            // });
+            // for (var i = 0; i < data2.length; i++) {
+            //   var child = data2[i].children;
+            //   for (var j = 0; j < child.length; j++) {
+            //     child[j].label = child[j].supplierName;
+            //     child[j].supplierId = child[j].supplierId;
+            //     child[j].value = child[j].supplierId;
+            //   }
+            // }
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1187,10 +1216,12 @@ export default {
         purchaseGroup: this.warehouses,
         purchaseBranch: this.stockType,
         provider: this.supplierId,
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
         providerName: this.supplierName,
         settlementGroup: this.storeName,
         settlementCurrency: "人民币",
-        shipperType: this.supplierCategoryNames,
+        shipperType: "业务组织",
         shipper: this.supplierName,
         shipperCode: this.supplierCodes,
         inStorageProductJson: text,
@@ -1218,6 +1249,10 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result !== null) {
+            this.$message({
+              message: res.data.result,
+              type: "success"
+            });
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1225,7 +1260,9 @@ export default {
             });
           }
           // this.tableData_enterpurchase = res.data.result
+
           this.tableData_enterpurchase.push(res.data.result);
+          this.purchinstorage();
         },
         error => {
           this.$message({

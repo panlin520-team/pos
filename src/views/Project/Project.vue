@@ -28,8 +28,8 @@
             </div>
           </div>
           <div class="stgblckbottom" slot="bottom">
-            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
             <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
           </div>
         </PopOver>
         <!-- </div> -->
@@ -361,6 +361,7 @@ export default {
       //密码
       secret: "",
       prodtCdList: [],
+      //计算原价
       retailPrespoe: "0",
       //计算总价
       totalPrice: "0",
@@ -573,9 +574,9 @@ export default {
     },
     calcTotalPrice: function() {
       this.totalPrice = 0; //总金额进行清零
+      this.retailPrespoe = 0; //原价清零
       this.tableDataList.forEach((item, index) => {
         if (item) {
-          this.retailPrespoe = "";
           this.totalPrice += item.amount * item.discountPrice; //累加的
           this.retailPrespoe += item.amount * item.retailPricess;
         }
@@ -671,18 +672,15 @@ export default {
     //改变数量
     changeNumer(res) {
       res.productNum = res.amount;
-      console.log(res);
       res.originalPrice = res.amount * res.discountPrice;
       if (res.amount < 1) {
         res.amount = 1;
       }
-      console.log(res);
       //计算
       this.calcTotalPrice();
     },
     //改变总价
     changeNumes(res) {
-      console.log(res);
       res.discountPrice = res.originalPrice / res.amount;
       this.calcTotalPrice();
     },
@@ -700,7 +698,8 @@ export default {
     },
     //点击删除订单
     removeBtn(res, index) {
-      this.amount = res.amount;
+      this.amount = 1;
+      this.retailPrespoe = this.retailPrespoe - res.amount * res.retailPrice;
       this.stockNum = parseInt(this.stockNum) + parseInt(this.amount);
       this.tableDataList.splice(index, 1);
 
@@ -788,8 +787,6 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          console.log(12312333333333);
-
           if (res.data.result) {
             res.data.result.forEach(value => {
               if (value.payTypeCategory == 2) {

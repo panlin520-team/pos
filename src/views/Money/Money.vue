@@ -50,7 +50,7 @@
         <div class="headerItem">应付金额</div>
         <div class="headerItem">已付金额</div>
         <div class="headerItem">状态</div>
-        <div class="headerItem">操作</div>
+        <div class="headerItem" style="min-width: 250px">操作</div>
       </div>
       <div class="list">
         <div class="listItem" v-for="(item,index) in orderDataFilter" :key="item.orderNumber">
@@ -803,7 +803,7 @@
         <div class="btn btn-submit" @click="handleChangeProduct" v-debounce>确认</div>
       </div>
     </pop-over>
-    <MemberFrame></MemberFrame>
+    <MemberFrame ref="moduleName"></MemberFrame>
   </div>
 </template>
 
@@ -1344,6 +1344,8 @@ export default {
                     if (res.data.responseStatusType.message == "Success") {
                       this.accountPopver = false;
                       this.billOpen = false;
+                      //刷新下方会员金额
+                      this.$refs.moduleName.memberbalance();
                       this.emptyData();
                       this.fetchOrder();
                       this.$notify({
@@ -2526,7 +2528,6 @@ export default {
         });
         return;
       }
-
       var path = this.$https.orderHost + "/order/payOrder";
       var info = {
         orderNumber: params.orderNumber,
@@ -2550,6 +2551,8 @@ export default {
             title: "结算成功",
             type: "success"
           });
+          //刷新下方会员金额
+          this.$refs.moduleName.memberbalance();
         },
         error => {
           this.$message({
@@ -2597,6 +2600,7 @@ export default {
                   type: "success",
                   message: "取消成功"
                 });
+
                 this.fetchOrder();
               } else {
                 this.$message({
@@ -2640,6 +2644,8 @@ export default {
         isTiYanKaOrDingzhi: this.isTiYanKaOrDingzhi,
         memberNum: item.cardNumber,
         orderNumber: item.orderNumber,
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
         stockCode: localStorage.getItem("stockCode"),
         storeName: localStorage.getItem("storeName"),
         products: JSON.stringify(arr)
@@ -2655,11 +2661,14 @@ export default {
         .then(() => {
           this.$https.fetchPost(url, params).then(
             res => {
+              console.log(res.data);
               if (res.data.responseStatusType.message == "Success") {
                 this.$message({
                   type: "success",
-                  message: "取消成功"
+                  message: "退款成功"
                 });
+                //刷新下方会员金额
+                this.$refs.moduleName.memberbalance();
                 this.fetchOrder();
               } else {
                 this.$message({
@@ -2676,7 +2685,12 @@ export default {
             }
           );
         })
-        .catch(() => {});
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "取消退货"
+          });
+        });
     },
 
     payOrder(item) {
@@ -2808,6 +2822,7 @@ export default {
         font-size: 16px;
         color: #ffffff;
         line-height: 40px;
+        cursor: pointer;
         text-align: center;
         background-color: #23a547;
       }
@@ -3772,6 +3787,7 @@ export default {
       font-weight: 700;
       background: #23a547;
       border-radius: 6px;
+      cursor: pointer;
     }
   }
 }
@@ -3935,7 +3951,6 @@ export default {
     padding: 5px 15px;
     display: flex;
     background: #ffffff;
-
     .count {
       margin-top: 2px;
       font-size: 14px;
@@ -3971,6 +3986,7 @@ export default {
       font-weight: 700;
       background: #23a547;
       border-radius: 6px;
+      cursor: pointer;
     }
   }
 }

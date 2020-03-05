@@ -2646,6 +2646,7 @@ export default {
         orderNumber: item.orderNumber,
         orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
+        storeId: localStorage.getItem("storeId"),
         stockCode: localStorage.getItem("stockCode"),
         storeName: localStorage.getItem("storeName"),
         products: JSON.stringify(arr)

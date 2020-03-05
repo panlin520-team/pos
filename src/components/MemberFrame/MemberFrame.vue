@@ -733,7 +733,14 @@ export default {
       currentPage2: 1,
       pageSize2: 10,
       totalPasz2: 0,
-      //退货商品
+      //划卡退货商品
+      salseshop: [
+        {
+          productCode: "",
+          productName: ""
+        }
+      ],
+      //定制项目退货商品
       projectsuder: [
         {
           productCode: "",
@@ -1406,6 +1413,8 @@ export default {
       this.recordId = res.recordId;
       this.productCodenal2 = res.productCode;
       this.productNamenal2 = res.productName;
+      this.salseshop[0].productCode = res.productCode;
+      this.salseshop[0].productName = res.productName;
       if (res.recordStatus == "未退货") {
         this.$confirm("是否确认退货", {
           confirmButtonText: "确定",
@@ -1649,6 +1658,10 @@ export default {
         storeName: localStorage.getItem("storeName"),
         productCode: this.productCodenal2,
         productName: this.productNamenal2,
+        storeId: localStorage.getItem("storeId"),
+        products: JSON.stringify(this.salseshop),
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
         experiencecardProductUserId: this.cardOrderDetailId,
         modifyOperator: localStorage.getItem("trueName"),
         orderNumber: this.orderNumber
@@ -1680,6 +1693,7 @@ export default {
         productName: this.productNamenal,
         orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
+        storeId: localStorage.getItem("storeId"),
         expUseRecordId: this.recordIds,
         products: JSON.stringify(this.projectsuder),
         experiencecardProductUserId: this.rienizauID,

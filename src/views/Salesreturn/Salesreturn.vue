@@ -25,7 +25,7 @@
         ></el-date-picker>
       </div>
     </div>
-    <div class="salereBottom" :style="{'height': (virtualHeight-213)+'px'}">
+    <div class="salereBottom">
       <el-table :data="tableData" style="width: 100%">
         <el-table-column label="单号">
           <template slot-scope="scope">
@@ -53,16 +53,18 @@
           </template>
         </el-table-column>
       </el-table>
+      <!-- 页码 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page.sync="currentPage1"
+        :page-size="pageSize"
+        background
+        layout="total, prev, pager, next"
+        :total="pageTotal"
+      ></el-pagination>
     </div>
-    <!-- 页码 -->
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page.sync="currentPage1"
-      :page-size="pageSize"
-      layout="total, prev, pager, next"
-      :total="pageTotal"
-    ></el-pagination>
+
     <!-- 退货弹出框 -->
     <!-- <PopOver
       custom-class="storageblock"
@@ -97,8 +99,8 @@ export default {
       input_numBer: "",
       //分页
       currentPage1: 1,
-      pageTotal: 40,
-      pageSize: 20,
+      pageTotal: 0,
+      pageSize: 10,
       //搜索时间段
       value_tinemve: "",
       //退货列表
@@ -161,6 +163,7 @@ export default {
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.result) {
           this.tableData = res.data.result.list;
+          this.pageTotal = res.data.result.total;
         } else {
           this.$message({
             message: res.data.responseStatusType.error.errorMsg,
@@ -201,6 +204,10 @@ export default {
   .salereBottom {
     width: 100%;
     padding: 0 20px;
+    .el-pagination {
+      text-align: right;
+      margin: 10px 10px 0 0;
+    }
   }
 }
 //退货弹出框

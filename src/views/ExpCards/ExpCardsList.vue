@@ -186,7 +186,7 @@ export default {
           })
           .catch(() => {
             this.$message({
-              message: "未取消",
+              message: "取消退货",
               type: "info"
             });
           });
@@ -204,6 +204,7 @@ export default {
         isTiYanKa: 1,
         isHuaKa: 0,
         isTiYanKaOrDingzhi: 1,
+        storeId: localStorage.getItem("storeId"),
         memberNum: this.orderNumberorder,
         orderNumber: this.orderStatusorder,
         expCardNum: this.cardNumsorder
@@ -212,7 +213,7 @@ export default {
         if (res.data.responseStatusType.message == "Success") {
           this.connectorCarlist();
           this.$message({
-            message: "取消成功!",
+            message: "退货成功",
             type: "success"
           });
         } else {

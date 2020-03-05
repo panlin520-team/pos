@@ -250,7 +250,7 @@
               custom-class="storageblockpassword"
               :visible.sync="visible_password"
               @close="close_password"
-              width="500px"
+              width="380px"
             >
               <div class="stgblcktop" slot="top">修改密码</div>
               <div class="stgblcktopmain" slot="main">
@@ -474,6 +474,11 @@
                 <div slot="reference" class="name-wrapper">{{ scope.row.amount }}</div>
               </template>
             </el-table-column>
+            <el-table-column label="可退金额">
+              <template slot-scope="scope">
+                <div slot="reference" class="name-wrapper">{{ scope.row.residueAmount }}</div>
+              </template>
+            </el-table-column>
             <el-table-column label="充值类型">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.accountTypeName }}</div>
@@ -486,7 +491,14 @@
             </el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button type="warning" @click="salesReturnails(scope.row)">退款</el-button>
+                <div class="InventryOperation">
+                  <div
+                    class="inventsome2"
+                    @click="salesReturnails(scope.row)"
+                    :class="scope.row.auditAmountStatus == 3 ? 'active' : 'acc'"
+                  >退款</div>
+                </div>
+                <!-- <el-button type="warning" @click="salesReturnails(scope.row)">退款</el-button> -->
               </template>
             </el-table-column>
           </el-table>
@@ -1095,6 +1107,7 @@ export default {
   methods: {
     //上传图片
     handleAvatarSuccess(res, file) {
+      localStorage.setItem("headImgUrl", res.data.src);
       setTimeout(() => {
         this.imageUrl = res.data.src;
         this.zhterMember();
@@ -1129,7 +1142,6 @@ export default {
     },
     //储蓄退款
     salesReturnails(res) {
-      console.log(res);
       this.orderNumbes = res.orderNo;
       this.accountTyps = res.accountTypeId;
       this.orderssname = res.name;
@@ -1137,7 +1149,15 @@ export default {
       this.memberNus = res.cardNumber;
       this.accountswer = res.accountTypeId;
       this.input_mesalesR = "";
-      this.visible_salesR = true;
+      if (res.auditAmountStatus == 3) {
+        this.visible_salesR = false;
+        this.$message({
+          message: "该订单金额已全部退完",
+          type: "warning"
+        });
+      } else {
+        this.visible_salesR = true;
+      }
     },
     //返回会员页
     getBack() {
@@ -1519,8 +1539,6 @@ export default {
         // }, 400);
       }
     },
-    //修改密码
-    changePassword() {},
     //添加会员s
     submitForm(formName) {
       let res = /^[1][3,4,5,7,8][0-9]{9}$/;
@@ -1928,6 +1946,8 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data) {
+            console.log(res);
+
             this.$message({
               message: "修改成功...",
               type: "success"
@@ -2016,6 +2036,7 @@ export default {
             message: "退款成功",
             type: "success"
           });
+          this.savingsData();
           this.savingAccount();
           this.$refs.moduleName.memberbalance();
         } else {
@@ -2781,6 +2802,26 @@ export default {
           margin-top: 15px;
           border-radius: 6px;
           box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+        }
+        .InventryOperation {
+          display: flex;
+          width: 235px;
+          justify-content: space-between;
+          .inventsome2 {
+            height: 28px;
+            padding: 0 15px;
+            line-height: 26px;
+            text-align: center;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+            &.active {
+              background-color: #a39898;
+            }
+            &.acc {
+              background-color: #fc580d;
+            }
+          }
         }
       }
       .pagination {

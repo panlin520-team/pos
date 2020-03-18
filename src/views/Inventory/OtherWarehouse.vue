@@ -32,6 +32,11 @@
             <div slot="reference" class="name-wrapper">{{ scope.row.outstorageOrgName }}</div>
           </template>
         </el-table-column>
+        <el-table-column label="入库方向" min-width="100">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.inventoryWays }}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="入库单号" min-width="170">
           <template slot-scope="scope">
             <span>{{ scope.row.inStorageNumber }}</span>
@@ -68,7 +73,7 @@
               <div
                 class="inventsome2"
                 @click="handleDelete(scope.row)"
-                :class="scope.row.invalidStatus == '未作废'? 'active' : 'acc'"
+                :class="scope.row.invalidStatus == '未作废' && scope.row.afterAuditInStorageId == null ? 'active' : 'acc'"
               >作废</div>
               <div
                 class="inventsome3"
@@ -109,23 +114,43 @@
                 <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
-            <!-- <el-table-column label="入库日期">
+            <el-table-column label="操作">
               <template slot-scope="scope">
-                <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                <div
+                  class="inventsome4"
+                  :class="scope.row.inventoryWay == 'GENERAL' && scope.row.afterAuditInStorageId !== null ? 'active' : 'acc'"
+                  @click="salesretrun(scope.row)"
+                >退货</div>
               </template>
-            </el-table-column>-->
+            </el-table-column>
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
-          <!-- <el-pagination
-            @size-change="handleSizeChckbo"
-            @current-change="handleCurrentChckbo"
-            background
-            :page-size="pageSize"
-            layout="prev, pager, next"
-            :total="pagetotals"
-          ></el-pagination>-->
           <el-button type="info" size="small" @click="tallyClick">确认</el-button>
+        </div>
+      </PopOver>
+      <!--退货 -->
+      <PopOver
+        custom-class="storageblocks"
+        :visible.sync="visible_times"
+        @close="closeTime"
+        width="450px"
+      >
+        <div class="stgblcktop" slot="top">退货</div>
+        <div class="stgblcktopmain" slot="main">
+          <div class="optionDate">
+            <label>退货数量：</label>
+            <el-input
+              placeholder="请输入退货数量"
+               oninput="value=value.replace(/[^\d]/g, '')"
+              v-model="value_return"
+              clearable
+            ></el-input>
+          </div>
+        </div>
+        <div class="stgblckbottom" slot="bottom">
+          <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+          <el-button @click="confirm_false" size="small" type="info">取消</el-button>
         </div>
       </PopOver>
     </div>
@@ -384,6 +409,8 @@ export default {
         ]
       },
       value_invenT: "",
+      //退货
+      value_return: "",
       //添加产品搜索框列表
       seekList: [],
       //采购订单搜索
@@ -460,6 +487,7 @@ export default {
       visible_examine: false,
       visible_warehouse: false,
       visible_peple: false,
+      visible_times: false,
       visible_orderfrom: false,
       class_seekbox: false,
       takedelivery: false,
@@ -468,6 +496,7 @@ export default {
       //分页
       //当前入库页数
       currentPage1: 1,
+      inStorageProductID: "",
       //其他入库页码
       pageSize: 10,
       pagetotal: 0,
@@ -477,6 +506,7 @@ export default {
       unitDatas: [],
       //其他入库
       inStorageType: "其他入库",
+      inStorageIdsss: "",
       //入库
       //入库选择
       ware_box: [
@@ -607,6 +637,18 @@ export default {
       this.supplierCodes = accoers.supplierCode;
       this.supplierCategoryNames = accoers.supplierCode;
     },
+    //确定退货
+    confirm_true() {
+      //请求退货
+      this.requestsres();
+      this.visible_times = false;
+      this.value_return = "";
+    },
+    //取消退货
+    confirm_false() {
+      this.visible_times = false;
+      this.value_return = "";
+    },
 
     //订单详情页分页
     handleSizeChckbo(val) {},
@@ -681,14 +723,28 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已确认收货了或已作废了喔!"
+          message: "该商品已作废了喔!"
         });
+      }
+    },
+    //退货
+    closeTime() {
+      this.visible_times = false;
+      this.value_return = "";
+    },
+    //退货按钮
+    salesretrun(res) {
+      console.log(res);
+      this.inStorageProductID = res.inStorageProductID;
+      if (res.inventoryWay == "GENERAL" && res.afterAuditInStorageId !== null) {
+        this.visible_times = true;
+      } else {
       }
     },
     //作废
     handleDelete(res) {
       this.inStorageId = res.inStorageId;
-      if (res.invalidStatus == "未作废") {
+      if (res.invalidStatus == "未作废" && res.afterAuditInStorageId == null) {
         this.$confirm("您是否确认作废？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -807,14 +863,20 @@ export default {
     },
     //点击查看订单详情
     showPopOver(item) {
+      console.log(item);
+
+      this.inStorageIdsss = item.inStorageId;
+      let someritm = item.inStorageProductList;
+      for (let i = 0; i < someritm.length; i++) {
+        someritm[i].inventoryWay = item.inventoryWay;
+        someritm[i].afterAuditInStorageId = item.afterAuditInStorageId;
+      }
       this.visible_examine = true;
       this.tableexamine = item.inStorageProductList;
-      // this.pagetotals = this.tableexamine;
     },
     closePopOver() {
       this.visible_examine = false;
     },
-
     //确认详情订单
     tallyClick() {
       this.visible_examine = false;
@@ -897,6 +959,33 @@ export default {
         }
       );
     },
+    //请求退货
+    requestsres() {
+      var url = this.$https.productHost + "/stock/instoragePreAuditReturn";
+      var params = {
+        inStorageId: this.inStorageIdsss,
+        number: this.value_return,
+        inStorageProductID: this.inStorageProductID
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.$message({
+              type: "success",
+              message: res.data.result
+            });
+            this.visible_examine = false;
+            this.otherinstorage();
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: "退货失败"
+          });
+        }
+      );
+    },
     //请求门店
     Requeststores() {
       var url =
@@ -921,7 +1010,7 @@ export default {
     },
     //作废请求
     cancellation() {
-      var url = this.$https.productHost + "/stock/auditInstorage";
+      var url = this.$https.productHost + "/stock/cancelInstoragePreAudit";
       var params = {
         inStorageId: this.inStorageId,
         invalid: localStorage.getItem("trueName")
@@ -930,8 +1019,8 @@ export default {
         res => {
           if (res.data.result == null) {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "error"
+              message: "作废成功",
+              type: "warning"
             });
             //刷新列表
             this.otherinstorage();
@@ -992,6 +1081,11 @@ export default {
               value.invalidStatus = "作废";
             } else {
               value.invalidStatus = "未作废";
+            }
+            if (value.inventoryWay == "RETURN") {
+              value.inventoryWays = "退货";
+            } else {
+              value.inventoryWays = "普通";
             }
             if (value.afterAuditInStorageNumber == null) {
               value.inStorageNumber = value.inStorageNumber;
@@ -1177,7 +1271,7 @@ export default {
         shipper: localStorage.getItem("storeName"), //货主
         shipperCode: localStorage.getItem("storeId"), //货主编码
         inventoryGroup: this.warehouses, //库存组织
-        inventoryWay: "普通", //库存方向（1普通、2退货）
+        inventoryWay: "GENERAL", //库存方向（1普通、2退货）
         inStorageProductJson: text,
         remark: this.remark, //备注
         instorageOrgName: localStorage.getItem("storeName"),
@@ -1302,6 +1396,7 @@ export default {
           background-color: #a39898;
         }
       }
+
       .inventsome3 {
         height: 28px;
         padding: 2px 15px;
@@ -1430,6 +1525,23 @@ export default {
     height: 100%;
     padding: 35px 0 0 40px;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .inventsome4 {
+      height: 28px;
+      width: 60px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 4px;
+      color: #fff;
+      background-color: #73f707;
+      cursor: pointer;
+      &.active {
+        background-color: #ec2323;
+      }
+      &.acc {
+        background-color: #525351;
+      }
+    }
+
     .el-input {
       width: 230px;
       border-radius: 5px;
@@ -1485,6 +1597,33 @@ export default {
     // .el-button {
     //   margin-top: 20px;
     // }
+  }
+}
+//退货
+.storageblocks {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 40px;
+      }
+      .el-input {
+        width: 200px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
   }
 }
 </style>

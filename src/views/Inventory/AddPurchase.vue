@@ -27,6 +27,11 @@
             <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
           </template>
         </el-table-column>
+        <el-table-column label="供货组织" min-width="120">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.outstorageOrgName }}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="采购订单号" min-width="170">
           <template slot-scope="scope">
             <span>{{ scope.row.inStorageNumber }}</span>
@@ -42,11 +47,20 @@
             <div slot="reference" class="name-wrapper">{{ scope.row.invalidStatus }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="是否收货" min-width="100">
+        <el-table-column label="审核状态" min-width="100">
+          <template slot-scope="scope">
+            <div
+              slot="reference"
+              :class="scope.row.suppIsAudit == '待审核' ? 'active1' : 'active2'"
+              class="name-wrapper"
+            >{{ scope.row.suppIsAudit }}</div>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="是否收货" min-width="100">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">{{ scope.row.confirmStatus }}</div>
           </template>
-        </el-table-column>
+        </el-table-column>-->
         <el-table-column label="操作" min-width="280">
           <template slot-scope="scope">
             <div class="InventryOperation">
@@ -54,11 +68,12 @@
               <div
                 class="inventsome2"
                 @click="handleDelete(scope.row)"
-                :class="scope.row.invalidStatus == '未作废' && scope.row.confirmStatus == '待收货' ? 'active' : 'acc'"
+                :class="scope.row.invalidStatus == '未作废' && scope.row.afterAuditInStorageId == null ? 'active' : 'acc'"
               >作废</div>
               <div
                 class="inventsome3"
-                :class="scope.row.confirmStatus == '待收货' && scope.row.invalidStatus == '未作废' ? 'active' : 'acc'"
+                v-show="takedelivery"
+                :class="scope.row.confirmStatus == '待收货' ? 'active' : 'acc'"
                 @click="confirmPopOver(scope.row)"
               >确认收货</div>
             </div>
@@ -452,6 +467,7 @@ export default {
       visible_orderfrom: false,
       class_seekbox: false,
       class_selckbox: false,
+      takedelivery: false,
 
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
@@ -714,14 +730,6 @@ export default {
       } else {
         this.submitindent();
         this.groupOpen = false;
-        // this.option_supplier = [];
-        // this.$message({
-        //   message: "提交成功",
-        //   type: "success"
-        // });
-        // setTimeout(() => {
-        //   this.purchinstorage();
-        // }, 300);
       }
     },
     //点击修改入库订单
@@ -783,7 +791,7 @@ export default {
     //作废
     handleDelete(res) {
       this.inStorageId = res.inStorageId;
-      if (res.invalidStatus == "未作废" && res.confirmStatus == "待收货") {
+      if (res.invalidStatus == "未作废" && res.afterAuditInStorageId == null) {
         this.$confirm("您是否确认作废？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -836,6 +844,7 @@ export default {
       let accoers = this.$refs.myCascader.getCheckedNodes()[0].data;
       this.supplierCodes = accoers.supplierCode;
       this.supplierCategoryNames = accoers.supplierCode;
+      console.log(accoers);
     },
 
     //分页
@@ -947,10 +956,15 @@ export default {
               } else {
                 value.invalidStatus = "未作废";
               }
-              if (value.confirmStatus == 0) {
-                value.confirmStatus = "待收货";
+              if (value.afterAuditInStorageNumber == null) {
+                value.inStorageNumber = value.inStorageNumber;
               } else {
-                value.confirmStatus = "已收货";
+                value.inStorageNumber = value.afterAuditInStorageNumber;
+              }
+              if (value.suppIsAudit == 0) {
+                value.suppIsAudit = "待审核";
+              } else {
+                value.suppIsAudit = "已审核";
               }
             });
           } else {
@@ -1103,31 +1117,7 @@ export default {
     //     }
     //   );
     // },
-    //请求第三供应商列表
-    // supplierList() {
-    //   var url = this.$https.storeHost + "/manage/supplier/listSupplier";
-    //   var params = {
-    //     storeId: localStorage.getItem("storeId"),
-    //     supplierCategoryId: 1
-    //   };
-    //   this.$https.fetchPost(url, params).then(
-    //     res => {
-    //       if (res.data.result !== null) {
-    //       } else {
-    //         this.$message({
-    //           message: res.data.responseStatusType.error.errorMsg,
-    //           type: "warning"
-    //         });
-    //       }
-    //     },
-    //     error => {
-    //       this.$message({
-    //         type: "error",
-    //         message: error
-    //       });
-    //     }
-    //   );
-    // },
+
     //请求第三供应商列表
     goyisList() {
       var url = this.$https.storeHost + "/manage/supplier/selectSuppTypeList";
@@ -1173,7 +1163,8 @@ export default {
                 value2.children = [];
                 value2.children.push({
                   label: value.supplierName,
-                  value: value.supplierId
+                  value: value.supplierId,
+                  supplierCode: value.supplierCode
                 });
               });
             });
@@ -1189,57 +1180,9 @@ export default {
         })
         .catch(err => {});
     },
-    //请求供应商列表
-    // goyisList() {
-    //   var url =
-    //     this.$https.storeHost + "/manage/supplier/listSupplierCategoryNoPage";
-    //   var params = {
-    //     companyType: 3,
-    //     companyId: localStorage.getItem("storeId")
-    //   };
-    //   this.$https.fetchPost(url, params).then(
-    //     res => {
-    //       var data2 = [];
-    //       if (res.data.result) {
-    //         res.data.result.forEach(value => {
-    //           this.option_supplier.push({
-    //             value: value.supplierCategoryId,
-    //             label: value.supplierCategoryName,
-    //             children: value.supplierList
-    //           });
-    //           data2.push({
-    //             label: value.supplierCategoryName,
-    //             supplierCategoryId: value.supplierCategoryId,
-    //             value: value.supplierCategoryName,
-    //             children: value.supplierList
-    //           });
-    //         });
-    //         for (var i = 0; i < data2.length; i++) {
-    //           var child = data2[i].children;
-    //           for (var j = 0; j < child.length; j++) {
-    //             child[j].label = child[j].supplierName;
-    //             child[j].supplierId = child[j].supplierCode;
-    //             child[j].value = child[j].supplierCode;
-    //           }
-    //         }
-    //       } else {
-    //         this.$message({
-    //           message: res.data.responseStatusType.error.errorMsg,
-    //           type: "warning"
-    //         });
-    //       }
-    //     },
-    //     error => {
-    //       this.$message({
-    //         type: "error",
-    //         message: error
-    //       });
-    //     }
-    //   );
-    // },
     //提交采购订单
     submitindent() {
-      var url = this.$https.productHost + "/stock/instorage";
+      var url = this.$https.productHost + "/stock/instoragePreAudit";
       var text = JSON.stringify(this.storageList);
       var params = {
         storeId: localStorage.getItem("storeId"),
@@ -1262,10 +1205,10 @@ export default {
         settlementGroup: this.storeName,
         settlementCurrency: "人民币",
         shipperType: "业务组织",
-        shipper: this.supplierName,
+        shipper: localStorage.getItem("storeName"), //货主
         shipperCode: this.supplierCodes,
         inStorageProductJson: text,
-        createOperator: localStorage.getItem("trueName"),
+        instorageOrgName: localStorage.getItem("storeName"),
         productType: 1,
         productionDate: this.createTime,
         //个人
@@ -1283,7 +1226,8 @@ export default {
         keeperType: 3,
         keeper: this.storeName,
         keeperCode: this.warehouses,
-        isSend: false
+        isSend: false,
+        createOperator: localStorage.getItem("trueName")
       };
 
       this.$https.fetchPost(url, params).then(
@@ -1392,14 +1336,20 @@ export default {
   }
   .clienList {
     width: 80%;
-    min-width: 1024px;
+    min-width: 1154px;
     box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
     padding: 10px 50px 20px 50px;
     margin: 0 auto;
     border-radius: 6px;
+    .active1 {
+      color: red;
+    }
+    .active2 {
+      color: rgb(134, 214, 6);
+    }
     .InventryOperation {
       display: flex;
-      width: 235px;
+      max-width: 235px;
       justify-content: space-between;
       .inventsome1 {
         padding: 0 15px;

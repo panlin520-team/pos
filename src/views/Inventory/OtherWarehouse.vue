@@ -22,9 +22,14 @@
     </div>
     <div class="clienList">
       <el-table :data="tableData_enterpurchase" style="width: 100%">
-        <el-table-column label="入库人" min-width="140">
+        <el-table-column label="入库人" min-width="120">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="供货组织" min-width="120">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.outstorageOrgName }}</div>
           </template>
         </el-table-column>
         <el-table-column label="入库单号" min-width="170">
@@ -42,23 +47,33 @@
             <div slot="reference" class="name-wrapper">{{ scope.row.invalidStatus }}</div>
           </template>
         </el-table-column>
-        <el-table-column label="是否收货" min-width="100">
+        <el-table-column label="审核状态" min-width="100">
+          <template slot-scope="scope">
+            <div
+              slot="reference"
+              :class="scope.row.suppIsAudit == '待审核' ? 'active1' : 'active2'"
+              class="name-wrapper"
+            >{{ scope.row.suppIsAudit }}</div>
+          </template>
+        </el-table-column>
+        <!-- <el-table-column label="是否收货" min-width="100">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">{{ scope.row.confirmStatus }}</div>
           </template>
-        </el-table-column>
-        <el-table-column label="操作" min-width="280">
+        </el-table-column>-->
+        <el-table-column label="操作" min-width="200">
           <template slot-scope="scope">
             <div class="InventryOperation">
               <div class="inventsome1" @click="showPopOver(scope.row)">查看</div>
               <div
                 class="inventsome2"
                 @click="handleDelete(scope.row)"
-                :class="scope.row.invalidStatus == '未作废' && scope.row.confirmStatus == '待收货' ? 'active' : 'acc'"
+                :class="scope.row.invalidStatus == '未作废'? 'active' : 'acc'"
               >作废</div>
               <div
                 class="inventsome3"
-                :class="scope.row.confirmStatus == '待收货' && scope.row.invalidStatus == '未作废' ? 'active' : 'acc'"
+                v-show="takedelivery"
+                :class="scope.row.invalidStatus == '未作废' ? 'active' : 'acc'"
                 @click="confirmPopOver(scope.row)"
               >确认收货</div>
             </div>
@@ -94,11 +109,11 @@
                 <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="入库日期">
+            <!-- <el-table-column label="入库日期">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
               </template>
-            </el-table-column>
+            </el-table-column>-->
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
@@ -230,16 +245,7 @@
             <el-button type="success" size="medium" @click="opencommodity">提交</el-button>
           </div>
           <div class="waresupplier">
-            <!--  <el-cascader
-              v-model="supplierCategoryName"
-              placeholder="请选择供应商"
-              :options="option_supplier"
-              filterable
-              ref="myCascader"
-              :show-all-levels="false"
-              @change="onProvincesChange"
-            ></el-cascader>-->
-            <el-select v-model="valueshop" placeholder="请选择部门">
+            <el-select v-model="valueshop" @change="valshape" placeholder="请选择部门">
               <el-option
                 v-for="item in optionsShops"
                 :key="item.k3Number"
@@ -248,7 +254,18 @@
               ></el-option>
             </el-select>
           </div>
-
+          <div class="department">
+            <el-cascader
+              v-model="supplierCategoryName"
+              placeholder="请选择供应商"
+              :options="option_supplier"
+              filterable
+              ref="myCascader"
+              :show-all-levels="false"
+              @expand-change="onProvincesChange"
+              @change="onProvincesChanges"
+            ></el-cascader>
+          </div>
           <div class="timebox">
             <el-date-picker
               v-model="createTime"
@@ -314,6 +331,7 @@ export default {
       supplierId: "",
       //供应商
       supplierCategoryName: "",
+      supplierCategoryNames: "",
       //普通仓库
       stockType: "",
       //公司名字
@@ -331,11 +349,11 @@ export default {
       remark: "",
       //供应商
       option_supplier: [
-        {
-          value: 1,
-          label: "第三方供应商",
-          children: []
-        }
+        // {
+        //   value: 1,
+        //   label: "第三方供应商",
+        // children: []
+        // }
       ],
 
       //添加产品数据
@@ -444,7 +462,7 @@ export default {
       visible_peple: false,
       visible_orderfrom: false,
       class_seekbox: false,
-
+      takedelivery: false,
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
       //分页
@@ -579,12 +597,15 @@ export default {
       });
     },
     //获取供应商当前字段
-    onProvincesChange() {
+    onProvincesChange(reo) {
+      this.supplierCategoryName = [...reo];
+      //请求第二段供应商
+      this.supplierTowList();
+    },
+    onProvincesChanges() {
       let accoers = this.$refs.myCascader.getCheckedNodes()[0].data;
       this.supplierCodes = accoers.supplierCode;
-      // this.supplierCategoryName = accoers.supplierCategoryName;
-      this.supplierId = accoers.supplierId;
-      this.supplierName = accoers.supplierName;
+      this.supplierCategoryNames = accoers.supplierCode;
     },
 
     //订单详情页分页
@@ -594,17 +615,18 @@ export default {
     addfriends() {
       //当前时间
       // this.createTime = new Date();
-
+      this.valueshop = "";
+      this.supplierCategoryName = "";
+      this.supplierCategoryNames = "";
       this.seekList = [];
       this.createTime = "";
-      this.supplierCategoryName = "";
-      this.option_supplier[0].children = [];
+      this.option_supplier = [];
       //请求商品
       this.requestcommodity();
       //请求仓库
       this.requestwarehouse();
       //请求供应商
-      // this.supplierList();
+      this.supplierList();
       //请求门店
       this.Requeststores();
       //请求公司
@@ -627,7 +649,8 @@ export default {
         }
       });
     },
-
+    //部门
+    valshape(res) {},
     //确认收货
     confirmPopOver(res) {
       this.inStorageId = res.inStorageId;
@@ -665,7 +688,7 @@ export default {
     //作废
     handleDelete(res) {
       this.inStorageId = res.inStorageId;
-      if (res.invalidStatus == "未作废" && res.confirmStatus == "待收货") {
+      if (res.invalidStatus == "未作废") {
         this.$confirm("您是否确认作废？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -674,9 +697,6 @@ export default {
         })
           .then(() => {
             this.cancellation();
-            setTimeout(() => {
-              this.otherinstorage();
-            }, 500);
           })
           .catch(() => {
             this.$message({
@@ -687,7 +707,7 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已确认收货了或已作废了喔!"
+          message: "该商品已作废了喔!"
         });
       }
     },
@@ -746,14 +766,12 @@ export default {
           message: "请选择入库商品",
           type: "warning"
         });
-      }
-      // else if (this.supplierCategoryName == "") {
-      //   this.$message({
-      //     message: "请选择供应商",
-      //     type: "warning"
-      //   });
-      // }
-      else if (this.valueshop == "") {
+      } else if (this.supplierCategoryNames == "") {
+        this.$message({
+          message: "请选择供应商",
+          type: "warning"
+        });
+      } else if (this.valueshop == "") {
         this.$message({
           message: "请选择部门",
           type: "warning"
@@ -764,6 +782,7 @@ export default {
           type: "warning"
         });
       } else {
+        //提交
         this.submitindent();
         this.groupOpen = false;
         // setTimeout(() => {
@@ -914,6 +933,8 @@ export default {
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
+            //刷新列表
+            this.otherinstorage();
           }
         },
         error => {
@@ -972,10 +993,15 @@ export default {
             } else {
               value.invalidStatus = "未作废";
             }
-            if (value.confirmStatus == 0) {
-              value.confirmStatus = "待收货";
+            if (value.afterAuditInStorageNumber == null) {
+              value.inStorageNumber = value.inStorageNumber;
             } else {
-              value.confirmStatus = "已收货";
+              value.inStorageNumber = value.afterAuditInStorageNumber;
+            }
+            if (value.suppIsAudit == 0) {
+              value.suppIsAudit = "待审核";
+            } else {
+              value.suppIsAudit = "已审核";
             }
           });
         })
@@ -1039,35 +1065,70 @@ export default {
         .catch(err => {});
     },
     //请求第三供应商列表
-    // supplierList() {
-    //   var url = this.$https.storeHost + "/manage/supplier/listSupplier ";
-    //   var params = {
-    //     storeId: localStorage.getItem("storeId"),
-    //     supplierCategoryId: 1
-    //   };
-    //   this.$https
-    //     .fetchPost(url, params)
-    //     .then(res => {
-    //       if (res.data.result) {
-    //         res.data.result.list.forEach(value => {
-    //           this.option_supplier[0].children.push({
-    //             label: value.supplierName,
-    //             value: value.supplierId,
-    //             supplierId: value.supplierId,
-    //             supplierName: value.supplierName,
-    //             supplierCategoryName: value.supplierCategoryName,
-    //             supplierCode: value.supplierCode
-    //           });
-    //         });
-    //       } else {
-    //         this.$message({
-    //           message: res.data.responseStatusType.error.errorMsg,
-    //           type: "warning"
-    //         });
-    //       }
-    //     })
-    //     .catch(err => {});
-    // },
+    supplierList() {
+      var url = this.$https.storeHost + "/manage/supplier/selectSuppTypeList";
+      var params = {
+        // storeId: localStorage.getItem("storeId"),
+        // supplierCategoryId: 1
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            let resd = res.data.result;
+            for (let i in resd) {
+              this.option_supplier.push({
+                label: resd[i],
+                value: i,
+                children: []
+              });
+            }
+            // res.data.result.forEach(value => {
+            //   console.log(value);
+            // });
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //二级供应商
+    supplierTowList() {
+      var url = this.$https.storeHost + "/manage/supplier/listSupplierNoPage";
+      var params = {
+        supplierType: this.supplierCategoryName[0],
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            res.data.result.forEach(value => {
+              this.option_supplier.forEach(value2 => {
+                value2.children = [];
+                value2.children.push({
+                  label: value.supplierName,
+                  value: value.supplierId,
+                  supplierCode: value.supplierCode
+                });
+              });
+            });
+          } else {
+            this.option_supplier.forEach(value2 => {
+              value2.children = [];
+            });
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
     //请求公司
     requestcompany() {
       var url = this.$https.storeHost + "/manage/store/selectStoreById";
@@ -1095,14 +1156,18 @@ export default {
     },
     //提交入库订单
     submitindent() {
-      var url = this.$https.productHost + "/stock/instorage";
+      var url = this.$https.productHost + "/stock/instoragePreAudit";
       var text = JSON.stringify(this.storageList);
       var params = {
-        storeId: localStorage.getItem("storeId"),
+        // storeId: localStorage.getItem("storeId"),
         supplierCategoryId: 1,
         inStorageType: "其他入库", //入库方式
         invoicesType: "标准其他入库", //单据类型
         inStorageDate: this.createTime, //入库日期
+        provider: this.supplierCategoryNames, //供应商
+        branch: this.valueshop, //部门
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
         //purchaseBranch: $("#instorage input[name='purchaseBranch']").val(), 入库部门
         stockGroup: this.warehouses, //仓库CK001
         shipperType: "业务组织", //货主类型（供应商
@@ -1115,6 +1180,7 @@ export default {
         inventoryWay: "普通", //库存方向（1普通、2退货）
         inStorageProductJson: text,
         remark: this.remark, //备注
+        instorageOrgName: localStorage.getItem("storeName"),
         createOperator: localStorage.getItem("trueName") //创建者
       };
       this.$https
@@ -1195,16 +1261,23 @@ export default {
   }
   .clienList {
     width: 80%;
-    min-width: 1024px;
+    min-width: 1154px;
     box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
     padding: 10px 50px 20px 50px;
     overflow: auto;
     border-radius: 6px;
     margin: 0 auto;
+    .active1 {
+      color: red;
+    }
+    .active2 {
+      color: rgb(134, 214, 6);
+    }
     .InventryOperation {
       display: flex;
-      width: 235px;
+      max-width: 235px;
       justify-content: space-between;
+
       .inventsome1 {
         padding: 0 15px;
         height: 28px;
@@ -1248,7 +1321,6 @@ export default {
   }
   .paging {
     width: 100%;
-    height: 100px;
     margin-top: 20px;
     line-height: 60px;
     text-align: center;
@@ -1324,11 +1396,18 @@ export default {
       .waresupplier {
         width: 220px;
         height: 50px;
-        // border: 1px solid rgb(167, 158, 158);
         position: fixed;
         bottom: 200px;
-        left: 300px;
+        left: 190px;
         border-radius: 4px;
+      }
+      .department {
+        width: 220px;
+        height: 42px;
+        position: fixed;
+        bottom: 210px;
+        border-radius: 4px;
+        left: 430px;
       }
       .timebox {
         width: 220px;
@@ -1336,7 +1415,7 @@ export default {
         position: fixed;
         bottom: 210px;
         border-radius: 4px;
-        left: 600px;
+        left: 700px;
       }
     }
   }

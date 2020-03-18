@@ -333,7 +333,8 @@
                       </div>
                     </div>
                     <div class="stgblckbottom" slot="bottom">
-                      <el-button type="info" @click="VipClick">确定</el-button>
+                      <el-button type="success" @click="VipClick">确定</el-button>
+                      <el-button type="info" @click="cancel">取消</el-button>
                     </div>
                   </PopOver>
                 </div>
@@ -1946,8 +1947,6 @@ export default {
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data) {
-            console.log(res);
-
             this.$message({
               message: "修改成功...",
               type: "success"
@@ -2396,13 +2395,17 @@ export default {
     close_stgbVip() {
       this.visible_VIP = false;
     },
+    //确定修改备注
     VipClick() {
       this.rmarkMember();
       this.remark = this.remark2;
       if (this.vipName == localStorage.getItem("memberName")) {
         localStorage.setItem("remark", this.remark2);
       }
-
+      this.visible_VIP = false;
+    },
+    //取消修改备注
+    cancel() {
       this.visible_VIP = false;
     },
     //点击充值

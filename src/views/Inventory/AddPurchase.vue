@@ -216,7 +216,8 @@
               filterable
               ref="myCascader"
               :show-all-levels="false"
-              @change="onProvincesChange"
+              @expand-change="onProvincesChange"
+              @change="onProvincesChanges"
             ></el-cascader>
             <!-- <el-cascader :options="options" :show-all-levels="false"></el-cascader> -->
           </div>
@@ -608,9 +609,9 @@ export default {
       //时间
       this.seekList = [];
       this.option_supplier = [];
-
-      this.createTime = "";
       this.supplierCategoryName = "";
+      this.supplierCategoryNames = "";
+      this.createTime = "";
       //子公司
       this.totalSize = 0;
       this.storageList = [];
@@ -700,7 +701,7 @@ export default {
           message: "请选择采购商品",
           type: "warning"
         });
-      } else if (this.supplierCategoryName == "") {
+      } else if (this.supplierCategoryNames == "") {
         this.$message({
           message: "请选择供应商",
           type: "warning"
@@ -791,9 +792,6 @@ export default {
         })
           .then(() => {
             this.cancellation();
-            setTimeout(() => {
-              this.purchinstorage();
-            }, 500);
           })
           .catch(() => {
             this.$message({
@@ -828,17 +826,16 @@ export default {
     tallyorderfrom() {
       this.visible_orderfrom = false;
     },
-    //获取当前字段
-    onProvincesChange() {
+    //获取供应商当前字段
+    onProvincesChange(reo) {
+      this.supplierCategoryName = [...reo];
+      //请求第二段供应商
+      this.supplierTowList();
+    },
+    onProvincesChanges() {
       let accoers = this.$refs.myCascader.getCheckedNodes()[0].data;
       this.supplierCodes = accoers.supplierCode;
-      this.supplierId = accoers.supplierId;
-      this.supplierName = accoers.supplierName;
-      if (accoers.supplierName == "俪凝美聚美业科技（眉山）有限公司") {
-        this.supplierCategoryNames = 1;
-      } else {
-        this.supplierCategoryNames = 2;
-      }
+      this.supplierCategoryNames = accoers.supplierCode;
     },
 
     //分页
@@ -891,6 +888,8 @@ export default {
               message: res.data.responseStatusType.error.errorMsg,
               type: "error"
             });
+            //刷新列表
+            this.purchinstorage();
           }
         },
         error => {
@@ -1129,76 +1128,115 @@ export default {
     //     }
     //   );
     // },
-    //请求供应商列表
+    //请求第三供应商列表
     goyisList() {
-      var url =
-        this.$https.storeHost + "/manage/supplier/listSupplierCategoryNoPage";
+      var url = this.$https.storeHost + "/manage/supplier/selectSuppTypeList";
       var params = {
-        companyType: 3,
-        companyId: localStorage.getItem("storeId")
+        // storeId: localStorage.getItem("storeId"),
+        // supplierCategoryId: 1
       };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          var data2 = [];
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
           if (res.data.result) {
-            res.data.result.forEach(value => {
+            let resd = res.data.result;
+            for (let i in resd) {
               this.option_supplier.push({
-                value: value.supplierCategoryId,
-                label: value.supplierCategoryName,
-                children: value.supplierList
+                label: resd[i],
+                value: i,
+                children: []
               });
-              data2.push({
-                label: value.supplierCategoryName,
-                supplierCategoryId: value.supplierCategoryId,
-                value: value.supplierCategoryName,
-                children: value.supplierList
-              });
-            });
-            for (var i = 0; i < data2.length; i++) {
-              var child = data2[i].children;
-              for (var j = 0; j < child.length; j++) {
-                child[j].label = child[j].supplierName;
-                child[j].supplierId = child[j].supplierCode;
-                child[j].value = child[j].supplierCode;
-              }
             }
-            // res.data.result.forEach(value => {
-            //   this.option_supplier[1].children.push({
-            //     label: value.supplierCategoryName,
-            //     supplierCategoryId: value.supplierCategoryId,
-            //     value: value.supplierCategoryName,
-            //     children: value.supplierList
-            //   });
-            //   data2.push({
-            //     label: value.supplierCategoryName,
-            //     supplierCategoryId: value.supplierCategoryId,
-            //     value: value.supplierCategoryName,
-            //     children: value.supplierList
-            //   });
-            // });
-            // for (var i = 0; i < data2.length; i++) {
-            //   var child = data2[i].children;
-            //   for (var j = 0; j < child.length; j++) {
-            //     child[j].label = child[j].supplierName;
-            //     child[j].supplierId = child[j].supplierId;
-            //     child[j].value = child[j].supplierId;
-            //   }
-            // }
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
             });
           }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
+        })
+        .catch(err => {});
     },
+    //二级供应商
+    supplierTowList() {
+      var url = this.$https.storeHost + "/manage/supplier/listSupplierNoPage";
+      var params = {
+        supplierType: this.supplierCategoryName[0],
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            res.data.result.forEach(value => {
+              this.option_supplier.forEach(value2 => {
+                value2.children = [];
+                value2.children.push({
+                  label: value.supplierName,
+                  value: value.supplierId
+                });
+              });
+            });
+          } else {
+            this.option_supplier.forEach(value2 => {
+              value2.children = [];
+            });
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //请求供应商列表
+    // goyisList() {
+    //   var url =
+    //     this.$https.storeHost + "/manage/supplier/listSupplierCategoryNoPage";
+    //   var params = {
+    //     companyType: 3,
+    //     companyId: localStorage.getItem("storeId")
+    //   };
+    //   this.$https.fetchPost(url, params).then(
+    //     res => {
+    //       var data2 = [];
+    //       if (res.data.result) {
+    //         res.data.result.forEach(value => {
+    //           this.option_supplier.push({
+    //             value: value.supplierCategoryId,
+    //             label: value.supplierCategoryName,
+    //             children: value.supplierList
+    //           });
+    //           data2.push({
+    //             label: value.supplierCategoryName,
+    //             supplierCategoryId: value.supplierCategoryId,
+    //             value: value.supplierCategoryName,
+    //             children: value.supplierList
+    //           });
+    //         });
+    //         for (var i = 0; i < data2.length; i++) {
+    //           var child = data2[i].children;
+    //           for (var j = 0; j < child.length; j++) {
+    //             child[j].label = child[j].supplierName;
+    //             child[j].supplierId = child[j].supplierCode;
+    //             child[j].value = child[j].supplierCode;
+    //           }
+    //         }
+    //       } else {
+    //         this.$message({
+    //           message: res.data.responseStatusType.error.errorMsg,
+    //           type: "warning"
+    //         });
+    //       }
+    //     },
+    //     error => {
+    //       this.$message({
+    //         type: "error",
+    //         message: error
+    //       });
+    //     }
+    //   );
+    // },
     //提交采购订单
     submitindent() {
       var url = this.$https.productHost + "/stock/instorage";
@@ -1215,7 +1253,9 @@ export default {
         needGroup: this.storeName,
         purchaseGroup: this.warehouses,
         purchaseBranch: this.stockType,
-        provider: this.supplierId,
+        provider: this.supplierCategoryNames, //供应商
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
         orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
         providerName: this.supplierName,

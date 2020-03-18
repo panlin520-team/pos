@@ -1,7 +1,10 @@
-<!-- 店铺设置 -->
+<!-- 退货查询 -->
 
 <template>
   <div class="Salesreturn">
+    <div class="salesTitle">
+    退货查询
+    </div>
     <div class="SalesreTop">
       <div class="searchBoxs">
         <label>姓名：</label>
@@ -184,11 +187,20 @@ export default {
 .Salesreturn {
   width: 100%;
   height: 100%;
+  .salesTitle{
+    width: 200px;
+    height: 60px;
+    text-align: center;
+    line-height: 80px;
+    font-size: 25px;
+    font-weight: 600;
+  }
   .SalesreTop {
     width: 100%;
     height: 115px;
     margin-left: 2px;
     display: flex;
+    padding-left: 100px;
     .searchBoxs {
       height: 50px;
       margin: 30px;

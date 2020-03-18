@@ -226,7 +226,8 @@
               filterable
               ref="myCascader"
               :show-all-levels="false"
-              @change="onProvincesChange"
+              @expand-change="onProvincesChange"
+              @change="onProvincesChanges"
             ></el-cascader>
           </div>
           <!-- <div class="warenavigation">
@@ -323,11 +324,7 @@ export default {
       },
       //供应商
       option_supplier: [
-        {
-          value: 1,
-          label: "第三方供应商",
-          children: []
-        }
+       
       ],
       //添加产品搜索框列表
       seekList: [],
@@ -585,11 +582,16 @@ export default {
       this.class_seekbox = true;
     },
     //获取供应商数据
-    onProvincesChange() {
+    //获取供应商当前字段
+    onProvincesChange(reo) {
+      this.supplierCategoryName = [...reo];
+      //请求第二段供应商
+      this.supplierTowList();
+    },
+    onProvincesChanges() {
       let accoers = this.$refs.myCascader.getCheckedNodes()[0].data;
       this.supplierCodes = accoers.supplierCode;
-      this.supplierId = accoers.supplierId;
-      this.supplierName = accoers.supplierName;
+      this.supplierCategoryNames = accoers.supplierCode;
     },
     //选择某个商品
     selcommodity(res) {
@@ -769,27 +771,62 @@ export default {
           // this.$message.error("商品请求错误...");
         });
     },
-    //请求第三供应商列表
-    supplierList() {
-      var url = this.$https.storeHost + "/manage/supplier/listSupplier ";
+    //二级供应商
+    supplierTowList() {
+      var url = this.$https.storeHost + "/manage/supplier/listSupplierNoPage";
       var params = {
-        storeId: localStorage.getItem("storeId"),
-        supplierCategoryId: 1
+        supplierType: this.supplierCategoryName[0],
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
       };
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data) {
-            res.data.result.list.forEach(value => {
-              this.option_supplier[0].children.push({
-                label: value.supplierName,
-                value: value.supplierId,
-                supplierId: value.supplierId,
-                supplierName: value.supplierName,
-                supplierCategoryName: value.supplierCategoryName,
-                supplierCode: value.supplierCode
+          if (res.data.result) {
+            res.data.result.forEach(value => {
+              this.option_supplier.forEach(value2 => {
+                value2.children = [];
+                value2.children.push({
+                  label: value.supplierName,
+                  value: value.supplierId,
+                  supplierCode: value.supplierCode
+                });
               });
             });
+          } else {
+            this.option_supplier.forEach(value2 => {
+              value2.children = [];
+            });
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //请求第三供应商列表
+    supplierList() {
+      var url = this.$https.storeHost + "/manage/supplier/selectSuppTypeList";
+      var params = {
+        // storeId: localStorage.getItem("storeId"),
+        // supplierCategoryId: 1
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            let resd = res.data.result;
+            for (let i in resd) {
+              this.option_supplier.push({
+                label: resd[i],
+                value: i,
+                children: []
+              });
+            }
+            // res.data.result.forEach(value => {
+            //   console.log(value);
+            // });
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

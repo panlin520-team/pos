@@ -1446,6 +1446,7 @@ export default {
                 item.discount
               );
             });
+
             this.productList.forEach(item => {
               item.discount = 1;
               item.discountPrice = this.$calculate.accMul(
@@ -2662,7 +2663,6 @@ export default {
         .then(() => {
           this.$https.fetchPost(url, params).then(
             res => {
-              console.log(res.data);
               if (res.data.responseStatusType.message == "Success") {
                 this.$message({
                   type: "success",

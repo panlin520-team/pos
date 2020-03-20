@@ -22,11 +22,6 @@
     </div>
     <div class="clienList">
       <el-table :data="tableData_enterpurchase" style="width: 100%">
-        <el-table-column label="入库人" min-width="120">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
-          </template>
-        </el-table-column>
         <el-table-column label="供货组织" min-width="120">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">{{ scope.row.outstorageOrgName }}</div>
@@ -61,11 +56,6 @@
             >{{ scope.row.suppIsAudit }}</div>
           </template>
         </el-table-column>
-        <!-- <el-table-column label="是否收货" min-width="100">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">{{ scope.row.confirmStatus }}</div>
-          </template>
-        </el-table-column>-->
         <el-table-column label="操作" min-width="200">
           <template slot-scope="scope">
             <div class="InventryOperation">
@@ -77,14 +67,10 @@
               >作废</div>
               <div
                 class="inventsome3"
-                v-show="takedelivery"
-                :class="scope.row.invalidStatus == '未作废' ? 'active' : 'acc'"
+                :class="scope.row.confirmStatus !== 'null' && scope.row.confirmStatus == 0 ? 'active' : 'acc'"
                 @click="confirmPopOver(scope.row)"
               >确认收货</div>
             </div>
-            <!-- <el-button size="mini" type="warning" @click="showPopOver(scope.row)">查看详情</el-button>
-            <el-button size="mini" type="danger" @click="handleDelete(scope.row)">作废</el-button>
-            <el-button size="mini" @click="confirmPopOver(scope.row)" type="success">确认收货</el-button>-->
           </template>
         </el-table-column>
       </el-table>
@@ -118,7 +104,7 @@
               <template slot-scope="scope">
                 <div
                   class="inventsome4"
-                  :class="scope.row.inventoryWay == 'GENERAL' && scope.row.afterAuditInStorageId !== null ? 'active' : 'acc'"
+                  :class="scope.row.afterAuditInStorageId !== null ? 'active' : 'acc'"
                   @click="salesretrun(scope.row)"
                 >退货</div>
               </template>
@@ -142,7 +128,7 @@
             <label>退货数量：</label>
             <el-input
               placeholder="请输入退货数量"
-               oninput="value=value.replace(/[^\d]/g, '')"
+              oninput="value=value.replace(/[^\d]/g, '')"
               v-model="value_return"
               clearable
             ></el-input>
@@ -490,7 +476,6 @@ export default {
       visible_times: false,
       visible_orderfrom: false,
       class_seekbox: false,
-      takedelivery: false,
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
       //分页
@@ -696,8 +681,9 @@ export default {
     //确认收货
     confirmPopOver(res) {
       this.inStorageId = res.inStorageId;
-      if (res.confirmStatus == "待收货" && res.invalidStatus == "未作废") {
-        this.confirmStatus = 1;
+
+      this.confirmStatus = 1;
+      if (res.confirmStatus !== null && res.confirmStatus == 0) {
         this.$confirm("您确定是否已收到货？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -705,14 +691,7 @@ export default {
           center: true
         })
           .then(() => {
-            this.$message({
-              type: "success",
-              message: "收货成功!"
-            });
             this.confirmReceipt();
-            setTimeout(() => {
-              this.otherinstorage();
-            }, 200);
           })
           .catch(() => {
             this.$message({
@@ -723,7 +702,7 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已作废了喔!"
+          message: "该商品已收货"
         });
       }
     },
@@ -734,11 +713,15 @@ export default {
     },
     //退货按钮
     salesretrun(res) {
-      console.log(res);
       this.inStorageProductID = res.inStorageProductID;
+
       if (res.inventoryWay == "GENERAL" && res.afterAuditInStorageId !== null) {
         this.visible_times = true;
       } else {
+         this.$message({
+          type: "warning",
+          message: "该商品已退货!"
+        });
       }
     },
     //作废
@@ -863,8 +846,6 @@ export default {
     },
     //点击查看订单详情
     showPopOver(item) {
-      console.log(item);
-
       this.inStorageIdsss = item.inStorageId;
       let someritm = item.inStorageProductList;
       for (let i = 0; i < someritm.length; i++) {
@@ -944,7 +925,14 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result) {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: "收获成功",
+              type: "success"
+            });
+            //刷新列表
+            this.otherinstorage();
+          } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -969,13 +957,18 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result) {
+          if (res.data.responseStatusType.message == "Success") {
             this.$message({
               type: "success",
               message: res.data.result
             });
             this.visible_examine = false;
             this.otherinstorage();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
           }
         },
         error => {
@@ -1177,9 +1170,6 @@ export default {
                 children: []
               });
             }
-            // res.data.result.forEach(value => {
-            //   console.log(value);
-            // });
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1406,9 +1396,11 @@ export default {
         color: #fff;
         cursor: pointer;
         &.active {
-          background-color: #67c23a;
+          display: block;
+          background-color: #68fc06;
         }
         &.acc {
+          display: none;
           background-color: #a39898;
         }
       }

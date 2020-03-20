@@ -323,9 +323,7 @@ export default {
         ]
       },
       //供应商
-      option_supplier: [
-       
-      ],
+      option_supplier: [],
       //添加产品搜索框列表
       seekList: [],
 
@@ -653,10 +651,6 @@ export default {
           type: "warning"
         });
       } else {
-        setTimeout(() => {
-          this.outinstorage();
-        }, 300);
-
         this.submitindent();
         this.groupOpen = false;
       }
@@ -992,6 +986,8 @@ export default {
               message: "提交成功",
               type: "success"
             });
+            //刷新页面
+            this.outinstorage();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

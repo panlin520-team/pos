@@ -2565,61 +2565,61 @@ export default {
     },
 
     // 取消待支付订单
-    cancelOrder(item) {
-      var list = item.productOrderList;
-      var arr = [];
-      for (var i = 0; i < list.length; i++) {
-        arr.push({
-          productCode: list[i].productCode,
-          productName: list[i].productName
-        });
-      }
-      var url = this.$https.orderHost + "/order/payOrderRefund";
-      var params = {
-        isTiYanKa: 0,
-        isHuaKa: 0,
-        payTypeAndAmount: item.payTypeAndAmount,
-        memberNum: item.cardNumber,
-        orderNumber: item.orderNumber,
-        stockCode: localStorage.getItem("stockCode"),
-        storeName: localStorage.getItem("storeName"),
-        products: JSON.stringify(arr)
-      };
-      this.$msgbox({
-        title: "提示",
-        message: "确认取消该订单吗?",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消"
-      })
-        .then(() => {
-          this.$https.fetchPost(url, params).then(
-            res => {
-              if (res.data.responseStatusType.message == "Success") {
-                this.$message({
-                  type: "success",
-                  message: "取消成功"
-                });
+    // cancelOrder(item) {
+    //   var list = item.productOrderList;
+    //   var arr = [];
+    //   for (var i = 0; i < list.length; i++) {
+    //     arr.push({
+    //       productCode: list[i].productCode,
+    //       productName: list[i].productName
+    //     });
+    //   }
+    //   var url = this.$https.orderHost + "/order/payOrderRefund";
+    //   var params = {
+    //     isTiYanKa: 0,
+    //     isHuaKa: 0,
+    //     payTypeAndAmount: item.payTypeAndAmount,
+    //     memberNum: item.cardNumber,
+    //     orderNumber: item.orderNumber,
+    //     stockCode: localStorage.getItem("stockCode"),
+    //     storeName: localStorage.getItem("storeName"),
+    //     products: JSON.stringify(arr)
+    //   };
+    //   this.$msgbox({
+    //     title: "提示",
+    //     message: "确认取消该订单吗?",
+    //     type: "warning",
+    //     showCancelButton: true,
+    //     confirmButtonText: "确定",
+    //     cancelButtonText: "取消"
+    //   })
+    //     .then(() => {
+    //       this.$https.fetchPost(url, params).then(
+    //         res => {
+    //           if (res.data.responseStatusType.message == "Success") {
+    //             this.$message({
+    //               type: "success",
+    //               message: "取消成功"
+    //             });
 
-                this.fetchOrder();
-              } else {
-                this.$message({
-                  type: "error",
-                  message: res.data.responseStatusType.error.errorMsg
-                });
-              }
-            },
-            error => {
-              this.$message({
-                type: "error",
-                message: error
-              });
-            }
-          );
-        })
-        .catch(() => {});
-    },
+    //             this.fetchOrder();
+    //           } else {
+    //             this.$message({
+    //               type: "error",
+    //               message: res.data.responseStatusType.error.errorMsg
+    //             });
+    //           }
+    //         },
+    //         error => {
+    //           this.$message({
+    //             type: "error",
+    //             message: error
+    //           });
+    //         }
+    //       );
+    //     })
+    //     .catch(() => {});
+    // },
 
     // 订单退货
     rebackOrder(item) {
@@ -2637,7 +2637,7 @@ export default {
           productName: list[i].productName
         });
       }
-      var url = this.$https.orderHost + "/order/payOrderRefund ";
+      var url = this.$https.orderHost + "/order/payOrderRefund";
       var params = {
         isHuaKa: 0,
         isTiYanKa: 0,

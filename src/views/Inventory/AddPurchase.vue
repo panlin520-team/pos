@@ -22,14 +22,14 @@
     </div>
     <div class="clienList">
       <el-table :data="tableData_enterpurchase" style="width: 100%">
-        <el-table-column label="入库人" min-width="140">
-          <template slot-scope="scope">
-            <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
-          </template>
-        </el-table-column>
         <el-table-column label="供货组织" min-width="120">
           <template slot-scope="scope">
             <div slot="reference" class="name-wrapper">{{ scope.row.outstorageOrgName }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column label="入库方向" min-width="100">
+          <template slot-scope="scope">
+            <div slot="reference" class="name-wrapper">{{ scope.row.inventoryWays }}</div>
           </template>
         </el-table-column>
         <el-table-column label="采购订单号" min-width="170">
@@ -72,18 +72,14 @@
               >作废</div>
               <div
                 class="inventsome3"
-                v-show="takedelivery"
-                :class="scope.row.confirmStatus == '待收货' ? 'active' : 'acc'"
+                :class="scope.row.confirmStatus !== 'null' && scope.row.confirmStatus == 0 ? 'active' : 'acc'"
                 @click="confirmPopOver(scope.row)"
               >确认收货</div>
             </div>
-            <!-- <el-button size="mini">查看</el-button>
-            <el-button size="mini" type="danger">作废</el-button>
-            <el-button size="mini" type="success">确认收货</el-button>-->
           </template>
         </el-table-column>
       </el-table>
-      <!-- 查看订单弹出框 -->
+      <!-- 查看订单弹出框 :class="scope.row.inventoryWay == 'GENERAL' && scope.row.afterAuditInStorageId !== null ? 'active' : 'acc'"-->
       <PopOver
         custom-class="storageblock"
         :visible.sync="visible_examine"
@@ -108,15 +104,43 @@
                 <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="入库日期">
+            <el-table-column label="操作">
               <template slot-scope="scope">
-                <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                <div
+                  class="inventsome4"
+                  :class="scope.row.inventoryWay == '' ? 'active' : 'acc'"
+                  @click="salesretrun(scope.row)"
+                >退货</div>
               </template>
             </el-table-column>
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
           <el-button type="info" size="small" @click="tallyClick">确认</el-button>
+        </div>
+      </PopOver>
+      <!--退货 -->
+      <PopOver
+        custom-class="storageblocks"
+        :visible.sync="visible_times"
+        @close="closeTime"
+        width="450px"
+      >
+        <div class="stgblcktop" slot="top">退货</div>
+        <div class="stgblcktopmain" slot="main">
+          <div class="optionDate">
+            <label>退货数量：</label>
+            <el-input
+              placeholder="请输入退货数量"
+              oninput="value=value.replace(/[^\d]/g, '')"
+              v-model="value_return"
+              clearable
+            ></el-input>
+          </div>
+        </div>
+        <div class="stgblckbottom" slot="bottom">
+          <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+          <el-button @click="confirm_false" size="small" type="info">取消</el-button>
         </div>
       </PopOver>
     </div>
@@ -296,6 +320,7 @@ export default {
       stockType: "",
       //获取人名币
       // moneypeople: "",
+      visible_times: false,
       //供应商类型
       supplierCode: [],
       //页数
@@ -338,8 +363,11 @@ export default {
       inStorageId: "",
       //当前条数的状态
       confirmStatus: "",
+      value_return: "",
       //商品总价
       totalPrice: "",
+      //
+      inStorageProductID: "",
       //子公司Cold
       chainCode: "",
       //数量
@@ -372,6 +400,7 @@ export default {
       ],
       //采购订单搜索
       inputorder: "",
+      inStorageIdsss: "",
       //时间选择
       value_invenT: "",
       //时间选择器
@@ -467,7 +496,6 @@ export default {
       visible_orderfrom: false,
       class_seekbox: false,
       class_selckbox: false,
-      takedelivery: false,
 
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
@@ -707,7 +735,18 @@ export default {
     getware_back() {
       this.groupOpen = false;
     },
-
+    //确定退货
+    confirm_true() {
+      //请求退货
+      this.requestsres();
+      this.visible_times = false;
+      this.value_return = "";
+    },
+    //取消退货
+    confirm_false() {
+      this.visible_times = false;
+      this.value_return = "";
+    },
     //入库保存
     opencommodity() {
       this.receivableNumber = this.createTime;
@@ -732,6 +771,10 @@ export default {
         this.groupOpen = false;
       }
     },
+    closeTime() {
+      this.visible_times = false;
+      this.value_return = "";
+    },
     //点击修改入库订单
     modiforder(res, index) {
       this.visible_orderfrom = true;
@@ -750,15 +793,22 @@ export default {
     //点击查看订单详情
     showPopOver(res) {
       this.tableexamine.createTime = res.inStorageDate;
+      this.inStorageIdsss = res.inStorageId;
+
       this.tableexamine = res.inStorageProductList;
+      let someritm = res.inStorageProductList;
+      for (let i = 0; i < someritm.length; i++) {
+        someritm[i].inventoryWay = res.inventoryWay;
+        someritm[i].afterAuditInStorageId = res.afterAuditInStorageId;
+      }
       this.visible_examine = true;
       this.pagetotals = this.tableexamine.length;
     },
     //确认收货
     confirmPopOver(res) {
       this.inStorageId = res.inStorageId;
-      if (res.confirmStatus == "待收货" && res.invalidStatus == "未作废") {
-        this.confirmStatus = 1;
+      this.confirmStatus = 1;
+      if (res.confirmStatus !== null && res.confirmStatus == 0) {
         this.$confirm("您确定是否已收到货？", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
@@ -766,14 +816,7 @@ export default {
           center: true
         })
           .then(() => {
-            this.$message({
-              type: "success",
-              message: "收货成功!"
-            });
             this.confirmReceipt();
-            setTimeout(() => {
-              this.purchinstorage();
-            }, 200);
           })
           .catch(() => {
             this.$message({
@@ -784,7 +827,19 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已确认收货了或已作废了喔!"
+          message: "该商品已收货"
+        });
+      }
+    },
+    //退货按钮
+    salesretrun(res) {
+      this.inStorageProductID = res.inStorageProductID;
+      if (res.inventoryWay == "" && res.afterAuditInStorageId !== null) {
+        this.visible_times = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "该商品已退货!"
         });
       }
     },
@@ -810,7 +865,7 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已确认收货了或已作废了喔!"
+          message: "该商品已作废"
         });
       }
     },
@@ -844,7 +899,6 @@ export default {
       let accoers = this.$refs.myCascader.getCheckedNodes()[0].data;
       this.supplierCodes = accoers.supplierCode;
       this.supplierCategoryNames = accoers.supplierCode;
-      console.log(accoers);
     },
 
     //分页
@@ -909,6 +963,38 @@ export default {
         }
       );
     },
+    //请求退货
+    requestsres() {
+      var url = this.$https.productHost + "/stock/instoragePreAuditReturn";
+      var params = {
+        inStorageId: this.inStorageIdsss,
+        number: this.value_return,
+        inStorageProductID: this.inStorageProductID
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              type: "success",
+              message: res.data.result
+            });
+            this.visible_examine = false;
+            this.purchinstorage();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: "退货失败"
+          });
+        }
+      );
+    },
     //确认收货
     confirmReceipt() {
       var url = this.$https.productHost + "/stock/confirm";
@@ -919,7 +1005,13 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result) {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: "收货成功",
+              type: "success"
+            });
+            this.purchinstorage();
+          } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -956,6 +1048,11 @@ export default {
               } else {
                 value.invalidStatus = "未作废";
               }
+              if (value.inventoryWay == "RETURN") {
+              value.inventoryWays = "退货";
+            } else {
+              value.inventoryWays = "普通";
+            }
               if (value.afterAuditInStorageNumber == null) {
                 value.inStorageNumber = value.inStorageNumber;
               } else {
@@ -1056,7 +1153,7 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result.list) {
+          if (res.data.result) {
             res.data.result.list.forEach(value => {
               if (value.productSubordinate == 0) {
                 this.seekList.push({
@@ -1226,8 +1323,8 @@ export default {
         keeperType: 3,
         keeper: this.storeName,
         keeperCode: this.warehouses,
-        isSend: false,
-        createOperator: localStorage.getItem("trueName")
+        isSend: false
+        // createOperator: localStorage.getItem("trueName")
       };
 
       this.$https.fetchPost(url, params).then(
@@ -1264,8 +1361,6 @@ export default {
     this.requestwarehouse();
     //请求公司
     this.requestcompany();
-    // //请求商品
-    // this.requestcommodity();
     //时间转换
     // this.dateFormat();
   },
@@ -1501,6 +1596,22 @@ export default {
     padding: 35px 0 0 40px;
     height: 100%;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .inventsome4 {
+      height: 28px;
+      width: 60px;
+      line-height: 28px;
+      text-align: center;
+      border-radius: 4px;
+      color: #fff;
+      background-color: #73f707;
+      cursor: pointer;
+      &.active {
+        background-color: #ec2323;
+      }
+      &.acc {
+        background-color: #525351;
+      }
+    }
     .el-input {
       width: 230px;
       border-radius: 5px;
@@ -1528,6 +1639,33 @@ export default {
       background-color: #ada3a3;
       width: 230px;
       border-radius: 5px;
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//退货
+.storageblocks {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 40px;
+      }
+      .el-input {
+        width: 200px;
+      }
     }
   }
   .stgblckbottom {

@@ -30,9 +30,9 @@ const OtherWarehouse = () => import( /* webpackChunkName: "OtherWarehouse" */ '.
 // 添加入库采购
 const AddPurchase = () => import( /* webpackChunkName: "AddPurchase" */ '../views/Inventory/AddPurchase.vue');
 // 添加出库采购
-const AddOutChase = () => import( /* webpackChunkName: "AddOutChase" */ '../views/Inventory/AddOutChase.vue');
+// const AddOutChase = () => import( /* webpackChunkName: "AddOutChase" */ '../views/Inventory/AddOutChase.vue');
 // 报废
-const OutWarehouse = () => import( /* webpackChunkName: "OutWarehouse" */ '../views/Inventory/OutWarehouse.vue');
+// const OutWarehouse = () => import( /* webpackChunkName: "OutWarehouse" */ '../views/Inventory/OutWarehouse.vue');
 // 报废
 const AddMerchandise = () => import( /* webpackChunkName: "OutWarehouse" */ '../views/Inventory/AddMerchandise.vue');
 // 报表
@@ -213,28 +213,28 @@ const routes = [
   },
 
   //添加出库采购
-  {
-    path: '/addoutchase',
-    name: 'AddOutChase',
-    component: AddOutChase,
-    meta: {
-      title: '添加出库采购',
-      requiresAuth: true,
-      menubar: true
-    }
-  },
+  // {
+  //   path: '/addoutchase',
+  //   name: 'AddOutChase',
+  //   component: AddOutChase,
+  //   meta: {
+  //     title: '添加出库采购',
+  //     requiresAuth: true,
+  //     menubar: true
+  //   }
+  // },
 
   //报废
-  {
-    path: '/outwarehouse',
-    name: 'OutWarehouse',
-    component: OutWarehouse,
-    meta: {
-      title: '报废',
-      requiresAuth: true,
-      menubar: true
-    }
-  },
+  // {
+  //   path: '/outwarehouse',
+  //   name: 'OutWarehouse',
+  //   component: OutWarehouse,
+  //   meta: {
+  //     title: '报废',
+  //     requiresAuth: true,
+  //     menubar: true
+  //   }
+  // },
   //添加商品
   {
     path: '/stock/addmerchandise',

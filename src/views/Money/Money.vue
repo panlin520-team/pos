@@ -122,7 +122,57 @@
         ></el-pagination>
       </div>
     </div>
-
+    <!-- 支付弹出框 -->
+    <PopOver
+      custom-class="storageblock"
+      :visible.sync="visible_examine"
+      @close="closePopOver"
+      width="450px"
+    >
+      <div class="stgblcktop" slot="top">结算</div>
+      <div class="stgblcktopmain" slot="main">
+        <!-- <div class="paymentprice">
+          <div class="stgeprice">
+            <label>原价：</label>
+            <span>{{retailPrespoe}}元</span>
+          </div>
+          <div class="stgeprice">
+            <label>总价：</label>
+            <span>{{totalPrice}}元</span>
+          </div>
+        </div>-->
+        <div class="member">
+          <div class="normal" v-if="this.$store.state.member == null">散客</div>
+          <div class="personal" v-if="this.$store.state.member != null">
+            会员姓名:
+            <span style="margin-right: 10px;">{{this.$store.state.member.userName}}</span>电话号码:
+            <span>{{this.$store.state.member.userMobile}}</span>
+          </div>
+        </div>
+        <div>
+          <div class="catalysis">
+            <div>
+              <label>支付方式：</label>
+              <el-select v-model="input_cataly" @change="changeOpen" placeholder="请选择">
+                <el-option
+                  v-for="item in options"
+                  :key="item.payTypeId"
+                  :label="item.payTypeName"
+                  :value="item.payTypeId"
+                ></el-option>
+              </el-select>
+            </div>
+            <div>
+              <label>支付金额：</label>
+              <el-input v-model="input_present" :disabled="true" placeholder="请输入支付金额"></el-input>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="stgblckbottom" slot="bottom">
+        <el-button @click="confirm_storage" type="success">确认购买</el-button>
+      </div>
+    </PopOver>
     <!-- 开单 -->
     <transition name="el-zoom-in-bottom">
       <div class="popPage billPage" v-if="billOpen == true">
@@ -479,7 +529,7 @@
     <!-- 对话框 待支付订单结算方式 -->
     <pop-over
       :visible.sync="orderpayPopver"
-      @close="orderpayPopver = false"
+      @close="orderpayPopves"
       width="500px"
       marginTop="5vh"
       custom-class="accountPop"
@@ -863,7 +913,14 @@ export default {
       vip: [],
       // 会员信息
       memberValue: false,
+      visible_examine: false,
+      retailPrespoe: "",
+      totalPrice: "",
+      input_cataly: "",
+      input_present: "",
       member: {},
+      options: [],
+      secret: "",
       // 门店项目
       serviceMenu: [],
       currentServiceMenuId: "",
@@ -875,6 +932,12 @@ export default {
       isTiYanKaOrDingzhi: "",
       // 产品下列表
       productItems: [],
+      //当前条ID  退货
+      outstorageId: "",
+      payTypeCategorys: "",
+      accountTypes: "",
+      payTypeNames: "",
+      discount: "",
       // 产品下员工
       productEmpList: [],
       // 已选中产品销售员
@@ -914,6 +977,7 @@ export default {
       serviceList: [],
       // 已选择产品
       productList: [],
+      tableDataList: [],
       // 水单号
       memoNum: "",
       // 备注
@@ -956,7 +1020,6 @@ export default {
       billOpen: false,
       // 订单详细
       orderDetailsPage: false,
-      isTiYanKaOrDingzhi: "",
       // 对话框
       // 结算
       accountPopver: false,
@@ -1050,6 +1113,10 @@ export default {
           this.payTypes = null;
         })
         .catch(() => {});
+    },
+    orderpayPopves() {
+      this.orderpayPopver = false;
+      this.tableDataList = [];
     },
     //取消订单
     cancellationorder(res) {
@@ -1454,8 +1521,6 @@ export default {
                 item.discount
               );
             });
-            // console.log("serveAFT", this.serviceList);
-            // console.log("productAFT", this.productList);
             this.caculatePrice();
           })
           .catch(() => {
@@ -1550,7 +1615,46 @@ export default {
       this.discountPrice = item.discountPrice;
       this.servicePricePopver = true;
     },
-
+    //收银支付
+    closePopOver() {
+      this.visible_examine = false;
+      this.options = [];
+      this.tableDataList = [];
+      this.input_cataly = "";
+    },
+    //下拉选择
+    changeOpen(res) {
+      this.options.forEach(value => {
+        if (this.input_cataly == value.payTypeId) {
+          this.payTypeCategorys = value.payTypeCategory;
+          this.accountTypes = value.accountType;
+          this.payTypeNames = value.payTypeName;
+          this.discounts = value.discount;
+        }
+        // if (this.discount == 0) {
+        //   this.input_present = this.retailPrespoe;
+        // } else {
+        //   this.input_present = this.totalPrice;
+        // }
+      });
+    },
+    confirm_storage() {
+      if (this.input_cataly == "") {
+        this.$message({
+          message: "请选择支付方式...",
+          type: "warning"
+        });
+      } else {
+        this.endOrder();
+        this.options = [];
+        this.input_woreter = "";
+        this.tableDataList = [];
+        this.totalPrice = "0";
+        this.input_cataly = "";
+        this.visible_examine = false;
+        this.retailPrespoe = "0";
+      }
+    },
     // 打开修改已选择产品数量、价格
     openChangeProduct(index, item) {
       this.saveProduct = item;
@@ -1725,6 +1829,33 @@ export default {
           this.caculatePrice();
         })
         .catch(() => {});
+    },
+    //支付方式
+    morepayment() {
+      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var params = {
+        memberNum: localStorage.getItem("membership"),
+        industryId: localStorage.getItem("industryID"),
+        subClassId: ""
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            res.data.result.forEach(value => {
+              if (value.payTypeCategory == 2) {
+                this.options.push({
+                  payTypeId: value.payTypeId,
+                  payTypeCategory: value.payTypeCategory,
+                  payTypeName: value.payTypeName,
+                  accountType: value.accountType,
+                  discount: value.discount
+                });
+              }
+            });
+          }
+        })
+        .catch(err => {});
     },
 
     // 会员折扣度
@@ -2035,7 +2166,45 @@ export default {
         }
       );
     },
-
+    //定制订单最后支付
+    endOrder() {
+      var arr = {
+        payType: this.input_cataly,
+        amount: this.input_present,
+        payTypeName: this.payTypeNames,
+        accountType: this.accountTypes,
+        payTypeCategory: this.payTypeCategorys
+      };
+      var url = this.$https.orderHost + "/order/payOrder";
+      var params = {
+        payTypeAndAmount: JSON.stringify([arr]),
+        productIds: JSON.stringify(this.tableDataList),
+        payPrice: this.input_present,
+        orderNumber: this.secret,
+        industryId: this.input_cataly,
+        createOperator: localStorage.getItem("trueName")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            this.$message({
+              message: res.data.result.order,
+              type: "success"
+            });
+            this.tableDataList = [];
+            //刷新页面
+            this.fetchOrder();
+            this.$refs.moduleName.memberbalance();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
     // 产品选择
     fetchProductParams(item) {
       if (localStorage.getItem("membershipLevelId") != "null") {
@@ -2623,6 +2792,7 @@ export default {
 
     // 订单退货
     rebackOrder(item) {
+      this.outstorageId = item.outStorageId;
       if (item.orderType == 4) {
         this.isTiYanKaOrDingzhi = 1;
       } else {
@@ -2644,8 +2814,9 @@ export default {
         payTypeAndAmount: item.payTypeAndAmount,
         isTiYanKaOrDingzhi: this.isTiYanKaOrDingzhi,
         memberNum: item.cardNumber,
+        outstorageId: this.outstorageId,
         orderNumber: item.orderNumber,
-        orgK3Number: localStorage.getItem("orgK3Number"),
+        // orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
         storeId: localStorage.getItem("storeId"),
         stockCode: localStorage.getItem("stockCode"),
@@ -2693,47 +2864,69 @@ export default {
           });
         });
     },
-
+    //支付弹框
     payOrder(item) {
-      this.payTypes = null;
-      var list = item.productOrderList;
-      var totalPrice = item.totalPrice;
-      var subclassIds = [];
-      for (var i = 0; i < list.length; i++) {
-        subclassIds.push(list[i].subclassID);
-      }
-      var newArr = subclassIds.join(",");
-      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
-      var params = {
-        memberNum: item.cardNumber,
-        subClassId: newArr,
-        industryId: localStorage.getItem("industryID")
-      };
-      this.$https.fetchPost(url, params).then(
-        res => {
-          if (res.data.result) {
-            this.orderpayPopver = true;
-            this.orderInfo = item;
-            var list = res.data.result;
-            list.forEach(item => {
-              item.checked = false;
-              item.value = totalPrice;
-            });
-            this.payTypes = list;
-          } else {
+      let objectsItem = item.productOrderList;
+      this.input_present = item.totalPrice;
+      this.secret = item.orderNumber;
+      objectsItem.forEach(value => {
+        this.tableDataList.push({
+          amount: value.productNum,
+          productCode: value.productCode,
+          productType: value.productTypeId,
+          productName: value.productName,
+          retailPricess: value.discountPrice,
+          retailPrice: value.discountPrice,
+          orderStatus: value.discountPrice,
+          discount: value.discount,
+          discountPrice: value.discountPrice,
+          useLimit: value.createdTime
+        });
+      });
+      if (item.orderTypeValue == "定制订单") {
+        this.visible_examine = true;
+        this.morepayment();
+      } else {
+        this.orderpayPopver = true;
+        this.payTypes = null;
+        var list = item.productOrderList;
+        var totalPrice = item.totalPrice;
+        var subclassIds = [];
+        for (var i = 0; i < list.length; i++) {
+          subclassIds.push(list[i].subclassID);
+        }
+        var newArr = subclassIds.join(",");
+        var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+        var params = {
+          memberNum: item.cardNumber,
+          subClassId: newArr,
+          industryId: localStorage.getItem("industryID")
+        };
+        this.$https.fetchPost(url, params).then(
+          res => {
+            if (res.data.result) {
+              this.orderInfo = item;
+              var list = res.data.result;
+              list.forEach(item => {
+                item.checked = false;
+                item.value = totalPrice;
+              });
+              this.payTypes = list;
+            } else {
+              this.$message({
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "warning"
+              });
+            }
+          },
+          error => {
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
-              type: "warning"
+              type: "error",
+              message: error
             });
           }
-        },
-        error => {
-          this.$message({
-            type: "error",
-            message: error
-          });
-        }
-      );
+        );
+      }
     },
 
     // 获取订单详细(根据订单状态)
@@ -3619,7 +3812,104 @@ export default {
     }
   }
 }
+.storageblock {
+  .stgblcktop {
+    text-align: center;
+    font-size: 20px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 300px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .member {
+      border-bottom: 1px solid #eeeeee;
+      height: 44px;
+      line-height: 44px;
+      padding: 0 25px;
+      font-size: 14px;
 
+      .normal {
+        color: #333333;
+      }
+
+      .personal {
+        span {
+          color: #feb019;
+        }
+      }
+    }
+    .el-select {
+      width: 215px;
+    }
+    .paymentprice {
+      width: 100%;
+      display: flex;
+      height: 45px;
+      justify-content: space-around;
+      border-bottom: 1px solid rgba(220, 220, 220, 0.7);
+      .stgeprice {
+        width: 110px;
+        height: 16px;
+        font-size: 16px;
+        padding: 10px 0;
+
+        span {
+          font-size: 18px;
+          color: #ecab1e;
+        }
+      }
+    }
+    .catalysis {
+      width: 400px;
+      margin: 50px 0 0 40px;
+      .ratio {
+        width: 150px;
+      }
+      label {
+        width: 80px;
+        margin-top: 12px;
+        font-size: 15px;
+        font-family: PingFang SC;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 1);
+      }
+      .el-input {
+        margin-top: 10px;
+        width: 217px;
+        border-radius: 5px;
+      }
+      .el-radio {
+        margin-left: 20px;
+      }
+    }
+    .catalysiss {
+      width: 400px;
+      height: 60px;
+      margin: 30px 0 0 40px;
+      display: flex;
+      label {
+        width: 80px;
+        margin-top: 12px;
+        font-size: 15px;
+        font-family: PingFang SC;
+        font-weight: 400;
+        color: rgba(0, 0, 0, 1);
+      }
+      .el-input {
+        width: 180px;
+        height: 45px;
+        border-radius: 5px;
+        border: 1px solid rgba(177, 173, 173, 0.7);
+      }
+      .el-radio {
+        margin-left: 20px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
 .servicePop {
   .top {
     padding: 5px 15px;

@@ -1257,12 +1257,14 @@ export default {
         height: 16px;
         font-size: 16px;
         padding: 10px 0;
-
         span {
           font-size: 18px;
           color: #ecab1e;
         }
       }
+    }
+    .el-select {
+      width: 215px;
     }
     .catalysis {
       width: 400px;
@@ -1280,7 +1282,7 @@ export default {
       }
       .el-input {
         margin-top: 10px;
-        width: 210px;
+        width: 217px;
         border-radius: 5px;
       }
       .el-radio {

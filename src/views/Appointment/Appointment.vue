@@ -1884,6 +1884,7 @@ export default {
 
   .right {
     font-size: 24px;
+    cursor: pointer;
   }
 }
 

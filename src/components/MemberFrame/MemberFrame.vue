@@ -98,11 +98,12 @@
             <!-- <div class="experienCards">
               <el-button type="warning" @click="show_customization">项目定制</el-button>
             </div>-->
+            <!-- 体验卡 -->
             <PopOver
               custom-class="storageblock2"
               :visible.sync="visible_carLise"
               @close="close_carLise"
-              width="900px"
+              width="1000px"
             >
               <div class="stgblcktop" slot="top">客户项目信息</div>
               <div class="stgblcktopmain" slot="main">
@@ -125,7 +126,7 @@
                 </div>
                 <div class="projctbottom" v-show="experiencehaha">
                   <el-table :data="tableData_details" style="width: 100%">
-                    <el-table-column label="项目名称">
+                    <el-table-column label="项目名称" min-width="100">
                       <template slot-scope="scope">
                         <div
                           slot="reference"
@@ -133,7 +134,7 @@
                         >{{ scope.row.experiencecardProductName }}</div>
                       </template>
                     </el-table-column>
-                    <el-table-column label="商品小类">
+                    <el-table-column label="商品小类" width="120">
                       <template slot-scope="scope">
                         <div slot="reference" class="name-wrapper">{{ scope.row.subClassName }}</div>
                       </template>
@@ -161,14 +162,27 @@
                         <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
                       </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="180">
+                    <el-table-column label="操作" width="320">
                       <template slot-scope="scope">
-                        <el-button size="mini" type="danger" @click="vipexdetails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="warning" @click="vipexdetails(scope.row)">划卡</el-button>
                         <el-button size="mini" type="success" @click="userdetails(scope.row)">使用详情</el-button>
+                        <div class="inbotton">
+                          <div
+                            class="inventsome6"
+                            :class="scope.row.totalTimes > scope.row.useTimes? 'active' : 'acc'"
+                            @click="salesreCare(scope.row)"
+                          >退货</div>
+                          <el-button
+                            size="mini"
+                            type="success"
+                            @click="Careticulars(scope.row)"
+                          >退货详情</el-button>
+                        </div>
                       </template>
                     </el-table-column>
                   </el-table>
                 </div>
+                <!-- 定制项目 -->
                 <div class="projctbottom" v-show="experienceheihei">
                   <el-table :data="tableData_rieniza" style="width: 100%">
                     <el-table-column label="项目名称">
@@ -196,10 +210,22 @@
                         <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
                       </template>
                     </el-table-column>
-                    <el-table-column label="操作" width="180">
+                    <el-table-column label="操作" width="320">
                       <template slot-scope="scope">
-                        <el-button size="mini" type="danger" @click="rienizatails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="warning" @click="rienizatails(scope.row)">划卡</el-button>
                         <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                        <div class="inbottons">
+                          <div
+                            class="inventsome5"
+                            :class="scope.row.totalTimes > scope.row.useTimes? 'active' : 'acc'"
+                            @click="salesretrun(scope.row)"
+                          >退货</div>
+                          <el-button
+                            size="mini"
+                            type="success"
+                            @click="salesparticulars(scope.row)"
+                          >退货详情</el-button>
+                        </div>
                       </template>
                     </el-table-column>
                   </el-table>
@@ -217,27 +243,27 @@
                   </div>
                   <div class="stgblcktopmain" slot="main">
                     <el-table :data="User_custopention" style="width: 100%">
-                      <el-table-column label="姓名">
+                      <el-table-column label="姓名" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="商品名称">
+                      <el-table-column label="商品名称" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="使用日期">
+                      <el-table-column label="使用日期" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="使用状态">
+                      <el-table-column label="使用状态" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="操作">
+                      <el-table-column label="操作" width="172">
                         <template slot-scope="scope">
                           <div
                             class="inventsome2"
@@ -261,6 +287,77 @@
                     <el-button size="mini" type="success" @click="pushUseropovepo">确定</el-button>
                   </div>
                 </pop-over>
+                <!-- 定制项目退货详情 -->
+                <pop-over
+                  :visible.sync="salesPopovepo"
+                  @close="salesPopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目退货详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="salesdartas" style="width: 100%">
+                      <el-table-column label="退货次数" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.refuseTimes }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="退货日期" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <!-- <el-pagination
+                      @size-change="handleSizeChange2"
+                      @current-change="handleCurrentChange2"
+                      :current-page.sync="currentPage2"
+                      :page-size="pageSize2"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz2"
+                      background
+                    ></el-pagination>-->
+                  </div>
+                </pop-over>
+                <!-- 体验卡退货详情 -->
+                <pop-over
+                  :visible.sync="CarePopovepo"
+                  @close="CarePopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">体验卡退货详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="salesdarta" style="width: 100%">
+                      <el-table-column label="退货次数" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.refuseTimes }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="退货日期" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <!-- <el-pagination
+                      @size-change="handleSizeChange2"
+                      @current-change="handleCurrentChange2"
+                      :current-page.sync="currentPage2"
+                      :page-size="pageSize2"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz2"
+                      background
+                    ></el-pagination>-->
+                  </div>
+                </pop-over>
+
                 <!-- 体验卡详情 -->
                 <pop-over
                   :visible.sync="suserPopover"
@@ -270,31 +367,31 @@
                   id="pop"
                 >
                   <div class="stgblcktop" slot="top">
-                    <div class="title">使用详情</div>
+                    <div class="title">体验卡使用详情</div>
                   </div>
                   <div class="stgblcktopmain" slot="main">
                     <el-table :data="User_customization" style="width: 100%">
-                      <el-table-column label="姓名">
+                      <el-table-column label="姓名" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="商品名称">
+                      <el-table-column label="商品名称" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="使用日期">
+                      <el-table-column label="使用日期" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="使用状态">
+                      <el-table-column label="使用状态" width="172">
                         <template slot-scope="scope">
                           <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
                         </template>
                       </el-table-column>
-                      <el-table-column label="操作">
+                      <el-table-column label="操作" width="172">
                         <template slot-scope="scope">
                           <div
                             class="inventsome1"
@@ -555,6 +652,44 @@
             </div>
           </div>
         </div>
+        <!-- 定制项目退货次数 -->
+        <PopOver
+          custom-class="storageCustomization"
+          :visible.sync="visible_Customization"
+          @close="closeCustomization"
+          width="450px"
+        >
+          <div class="stgblcktop" slot="top">退货</div>
+          <div class="stgblcktopmain" slot="main">
+            <div class="optionDate">
+              <label>退货次数：</label>
+              <el-input v-model="input_Customization" clearable placeholder="请输入退货次数"></el-input>
+            </div>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
+          </div>
+        </PopOver>
+        <!-- 体验卡退货次数 -->
+        <PopOver
+          custom-class="storageCare"
+          :visible.sync="visible_CustomiCares"
+          @close="closeCustoCare"
+          width="450px"
+        >
+          <div class="stgblcktop" slot="top">退货</div>
+          <div class="stgblcktopmain" slot="main">
+            <div class="optionDate">
+              <label>退货次数：</label>
+              <el-input v-model="input_Customization" clearable placeholder="请输入退货次数"></el-input>
+            </div>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-button @click="conCare_true" size="small" type="success">确定</el-button>
+            <el-button @click="conCare_false" size="small" type="info">取消</el-button>
+          </div>
+        </PopOver>
         <PopOver
           custom-class="storageblockk"
           :visible.sync="visible_recharge"
@@ -686,18 +821,21 @@ export default {
       // visible_vipexd: false,
       servicePopover: false,
       visible_recharge: false,
-      visible_customization: false,
+      visible_CustomiCares: false,
       visible_customs: false,
       suserPopover: false,
-      // visible_rieniza: false,
+      visible_Customization: false,
       suserPopovepo: false,
       values_truwes: false,
       experiencehaha: true,
       experienceheihei: false,
+      salesPopovepo: false,
+      CarePopovepo: false,
       //会员等级
       grade: "",
       rotate: false,
       rienizauID: "",
+      salasIdtow: "",
       //搜索数据
       tableData_vippeple: [],
       empsetlist: [],
@@ -706,9 +844,13 @@ export default {
       productNamenal: "",
       productCodenal2: "",
       productNamenal2: "",
+      outstorageId: "",
+      outstoragetwoId: "",
       //查看体验卡
       tableData_carLise: [],
       optionpersonals: [],
+      salesdarta: [],
+      salesdartas: [],
       //体验卡定制项目按钮
       someData: [
         {
@@ -722,6 +864,7 @@ export default {
       ],
       //退货ID
       recordId: "",
+      recordIds: "",
       //区分体验卡和定制项目
       differentiate: "",
       //详情列表
@@ -762,6 +905,9 @@ export default {
 
       // 项目当前工种下已选员工id
       currentEmpId: null,
+      //退货输入框
+      input_Customization: "",
+      salasId: "",
       //充值
       //选择员工
       beauticianIds: [
@@ -860,6 +1006,8 @@ export default {
       value_accounTelp: "",
       //支付状态
       value_accountstate: "",
+      caresongre: "",
+      caresongresss: "",
       //充值账户类型下拉选项
       interestTple: [],
       optionpeTylp: [],
@@ -1020,6 +1168,30 @@ export default {
             message: "请选择完员工时间"
           });
         }
+      }
+    },
+    //定制项目退货
+    salesretrun(res) {
+      this.salasIdtow = res.id;
+      if (res.totalTimes > res.useTimes) {
+        this.visible_Customization = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "该订单已退完"
+        });
+      }
+    },
+    //体验卡退货
+    salesreCare(res) {
+      this.salasId = res.id;
+      if (res.totalTimes > res.useTimes) {
+        this.visible_Customization = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "该订单已退完"
+        });
       }
     },
     //使用详情
@@ -1235,6 +1407,18 @@ export default {
       this.orderNumber = res.orderNum;
       this.particulpovepo();
     },
+    //体验卡退货详情
+    Careticulars(res) {
+      this.caresongre = res.id;
+      this.CarePopovepo = true;
+      this.salesCared();
+    },
+    //定制项目退货详情
+    salesparticulars(res) {
+      this.caresongresss = res.id;
+      this.salesPopovepo = true;
+      this.salescaengd();
+    },
     //详情分页
     handleSizeChange(val) {},
     handleSizeChange2(val) {},
@@ -1243,6 +1427,48 @@ export default {
     },
     handleCurrentChange(val) {
       this.particularsList();
+    },
+    //定制项目弹框消失
+    closeCustomization() {
+      this.visible_Customization = false;
+    },
+    //确定定制项目退货
+    confirm_true() {
+      if (this.input_Customization == "") {
+        this.$message({
+          type: "warning",
+          message: "请输入退货数量"
+        });
+      } else {
+        this.salestweTumoney();
+      }
+    },
+    confirm_false() {
+      this.input_Customization = "";
+
+      this.visible_Customization = false;
+    },
+    //体验卡弹框消失
+    closeCustoCare() {
+      this.input_Customization = "";
+
+      this.visible_CustomiCares = false;
+    },
+    //体验卡退货确定
+    conCare_true() {
+      if (this.input_Customization == "") {
+        this.$message({
+          type: "warning",
+          message: "请输入退货数量"
+        });
+      } else {
+        this.salesCareTumoney();
+      }
+    },
+    //体验卡退货取消
+    conCare_false() {
+      this.input_Customization = "";
+      this.visible_CustomiCares = false;
     },
     //搜索电话
     show_stgbcar2() {
@@ -1410,11 +1636,14 @@ export default {
     // },
     //划卡退货
     salesReturnails(res) {
+      this.input_Customization = "";
       this.recordId = res.recordId;
       this.productCodenal2 = res.productCode;
       this.productNamenal2 = res.productName;
       this.salseshop[0].productCode = res.productCode;
       this.salseshop[0].productName = res.productName;
+      this.outstorageId = res.outStorageId;
+      console.log(this.outstorageId);
       if (res.recordStatus == "未退货") {
         this.$confirm("是否确认退货", {
           confirmButtonText: "确定",
@@ -1509,6 +1738,7 @@ export default {
       this.recordIds = res.recordId;
       this.productCodenal = res.productCode;
       this.productNamenal = res.productName;
+      this.outstoragetwoId = res.outStorageId;
       if (res.recordStatus == "未退货") {
         this.$confirm("是否确认退货", {
           confirmButtonText: "确定",
@@ -1570,6 +1800,88 @@ export default {
           });
         }
       );
+    },
+    //体验卡退货详情
+    salesCared() {
+      var url =
+        this.$https.storeHost +
+        "/manage/experienceCard/selectExperiencecardProductUserRefuseList";
+      var params = {
+        id: this.caresongre
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.salesdarta = res.data.result;
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //定制项目退货详情
+    salescaengd() {
+      var url =
+        this.$https.orderHost + "/order/selectCustomProjectUserRefuseList";
+      var params = {
+        id: this.caresongresss
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.salesdartas = res.data.result;
+        }
+      });
+    },
+    //体验卡退货
+    salesCareTumoney() {
+      var url =
+        this.$https.storeHost +
+        "/manage/experienceCard/experiencecardProductUserRefuse";
+      var params = {
+        refuseTimes: this.input_Customization,
+        id: this.salasId
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.visible_CustomiCares = false;
+          this.input_Customization = "";
+          this.memberdcarUser();
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //定制项目退货
+    salestweTumoney() {
+      var url = this.$https.orderHost + "/order/customProjectUserRefuse";
+      var params = {
+        refuseTimes: this.input_Customization,
+        id: this.salasIdtow
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.visible_Customization = false;
+          this.input_Customization = "";
+          this.projectturnData();
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
     },
     //定制项目详情列表
     particulpovepo() {
@@ -1652,6 +1964,7 @@ export default {
     salesReturnData() {
       var url = this.$https.orderHost + "/order/payOrderRefund";
       var params = {
+        isTiYanKa: 1,
         isHuaKa: 1,
         expUseRecordId: this.recordId,
         stockCode: localStorage.getItem("stockCode"),
@@ -1664,7 +1977,8 @@ export default {
         stockId: localStorage.getItem("stockId"),
         experiencecardProductUserId: this.cardOrderDetailId,
         modifyOperator: localStorage.getItem("trueName"),
-        orderNumber: this.orderNumber
+        orderNumber: this.orderNumber,
+        outstorageId: this.outstorageId
       };
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.responseStatusType.message == "Success") {
@@ -1686,6 +2000,8 @@ export default {
     salesReturnDatas() {
       var url = this.$https.orderHost + "/order/payOrderRefund";
       var params = {
+        isTiYanKaOrDingzhi: 1,
+        isTiYanKa: 0,
         isHuaKa: 2,
         stockCode: localStorage.getItem("stockCode"),
         storeName: localStorage.getItem("storeName"),
@@ -1698,7 +2014,8 @@ export default {
         products: JSON.stringify(this.projectsuder),
         experiencecardProductUserId: this.rienizauID,
         modifyOperator: localStorage.getItem("trueName"),
-        orderNumber: this.orderNumber
+        orderNumber: this.orderNumber,
+        outstorageId: this.outstoragetwoId
       };
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.responseStatusType.message == "Success") {
@@ -1931,6 +2248,7 @@ export default {
         .then(res => {})
         .catch(err => {});
     },
+
     //充值
     rechargeList() {
       var url =
@@ -2008,6 +2326,8 @@ export default {
               localStorage.setItem("list", JSON.stringify(arr));
             }
           });
+          //刷新星级
+          this.staCardxins();
         })
         .catch(err => {
           this.$message.error("获取账户余额请求错误...");
@@ -2176,7 +2496,7 @@ export default {
             } else {
               this.values_truwes = true;
               this.empsetlist.forEach(value => {
-                if (value.postCategoryId == 7) {
+                if (value.postCategoryName == "美发师") {
                   this.optionpersonal = value.beauticianList;
                 }
                 this.optionpersonals = value.beauticianList;
@@ -2538,6 +2858,46 @@ export default {
       width: 100%;
       max-height: 500px;
       overflow: auto;
+      .inbottons {
+        float: right;
+        display: flex;
+      }
+      .inventsome5 {
+        height: 28px;
+        width: 60px;
+        margin-right: 5px;
+        line-height: 28px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #cf0808;
+        }
+        &.acc {
+          background-color: #525351;
+        }
+      }
+      .inbotton {
+        float: right;
+        display: flex;
+      }
+      .inventsome6 {
+        height: 28px;
+        width: 60px;
+        margin-right: 5px;
+        line-height: 28px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #cf0808;
+        }
+        &.acc {
+          background-color: #525351;
+        }
+      }
     }
   }
 }
@@ -2742,7 +3102,60 @@ export default {
     }
   }
 }
-
+//定制项目退货弹框
+.storageCustomization {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      .el-input {
+        width: 200px;
+      }
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 38px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//体验卡退货弹框
+.storageCare {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      .el-input {
+        width: 200px;
+      }
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 38px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
 //弹框
 .serviceUserpo {
   width: 100%;
@@ -2753,6 +3166,7 @@ export default {
   }
   .stgblcktopmain {
     width: 90%;
+    max-height: 500px;
     margin: 0 auto;
     overflow: auto;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);

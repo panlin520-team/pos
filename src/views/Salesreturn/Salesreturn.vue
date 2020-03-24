@@ -2,9 +2,7 @@
 
 <template>
   <div class="Salesreturn">
-    <div class="salesTitle">
-    退货查询
-    </div>
+    <div class="salesTitle">退货查询</div>
     <div class="SalesreTop">
       <div class="searchBoxs">
         <label>姓名：</label>
@@ -28,8 +26,8 @@
         ></el-date-picker>
       </div>
     </div>
-    <div class="salereBottom">
-      <el-table :data="tableData" style="width: 100%">
+    <div class="carContent">
+      <el-table :data="tableData_content" style="width: 100%">
         <el-table-column label="单号">
           <template slot-scope="scope">
             <span>{{ scope.row.orderNo }}</span>
@@ -56,17 +54,16 @@
           </template>
         </el-table-column>
       </el-table>
-      <!-- 页码 -->
-      <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page.sync="currentPage1"
-        :page-size="pageSize"
-        background
-        layout="total, prev, pager, next"
-        :total="pageTotal"
-      ></el-pagination>
     </div>
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page.sync="currentPage1"
+      :page-size="pageSize"
+      background
+      layout="total, prev, pager, next"
+      :total="pageTotal"
+    ></el-pagination>
 
     <!-- 退货弹出框 -->
     <!-- <PopOver
@@ -107,26 +104,7 @@ export default {
       //搜索时间段
       value_tinemve: "",
       //退货列表
-      tableData: [
-        {
-          memberNum: "2016-05-02",
-          name: "王小虎",
-          mobile: "213411412",
-          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          memberNum: "2016-05-02",
-          name: "王小虎",
-          mobile: "213411412",
-          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
-        },
-        {
-          memberNum: "2016-05-02",
-          name: "王小虎",
-          mobile: "213411412",
-          membershipLevelName: "上海市普陀区金沙江路 1518 弄"
-        }
-      ]
+      tableData_content: []
     };
   },
 
@@ -165,7 +143,7 @@ export default {
       };
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.result) {
-          this.tableData = res.data.result.list;
+          this.tableData_content = res.data.result.list;
           this.pageTotal = res.data.result.total;
         } else {
           this.$message({
@@ -187,7 +165,7 @@ export default {
 .Salesreturn {
   width: 100%;
   height: 100%;
-  .salesTitle{
+  .salesTitle {
     width: 200px;
     height: 60px;
     text-align: center;
@@ -213,13 +191,18 @@ export default {
       }
     }
   }
-  .salereBottom {
-    width: 100%;
-    padding: 0 20px;
-    .el-pagination {
-      text-align: right;
-      margin: 10px 10px 0 0;
-    }
+  .carContent {
+    width: 90%;
+    flex: 1;
+    margin: 25px 0 15px 80px;
+    background: rgba(255, 255, 255, 1);
+    border: 1px solid rgba(238, 238, 238, 1);
+    box-shadow: 0px 0px 13px 3px rgba(221, 248, 229, 1);
+    border-radius: 4px;
+  }
+  .el-pagination {
+    float: right;
+    margin-right: 20px;
   }
 }
 //退货弹出框

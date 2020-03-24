@@ -63,18 +63,6 @@
                   :key="item.index"
                 >{{item.name}}</div>
               </div>
-              <!-- <div class="projectcar">
-                <el-button size="mini" type="success" @click="experienceCard">入库单</el-button>
-              </div>
-              <div class="projectcars">
-                <el-button size="mini" type="success" @click="experienization">入库商品</el-button>
-              </div>
-              <div class="projectcws">
-                <el-button size="mini" type="success" @click="experieniserw">出库单</el-button>
-              </div>
-              <div class="projectrtf">
-                <el-button size="mini" type="success" @click="experienisqgr">出库商品</el-button>
-              </div>-->
             </div>
             <!-- 入库总数 -->
             <div class="projctbottom" v-show="storageNustog">
@@ -164,11 +152,11 @@
             <!-- 入库分散 -->
             <div class="projctbottom" v-show="experiencehaha">
               <el-table :data="tableData_details" style="width: 100%">
-                <el-table-column label="入库人">
+                <!-- <el-table-column label="入库人">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
                   </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="入库类型">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.inStorageType }}</div>
@@ -212,11 +200,11 @@
             </div>
             <div class="projctbottom" v-show="experietow">
               <el-table :data="tableDqdwqedails" style="width: 100%">
-                <el-table-column label="出库人">
+                <!-- <el-table-column label="出库人">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.createOperator }}</div>
                   </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="出库类型">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.outStorageType }}</div>

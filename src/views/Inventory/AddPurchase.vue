@@ -89,22 +89,22 @@
         <div class="stgblcktop" slot="top"></div>
         <div class="stgblcktopmain" slot="main">
           <el-table :data="tableexamine" style="width: 100%">
-            <el-table-column label="项目名称">
+            <el-table-column label="项目名称" width="190">
               <template slot-scope="scope">
                 <span>{{ scope.row.productName }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="数量">
+            <el-table-column label="数量" width="190">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.receivedNumber }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="单位">
+            <el-table-column label="单位" width="190">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="190">
               <template slot-scope="scope">
                 <div
                   class="inventsome4"
@@ -116,7 +116,7 @@
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
-          <el-button type="info" size="small" @click="tallyClick">确认</el-button>
+          <el-button type="success" plain size="small" @click="tallyClick">确认</el-button>
         </div>
       </PopOver>
       <!--退货 -->
@@ -1636,7 +1636,6 @@ export default {
       }
     }
     .block {
-      background-color: #ada3a3;
       width: 230px;
       border-radius: 5px;
     }

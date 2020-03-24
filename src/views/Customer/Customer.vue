@@ -459,8 +459,8 @@
               </div>
             </div>
           </div>
-          <el-table :data="savingsRecordFilter" style="width: 100%">
-            <el-table-column label="订单号">
+          <el-table :data="savingsRecordFilter" class="el-tableList">
+            <el-table-column label="订单号" width="170">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.orderNo }}</div>
               </template>
@@ -485,7 +485,7 @@
                 <div slot="reference" class="name-wrapper">{{ scope.row.accountTypeName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="卡号">
+            <el-table-column label="卡号" width="170">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.cardNumber }}</div>
               </template>
@@ -2799,7 +2799,7 @@ export default {
           }
         }
         .el-tableList {
-          width: 80%;
+          width: 90%;
           margin: 0 auto;
           position: relative;
           margin-top: 15px;
@@ -2860,7 +2860,7 @@ export default {
     .moreData {
       flex: 1;
       max-width: 1200px;
-      margin: auto;
+      margin-left: 200px;
       background-color: #f8f8f8;
       .vipData {
         width: 100%;
@@ -3004,7 +3004,8 @@ export default {
           width: 100%;
           height: 100%;
           background-color: #f4f4f4;
-          border-radius: 10px;
+          border: 1px solid rgb(196, 191, 191);
+          border-radius: 3px;
           padding: 15px;
           margin-left: 35px;
         }
@@ -3096,10 +3097,14 @@ export default {
     .el-input {
       width: 215px;
     }
+    .el-select {
+      width: 215px;
+    }
     .textarea {
       width: 250px;
       height: 100px;
       border-radius: 5px;
+      border: 1px solid rgb(212, 211, 211);
       padding: 10px;
     }
     .el-textarea__inner {
@@ -3117,7 +3122,9 @@ export default {
   .stgblcktopmain {
     padding-top: 20px;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
-
+    .el-date-editor {
+      background-color: #fff !important;
+    }
     .el-input {
       width: 215px;
       // border: 1px solid rgb(184, 178, 178);
@@ -3139,6 +3146,8 @@ export default {
     .textarea {
       width: 260px;
       height: 100px;
+      border: 1px solid rgb(196, 191, 191);
+
       border-radius: 5px;
       padding: 10px;
     }

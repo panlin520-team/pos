@@ -85,22 +85,20 @@
         <div class="stgblcktop" slot="top"></div>
         <div class="stgblcktopmain" slot="main">
           <el-table :data="tableexamine" style="width: 100%">
-            <el-table-column label="项目名称">
-              <template slot-scope="scope">
-                <span>{{ scope.row.productName }}</span>
-              </template>
+            <el-table-column label="项目名称" width="190">
+              <template slot-scope="scope">{{ scope.row.productName }}</template>
             </el-table-column>
-            <el-table-column label="数量">
+            <el-table-column label="数量" width="190">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.receivedNumber }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="单位">
+            <el-table-column label="单位" width="190">
               <template slot-scope="scope">
                 <div slot="reference" class="name-wrapper">{{ scope.row.unitName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="操作">
+            <el-table-column label="操作" width="190">
               <template slot-scope="scope">
                 <div
                   class="inventsome4"
@@ -112,7 +110,7 @@
           </el-table>
         </div>
         <div class="stgblckbottom" slot="bottom">
-          <el-button type="info" size="small" @click="tallyClick">确认</el-button>
+          <el-button type="success" plain size="small" @click="tallyClick">确认</el-button>
         </div>
       </PopOver>
       <!--退货 -->
@@ -161,7 +159,7 @@
     <!-- 入库 -->
     <div class="warehousing" v-if="groupOpen == true">
       <div class="wareTitle">
-        <div @click="groupOpen = false">
+        <div @click="groupOpentrun">
           <img src="../../assets/images/icon-left.png" alt />
         </div>
         <h2>添加其他入库</h2>
@@ -718,7 +716,7 @@ export default {
       if (res.inventoryWay == "GENERAL" && res.afterAuditInStorageId !== null) {
         this.visible_times = true;
       } else {
-         this.$message({
+        this.$message({
           type: "warning",
           message: "该商品已退货!"
         });
@@ -796,6 +794,10 @@ export default {
           this.unit = value.unitId;
         }
       });
+    },
+    groupOpentrun() {
+      this.groupOpen = false;
+      this.otherinstorage();
     },
     //入库保存
     opencommodity() {
@@ -1509,11 +1511,14 @@ export default {
 }
 //出入库弹出框
 .storageblock {
+  width: 100%;
+  height: 100%;
   .stgblcktop {
     text-align: center;
     font-size: 16px;
   }
   .stgblcktopmain {
+    width: 100%;
     height: 100%;
     padding: 35px 0 0 40px;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
@@ -1544,7 +1549,8 @@ export default {
       .textarea {
         width: 100%;
         height: 100%;
-        border-radius: 10px;
+        border: 1px solid rgb(196, 191, 191);
+        border-radius: 3px;
         padding: 5px 0 0 5px;
       }
     }
@@ -1561,7 +1567,6 @@ export default {
       }
     }
     .block {
-      background-color: #ada3a3;
       width: 230px;
       border-radius: 5px;
     }

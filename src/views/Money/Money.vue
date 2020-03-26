@@ -3443,7 +3443,7 @@ export default {
     border-radius: 6px;
     overflow: hidden;
     z-index: 10;
-    margin: 0 15px 15px;
+    margin: 30px 15px 15px;
     font-size: 15px;
 
     .submenuItem {

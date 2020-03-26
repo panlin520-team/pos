@@ -5,11 +5,7 @@
       <div class="title">员工管理</div>
       <div class="btns btnsRight">
         <!-- <div class="btn iconfont icon-team" title="查看分组" @click="groupOpen = true"></div> -->
-        <div
-          class="iconfont icon-addMember btn-pointer"
-          title="添加成员"
-          @click="employeesOpen =true;employeesDetails = {};selectStatus = 1"
-        ></div>
+        <div class="iconfont icon-addMember btn-pointer" title="添加成员" @click="addemployees"></div>
       </div>
     </div>
 
@@ -47,7 +43,7 @@
           <!-- <div style="flex:1">{{item.postLevelName}}</div> -->
           <div
             style="flex:1"
-          >{{item.isBasicSalary == 0 ? '否' : ''}}{{item.isBasicSalary == 1 ? '是' : ''}}{{item.isBasicSalary == null ? '未知' : ''}}</div>
+          >{{item.isBasicSalarer == 0 ? '否' : ''}}{{item.isBasicSalarer == 1 ? '是' : ''}}{{item.isBasicSalarer == null ? '未知' : ''}}</div>
           <div
             style="flex:1"
           >{{item.workingState == 0 ? '离职' : ''}}{{item.workingState == 1 ? '在职' : ''}}{{item.workingState == null ? '未知' : ''}}</div>
@@ -77,6 +73,16 @@
             background
           ></el-pagination>
         </div>-->
+        <div class="pagination">
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="currentPage"
+            :page-size="pageSize1"
+            layout="total, prev, pager, next"
+            :total="dataTotal1"
+            background
+          ></el-pagination>
+        </div>
       </div>
     </div>
 
@@ -184,9 +190,35 @@
             </div>
           </div>
           <div class="item">
+            <label class="label-left">兼职职务</label>
+            <div class="value">
+              <el-select v-model="part_timeJobe" @change="changejobe" placeholder="请选择兼职职务">
+                <el-option
+                  v-for="item in part_timeNames"
+                  :key="item.postId"
+                  :label="item.name"
+                  :value="item.postId"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
+            <label class="label-left">是否兼职</label>
+            <div class="value">
+              <el-select v-model="part_trueJobe" @change="changetrueJobe" placeholder="请确认是否兼职">
+                <el-option
+                  v-for="item in part_trueNames"
+                  :key="item.postId"
+                  :label="item.name"
+                  :value="item.postId"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
             <label class="label-left">计算底薪</label>
             <div class="value">
-              <el-select v-model="employeesDetails.isBasicSalary" placeholder="是否计算底薪">
+              <el-select v-model="isBasicSalarer" @change="changeSalary" placeholder="是否计算底薪">
                 <el-option
                   v-for="item in isBasicSalary"
                   :key="item.value"
@@ -228,7 +260,7 @@
           <div class="item">
             <label class="label-left">目前状态</label>
             <div class="value">
-              <el-select v-model="employeesDetails.workingState" placeholder="请选择员工目前状态">
+              <el-select v-model="workingState" @change="changezhtai" placeholder="请选择员工目前状态">
                 <el-option
                   v-for="item in workingStates"
                   :key="item.state"
@@ -550,8 +582,15 @@ export default {
       emlpoyeesData: [],
       // 门店可选分组组长
       groupLeader: [],
+      //兼职职务
+      part_timeJobe: "",
       // 员工详细
       employeesDetails: {},
+      // 门店兼职职务
+      part_timeNames: [],
+      //兼职职务
+      postCategoryId: 0,
+      postId: 0,
       // 分组详细(组id，组名，组长id)
       groupId: "",
       groupName: "",
@@ -561,8 +600,23 @@ export default {
       groups: [],
       // 员工级别
       levels: [],
+      //是否计算底薪
+      isBasicSalarer: 1,
       // 门店职务
       postNames: [],
+      //是否兼职
+      part_trueNames: [
+        {
+          postId: 1,
+          name: "是"
+        },
+        {
+          postId: 0,
+          name: "否"
+        }
+      ],
+      //是否兼职
+      part_trueJobe: 0,
       // 性别
       genders: [
         {
@@ -577,12 +631,12 @@ export default {
       // 在职状态
       workingStates: [
         {
-          state: 0,
-          name: "离职"
-        },
-        {
           state: 1,
           name: "在职"
+        },
+        {
+          state: 0,
+          name: "离职"
         }
       ],
       // 是否计算底薪
@@ -599,6 +653,7 @@ export default {
 
       // 某些元素的显示
       selectStatus: null,
+      workingState: 1,
 
       // 弹出层
       // 分组列表
@@ -613,9 +668,9 @@ export default {
       // 当前页码
       currentPage: 1,
       // 每页显示个数
-      pageSize: 20,
+      pageSize1: 10,
       // 总个数
-      dataTotal: null,
+      dataTotal1: 0,
 
       // 对话框
       // 分组详细修改与新增
@@ -668,6 +723,36 @@ export default {
     catchData(val) {
       this.editorPop = true;
       this.content = val;
+    },
+    //兼职职务
+    changejobe(vId) {
+      let obj = {};
+      obj = this.part_timeNames.find(item => {
+        if (vId == item.postId) {
+          this.postCategoryId = item.postCategoryId;
+          this.postId = item.postId;
+        }
+      });
+    },
+    //是否兼职 
+    changetrueJobe(res) {
+      this.part_trueJobe = res;
+    },
+    //是否计算底薪
+    changeSalary(res) {
+      this.isBasicSalarer = res;
+    },
+    //目前状态
+    changezhtai(res) {
+      this.workingState = res;
+    },
+    //添加员工
+    addemployees() {
+      this.employeesOpen = true;
+      this.employeesDetails = {};
+      this.selectStatus = 1;
+      this.parteNames();
+      this.part_timeJobe = "";
     },
 
     // 删除成员
@@ -723,8 +808,8 @@ export default {
         gender: this.employeesDetails.gender,
         storeId: this.employeesDetails.storeId,
         postId: this.employeesDetails.postId,
-        isBasicSalary: this.employeesDetails.isBasicSalary,
-        workingState: this.employeesDetails.workingState,
+        isBasicSalary: this.isBasicSalarer,
+        workingState: this.workingState,
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
@@ -843,11 +928,14 @@ export default {
         gender: this.employeesDetails.gender,
         storeId: localStorage.getItem("storeId"),
         postId: this.employeesDetails.postId,
-        isBasicSalary: this.employeesDetails.isBasicSalary,
-        workingState: this.employeesDetails.workingState,
+        isBasicSalary: this.isBasicSalarer,
+        workingState: this.workingState,
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
+        isPartTime: this.part_trueJobe,
+        partTimePostId: this.postId,
+        partTimePostCategoryId: this.postCategoryId,
         introduction: this.employeesDetails.introduction,
         modifyOperator: localStorage.getItem("trueName"),
         createOperator: localStorage.getItem("trueName")
@@ -900,30 +988,13 @@ export default {
         });
         return false;
       }
-
-      // if (params.postLevel == undefined) {
-      //   this.$message({
-      //     message: "请选择级别",
-      //     type: "warning"
-      //   });
-      //   return false;
-      // }
-
-      if (params.workingState == undefined) {
+      if (params.entryTime == undefined) {
         this.$message({
-          message: "请选择目前状态",
+          message: "请选择入职时间",
           type: "warning"
         });
         return false;
       }
-
-      // if (params.entryTime == undefined) {
-      //   this.$message({
-      //     message: "请选择入职时间",
-      //     type: "warning"
-      //   });
-      //   return false;
-      // }
 
       var url = this.$https.storeHost + "/manage/beautician/insertBeautician";
       this.$https.fetchPost(url, params).then(
@@ -965,6 +1036,7 @@ export default {
         res => {
           if (res.data.result) {
             this.employeesOpen = true;
+
             this.employeesDetails = res.data.result;
           } else {
             this.$message({
@@ -989,19 +1061,19 @@ export default {
       var params = {
         storeId: localStorage.getItem("storeId"),
         pageNum: this.currentPage,
-        pageSize: this.pageSize
+        pageSize: this.pageSize1
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
-            this.dataTotal = res.data.result.total;
+            this.dataTotal1 = res.data.result.total;
             this.emlpoyeesData = res.data.result.list;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
             });
-            this.dataTotal = 0;
+            this.dataTotal1 = 0;
             this.emlpoyeesData = [];
           }
         },
@@ -1042,11 +1114,40 @@ export default {
     // 门店员工职务
     fetchPostNames() {
       var url = this.$https.storeHost + "/manage/beautician/selectPost";
-      var params = { postIndustryIDSearch: localStorage.getItem("industryID") };
+      var params = {
+        postIndustryIDSearch: localStorage.getItem("industryID"),
+        companyId: localStorage.getItem("parentParentCompanyId")
+      };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.postNames = res.data.result.list;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    // 门店员工兼职职务
+    parteNames() {
+      var url = this.$https.storeHost + "/manage/beautician/selectPost";
+      var params = {
+        postIndustryIDSearch: localStorage.getItem("industryID"),
+        companyId: localStorage.getItem("parentParentCompanyId")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.part_timeNames = res.data.result.list;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1093,7 +1194,6 @@ export default {
 
     // 改变页码
     handleCurrentChange(val) {
-      this.currentPage = val;
       this.fetchEmployees();
     },
 

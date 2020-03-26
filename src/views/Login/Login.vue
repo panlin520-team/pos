@@ -117,6 +117,7 @@ export default {
             localStorage.setItem("stockCode", res.data.result.stockCode);
             localStorage.setItem("orgK3Number", res.data.result.orgK3Number);
             localStorage.setItem("stockId", res.data.result.stockId);
+            localStorage.setItem("parentParentCompanyId", res.data.result.parentParentCompanyId);
             this.$store.commit("setTrueName", res.data.result.trueName);
             this.$store.commit("setStoreName", res.data.result.companyName);
             localStorage.setItem("isLogin", "true");

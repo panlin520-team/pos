@@ -700,7 +700,7 @@
           <div class="recharge_main" slot="main">
             <el-form ref="form" :model="form" status-icon label-width="80px">
               <el-form-item label="账户类型" prop="regions">
-                <el-select v-model="value_tregion" placeholder="请选择账户类型">
+                <el-select v-model="value_tregion" @focus="wwww" placeholder="请选择账户类型">
                   <el-option
                     v-for="item in interestTple"
                     :key="item.accountTypeId"
@@ -2107,6 +2107,11 @@ export default {
         }
       );
     },
+    wwww() {
+      this.accounttypeData();
+      console.log(123);
+      
+    },
     //账户类型
     accounttypeData() {
       var url =
@@ -2526,7 +2531,7 @@ export default {
   },
   mounted() {
     //请求
-    this.accounttypeData();
+    // this.accounttypeData();
     this.paymentTalp();
     this.rechargepeople();
     this.fetchStoreTimes();

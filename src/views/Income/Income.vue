@@ -157,7 +157,18 @@
           <label>储蓄订单总收入</label>
           <div>天</div>
         </div>
-        <div class="ordermenneu">{{storedvalue}}</div>
+        <div class="ordermenneu">
+          <div class="ordermenneuss">
+            <div class="flashs">
+              <label>总收入:</label>
+              <span>{{this.storedvalue.rechargeAmount}}</span>
+            </div>
+            <div class="flashs">
+              <label>退款金额:</label>
+              <span>{{this.storedvalue.totalRefuse}}</span>
+            </div>
+          </div>
+        </div>
         <div class="orderbottom">
           <label>
             单位：
@@ -196,7 +207,7 @@ export default {
       newVIP: "",
       allPayPrice: "0",
       allCashPayPrice: "0",
-      storedvalue: "",
+      storedvalue: {},
       totalcapacity: "",
       visible_cash: false,
       visible_poss: false,
@@ -391,6 +402,7 @@ export default {
         .then(res => {
           if (res.data) {
             this.storedvalue = res.data.result;
+            console.log(this.storedvalue);
           } else {
             this.$message({
               // message: res.data.responseStatusType.error.errorMsg,
@@ -663,6 +675,7 @@ export default {
       .ordermenneu {
         width: 100%;
         height: 100px;
+        color: rgb(247, 170, 4);
         font-size: 30px;
         padding-left: 10px;
         line-height: 90px;
@@ -692,7 +705,6 @@ export default {
       .ordermenneu {
         width: 100%;
         height: 100px;
-
         display: flex;
         padding-left: 10px;
         line-height: 90px;
@@ -702,6 +714,7 @@ export default {
           span {
             font-size: 20px;
             margin-left: 5px;
+            color: rgb(247, 170, 4);
           }
         }
       }
@@ -742,6 +755,7 @@ export default {
             span {
               font-size: 20px;
               margin-left: 5px;
+              color: rgb(247, 170, 4);
             }
           }
         }
@@ -778,8 +792,22 @@ export default {
         width: 100%;
         height: 100px;
         font-size: 30px;
-        padding-left: 10px;
         line-height: 90px;
+        margin-left: 10px;
+
+        .ordermenneuss {
+          display: flex;
+          height: 70px;
+          .flashs {
+            margin-left: 8px;
+            font-size: 16px;
+            span {
+              font-size: 20px;
+              margin-left: 5px;
+              color: rgb(247, 170, 4);
+            }
+          }
+        }
       }
       .orderbottom {
         display: flex;

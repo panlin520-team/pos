@@ -929,7 +929,7 @@ export default {
         res => {
           if (res.data.responseStatusType.message == "Success") {
             this.$message({
-              message: "收获成功",
+              message: "收货成功",
               type: "success"
             });
             //刷新列表

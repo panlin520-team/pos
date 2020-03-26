@@ -108,6 +108,7 @@ export default {
   line-height: 80px;
   text-align: center;
   font-size: 15px;
+  cursor: pointer;
   color: #ffffff;
   white-space: nowrap;
   overflow: hidden;

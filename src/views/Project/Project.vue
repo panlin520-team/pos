@@ -171,7 +171,7 @@
           </div>
         </div>-->
 
-        <!-- <el-pagination
+        <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage3"
@@ -179,7 +179,7 @@
           background
           layout="total, prev, pager, next"
           :total="pageTotal"
-        ></el-pagination>-->
+        ></el-pagination>
       </div>
       <!-- 右边内容 -->
       <div class="elright">
@@ -506,13 +506,18 @@ export default {
         subClassId: id,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.commodityItem = res.data.result.list;
+            this.pageTotal = res.data.result.total;
           } else {
+            this.productmodel = [];
+            this.pageTotal = 0;
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -659,16 +664,12 @@ export default {
     },
 
     //分页
-    // handleSizeChange(val) {
-    //   setTimeout(() => {
-    //     this.projectsubsmall();
-    //   }, 300);
-    // },
-    // handleCurrentChange(val) {
-    //   setTimeout(() => {
-    //     this.projectsubsmall();
-    //   }, 300);
-    // },
+    handleSizeChange(val) {
+        this.projectsubsmall();
+    },
+    handleCurrentChange(val) {
+        this.projectsubsmall();
+    },
     //改变数量
     changeNumer(res) {
       res.productNum = res.amount;
@@ -872,7 +873,9 @@ export default {
         subClassId: this.subclassID,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize
       };
       this.$https
         .fetchPost(url, params)
@@ -1400,7 +1403,6 @@ export default {
     bottom: 0;
     margin: 15px 15px 20px 0;
     box-shadow: 0 2px 2px 1px #dddddd;
-
     .name {
       height: 100px;
       font-size: 15px;

@@ -98,7 +98,7 @@
               size="mini"
               @click="rebackOrder(item)"
               type="danger"
-              v-if="item.orderStatus != 1 && item.orderStatus != 4 && item.orderStatus != 5"
+              v-if="item.orderStatus != 1 && item.orderStatus != 4 && item.orderStatus != 5 && item.orderNumber.slice(0, 4) != 'TYHK' && item.orderNumber.slice(0, 4) != 'DZHK'"
             >退货</el-button>
             <el-button
               size="mini"
@@ -179,7 +179,7 @@
         <div class="left">
           <!-- 大类 -->
           <div class="tab">
-            <div class="btn-pointer btn-close el-icon-close" @click="billOpen = false;emptyData"></div>
+            <div class="btn-pointer btn-close el-icon-close" @click="trueshoyin"></div>
             <div
               class="tabItem btn-pointer"
               v-for="item in menu"
@@ -216,7 +216,7 @@
             >{{item.productTypeName}}</div>-->
           </div>
           <!-- 商品 -->
-          <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
+          <div class="box scrollY" :style="{'height': (virtualHeight-400)+'px'}">
             <div
               class="boxItem btn-pointer"
               v-for="(item,index) in commodityItem"
@@ -253,8 +253,19 @@
               </div>
             </div>-->
           </div>
+          <div class="elpage">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page.sync="currentPage3"
+              :page-size="pageSize2"
+              background
+              layout="total, prev, pager, next"
+              :total="pageTotal2"
+            ></el-pagination>
+          </div>
         </div>
-
+        <!-- 右边 -->
         <div class="right orderView">
           <div class="orderInfoView">
             <div class="upside">
@@ -876,13 +887,15 @@ export default {
       // 当前页码
       currentPage: 1,
       // 每页显示个数
-      pageSize: 20,
+      pageSize: 10,
+      pageTotal2: 0,
       // 总个数
       dataTotal: null,
       // 订单状态
       orderType: "",
       // 订单状态选项
       orderTypes: [],
+      outStorageIdXiaoShou: "",
       // 订单
       orderData: [],
       // 门店开单菜单
@@ -911,6 +924,8 @@ export default {
       clientList: "",
       // 会员查询确认结果
       vip: [],
+      currentPage3: 1,
+      pageSize2: 12,
       // 会员信息
       memberValue: false,
       visible_examine: false,
@@ -2205,6 +2220,12 @@ export default {
         })
         .catch(err => {});
     },
+    //返回收银列表
+    trueshoyin() {
+      this.billOpen = false;
+      this.emptyData();
+      this.fetchOrder();
+    },
     // 产品选择
     fetchProductParams(item) {
       if (localStorage.getItem("membershipLevelId") != "null") {
@@ -2288,7 +2309,34 @@ export default {
       this.currentMenuId = "";
       this.menuItem = [];
       this.currentMenuItemId = "";
-      this.commodityItem = [];
+      this.commodityItem = [
+        { 
+          productName: "护理", 
+          retailPrice: "12",
+           stockNum: "123" 
+          },
+           { 
+          productName: "护理", 
+          retailPrice: "12",
+           stockNum: "123" 
+          },
+           { 
+          productName: "护理", 
+          retailPrice: "12",
+           stockNum: "123" 
+          },
+           { 
+          productName: "护理", 
+          retailPrice: "12",
+           stockNum: "123" 
+          },
+           { 
+          productName: "护理", 
+          retailPrice: "12",
+           stockNum: "123" 
+          },
+
+      ];
       // 清空订单内项目、产品
       this.serviceList = [];
       this.productList = [];
@@ -2452,12 +2500,15 @@ export default {
         subClassId: id,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize2
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.commodityItem = res.data.result.list;
+            this.pageTotal2 = res.data.result.total;
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -2466,6 +2517,7 @@ export default {
           }
         },
         error => {
+          this.pageTotal2 = 0;
           this.commodityItem = [];
           this.$message({
             type: "error",
@@ -2710,19 +2762,26 @@ export default {
       };
       this.$https.fetchPost(path, info).then(
         res => {
-          this.orderpayPopver = false;
-          this.emptyData();
-          this.fetchOrder();
-          this.$notify({
-            // 信息
-            message: res.data.result,
-            // 关闭自动关闭
-            duration: 0,
-            title: "结算成功",
-            type: "success"
-          });
-          //刷新下方会员金额
-          this.$refs.moduleName.memberbalance();
+          if (res.data.responseStatusType.message == "Success") {
+            this.orderpayPopver = false;
+            this.emptyData();
+            this.fetchOrder();
+            this.$notify({
+              // 信息
+              message: res.data.result,
+              // 关闭自动关闭
+              duration: 0,
+              title: "结算成功",
+              type: "success"
+            });
+            //刷新下方会员金额
+            this.$refs.moduleName.memberbalance();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
         },
         error => {
           this.$message({
@@ -2789,10 +2848,17 @@ export default {
     //     })
     //     .catch(() => {});
     // },
-
+    //分页
+    handleSizeChange(val) {},
+    handleCurrentChange(val) {},
     // 订单退货
     rebackOrder(item) {
-      this.outstorageId = item.outStorageId;
+
+      this.outstorageId = item.outStorageIdQiTa;
+      this.outStorageIdXiaoShou = item.outStorageIdXiaoShou;
+      // if (item.outStorageIdXiaoShou == null) {
+      //   this.outStorageIdXiaoShou == "";
+      // }
       if (item.orderType == 4) {
         this.isTiYanKaOrDingzhi = 1;
       } else {
@@ -2814,7 +2880,8 @@ export default {
         payTypeAndAmount: item.payTypeAndAmount,
         isTiYanKaOrDingzhi: this.isTiYanKaOrDingzhi,
         memberNum: item.cardNumber,
-        outstorageId: this.outstorageId,
+        outStorageIdQiTa: this.outstorageId,
+        outStorageIdXiaoShou: this.outStorageIdXiaoShou,
         orderNumber: item.orderNumber,
         // orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
@@ -3344,6 +3411,7 @@ export default {
       display: flex;
       padding: 15px 5px 20px 5px;
       line-height: 24px;
+      text-align: center;
 
       .remark {
         flex: 1;
@@ -3531,6 +3599,10 @@ export default {
       bottom: 10px;
       box-shadow: 0px 0px 11px 2px #cfcfcf;
     }
+  }
+  .elpage {
+    width: 100%;
+    text-align: center;
   }
 
   // 订单内容

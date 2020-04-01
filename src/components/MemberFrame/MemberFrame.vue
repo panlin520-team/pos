@@ -793,6 +793,10 @@ export default {
       cardNum: "",
       // 项目或产品默认初始数量
       productNum: 1,
+      outStorageIdQiTa: "",
+      outStorageIdXiaoShou: "",
+      outStorageIdQiTass: "",
+      outStorageIdXiaoShouss: "",
       // 项目或产品默认名称
       productName: null,
       // 项目或产品可选工位与可选员工
@@ -890,6 +894,7 @@ export default {
           productName: ""
         }
       ],
+      gradeed: "",
       //账户信息余额
       accounBalance: [],
       //查看体验卡详情
@@ -1560,7 +1565,7 @@ export default {
         localStorage.setItem("headImgUrl", res.headImgUrl);
       } else {
         this.imageUrl = this.imageUrls;
-        localStorage.setItem("headImgUrl", this.imageUrl);
+        localStorage.setItem("headImgUrl", this.imageUrls);
       }
       this.remark = res.remark;
       this.cardNum = res.cardNum;
@@ -1576,7 +1581,6 @@ export default {
       localStorage.setItem("membership", this.memberNum);
       localStorage.setItem("grade", this.grade);
       localStorage.setItem("membershipLevelId", res.membershipLevelId);
-
       var params = {
         // 会员名称
         userName: res.name,
@@ -1617,7 +1621,7 @@ export default {
           localStorage.removeItem("grade");
           localStorage.removeItem("list");
           localStorage.removeItem("membershipLevelId");
-          // localStorage.removeItem("imageUrl");
+          localStorage.removeItem("headImgUrl");
           this.accounBalance = [];
         })
         .catch(() => {});
@@ -1640,6 +1644,8 @@ export default {
       this.recordId = res.recordId;
       this.productCodenal2 = res.productCode;
       this.productNamenal2 = res.productName;
+      this.outStorageIdQiTass = res.outStorageIdQiTa;
+      this.outStorageIdXiaoShouss = res.outStorageIdXiaoShou;
       this.salseshop[0].productCode = res.productCode;
       this.salseshop[0].productName = res.productName;
       this.outstorageId = res.outStorageId;
@@ -1736,6 +1742,8 @@ export default {
       this.projectsuder[0].productCode = res.productCode;
       this.projectsuder[0].productName = res.productName;
       this.recordIds = res.recordId;
+      this.outStorageIdQiTa = res.outStorageIdQiTa;
+      this.outStorageIdXiaoShou = res.outStorageIdXiaoShou;
       this.productCodenal = res.productCode;
       this.productNamenal = res.productName;
       this.outstoragetwoId = res.outStorageId;
@@ -1971,6 +1979,8 @@ export default {
         storeName: localStorage.getItem("storeName"),
         productCode: this.productCodenal2,
         productName: this.productNamenal2,
+        outStorageIdQiTa: this.outStorageIdQiTass,
+        outStorageIdXiaoShou: this.outStorageIdXiaoShouss,
         storeId: localStorage.getItem("storeId"),
         products: JSON.stringify(this.salseshop),
         orgK3Number: localStorage.getItem("orgK3Number"),
@@ -2007,10 +2017,13 @@ export default {
         storeName: localStorage.getItem("storeName"),
         productCode: this.productCodenal,
         productName: this.productNamenal,
+        outStorageIdQiTa: this.outStorageIdQiTa,
+        outStorageIdXiaoShou: this.outStorageIdXiaoShou,
         orgK3Number: localStorage.getItem("orgK3Number"),
         stockId: localStorage.getItem("stockId"),
         storeId: localStorage.getItem("storeId"),
         expUseRecordId: this.recordIds,
+
         products: JSON.stringify(this.projectsuder),
         experiencecardProductUserId: this.rienizauID,
         modifyOperator: localStorage.getItem("trueName"),
@@ -2110,7 +2123,6 @@ export default {
     wwww() {
       this.accounttypeData();
       console.log(123);
-      
     },
     //账户类型
     accounttypeData() {
@@ -2153,7 +2165,7 @@ export default {
           if (res.data.result) {
             this.memberDataTotal = res.data.result.total;
             this.tableData_vippeple = res.data.result.list;
-            this.grade = res.data.result.list[0].membershipLevelName;
+            // this.grade = res.data.result.list[0].membershipLevelName;
           } else {
             this.memberDataTotal = null;
             this.tableData_vippeple = [];
@@ -2250,7 +2262,11 @@ export default {
       };
       this.$https
         .fetchPost(url, params)
-        .then(res => {})
+        .then(res => {
+          console.log(res.data.result);
+          this.grade = res.data.result;
+          localStorage.setItem("grade", this.grade);
+        })
         .catch(err => {});
     },
 
@@ -2308,7 +2324,6 @@ export default {
     //获取账户余额
     memberbalance() {
       this.accounBalance = [];
-
       var url =
         this.$https.accountHost + "/manage/memberUser/listMemberAccount";
       var params = {
@@ -2327,7 +2342,6 @@ export default {
                 isQingKe: value.isQingKe
               });
               var arr = this.accounBalance;
-
               localStorage.setItem("list", JSON.stringify(arr));
             }
           });
@@ -2525,13 +2539,17 @@ export default {
     this.input_number = localStorage.getItem("memberNumber");
     this.grade = localStorage.getItem("grade");
     this.remark = localStorage.getItem("remark");
-    this.imageUrl = localStorage.getItem("headImgUrl");
+    if (localStorage.getItem("headImgUrl")) {
+      this.imageUrl = localStorage.getItem("headImgUrl");
+    } else {
+      this.imageUrl = this.imageUrls;
+    }
     this.accounBalance = JSON.parse(localStorage.getItem("list"));
     // store.commit("usernames",this.input_name)
   },
   mounted() {
     //请求
-    // this.accounttypeData();
+    this.staCardxins();
     this.paymentTalp();
     this.rechargepeople();
     this.fetchStoreTimes();

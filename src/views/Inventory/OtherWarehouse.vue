@@ -181,12 +181,8 @@
               <div class="stgblcktopmain" slot="main">
                 <el-form :model="addruleForm" :rules="rules" ref="addruleForm" label-width="100px">
                   <el-form-item label="项目名称：">
-                    <el-input @focus="seekproductName" v-model="addruleForm.name"></el-input>
-                    <div class="seekprbox" v-show="class_seekbox == true">
-                      <ul v-for="itemsk in seekListFilter" :key="itemsk.index">
-                        <li @click="selcommodity(itemsk)">{{itemsk.name}}</li>
-                      </ul>
-                    </div>
+                    <el-input v-model="addruleForm.name" :disabled="true"></el-input>
+                    <div class="addputs" @click="addposheo">添加</div>
                   </el-form-item>
                   <div class="unitfrom">
                     <label>单位：</label>
@@ -219,6 +215,58 @@
                 <el-button type="primary" @click="submitForm('addruleForm')">确定</el-button>
                 <el-button @click="resetForm('addruleForm')">取消</el-button>
               </div>
+            </PopOver>
+            <!-- 商品 -->
+            <PopOver
+              custom-class="storageblockshipping"
+              :visible.sync="visible_ordershapping"
+              @close="closeordershapping"
+              width="800px"
+            >
+              <div class="stgblcktop" slot="top">
+                <div class="search">
+                  <el-input
+                    type="text"
+                    v-model="keyword"
+                    v-on:keyup.13.native="show_stgbcar"
+                    placeholder="请输入商品名称"
+                  />
+                  <div class="userName-boxs">
+                    <i class="el-icon-search" @click="show_stgbcar"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="stgblcktopmain" slot="main">
+                <el-table :data="storageshoppng" style="width: 100%">
+                  <el-table-column label="商品名称">
+                    <template slot-scope="scope">
+                      <span>{{ scope.row.name }}</span>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="商品编号">
+                    <template slot-scope="scope">
+                      <div slot="reference" class="name-wrapper">{{ scope.row.productCode }}</div>
+                    </template>
+                  </el-table-column>
+                  <el-table-column label="操作">
+                    <template slot-scope="scope">
+                      <el-button size="mini" @click="selcommodity(scope.row,scope.$index)">确定</el-button>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <div class="block">
+                  <el-pagination
+                    @size-change="handleSizeChangeapping"
+                    @current-change="handleCurrentChangeapping"
+                    :current-page.sync="currentPagedity"
+                    :page-size="pageSizedity"
+                    background
+                    layout="total, prev, pager, next"
+                    :total="totalSizedity"
+                  ></el-pagination>
+                </div>
+              </div>
+              <div class="stgblckbottom" slot="bottom"></div>
             </PopOver>
           </div>
           <div class="wareLists">
@@ -343,6 +391,7 @@ export default {
       supplierCategoryNames: "",
       //普通仓库
       stockType: "",
+      keyword: "",
       //公司名字
       storeName: "",
       //数量
@@ -354,8 +403,14 @@ export default {
       unitPrice: "",
       //子公司ID
       subCompanyId: "",
+      //商品分页
+      currentPagedity: 1,
+      pageSizedity: 8,
+      totalSizedity: 0,
       //备注
       remark: "",
+      //商品
+      storageshoppng: [],
       //供应商
       option_supplier: [
         // {
@@ -474,6 +529,7 @@ export default {
       visible_times: false,
       visible_orderfrom: false,
       class_seekbox: false,
+      visible_ordershapping: false,
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
       //分页
@@ -572,7 +628,7 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          if (this.class_seekbox == false && this.addruleForm.name) {
+          if (this.addruleForm.name) {
             if (this.addruleForm.curIndex == undefined) {
               this.addruleForm.totalPrice =
                 this.unitPrice * this.addruleForm.receivedNumber;
@@ -590,14 +646,13 @@ export default {
               );
             }
             this.$message({
-              message: "添加成功...",
+              message: "添加成功",
               type: "success"
             });
-            this.class_seekbox = false;
             this.visible_orderfrom = false;
           } else {
             this.$message({
-              message: "请选择正确的商品",
+              message: "请选择商品",
               type: "warning"
             });
           }
@@ -646,8 +701,6 @@ export default {
       this.seekList = [];
       this.createTime = "";
       this.option_supplier = [];
-      //请求商品
-      this.requestcommodity();
       //请求仓库
       this.requestwarehouse();
       //请求供应商
@@ -673,6 +726,10 @@ export default {
           return false;
         }
       });
+    },
+    closeordershapping() {
+      this.visible_ordershapping = false;
+      this.storageshoppng = [];
     },
     //部门
     valshape(res) {},
@@ -744,10 +801,13 @@ export default {
       } else {
         this.$message({
           type: "warning",
-          message: "该商品已作废了喔!"
+          message: "该商品已作废或已确认收货"
         });
       }
     },
+    //商品分页
+    handleSizeChangeapping(val) {},
+    handleCurrentChangeapping(val) {},
     //搜索时间
     searchTime() {
       this.otherinstorage();
@@ -755,16 +815,19 @@ export default {
     resetamend(formName) {
       this.$refs[formName].resetFields();
     },
-    //搜索产品名称
-    seekproductName() {
-      this.class_seekbox = true;
+    //点击添加商品
+    addposheo() {
+      this.visible_ordershapping = true;
+      this.requestcommodity();
+      this.keyword = "";
     },
     //选择某个商品
     selcommodity(res) {
+      this.storageshoppng = [];
       this.productName = res.name;
       this.unitPrice = res.unitPrice;
       this.productCode = res.productCode;
-      this.class_seekbox = false;
+      this.visible_ordershapping = false;
       this.unit = res.unit;
       var object = {
         name: res.name,
@@ -831,7 +894,9 @@ export default {
         // }, 300);
       }
     },
-
+    show_stgbcar() {
+      this.requestcommodity();
+    },
     //点击修改入库订单
     modiforder(res, index) {
       this.visible_orderfrom = true;
@@ -1098,6 +1163,7 @@ export default {
     },
     //请求商品
     requestcommodity() {
+      this.storageshoppng = [];
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
         companyId: localStorage.getItem("storeId"),
@@ -1105,30 +1171,43 @@ export default {
         status: 1,
         productStatus: 1,
         companyType: 3,
-        isHoutai: 0
+        isHoutai: 0,
+        pageNum: this.currentPagedity,
+        pageSize: this.pageSizedity,
+        keyWord: this.keyword
       };
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          if (res.data.result) {
+          if (res.data.result.total !== 0) {
+            this.totalSizedity = res.data.result.total;
             res.data.result.list.forEach(value => {
-              this.seekList.push({
+              this.storageshoppng.push({
                 name: value.productName,
                 id: value.serviceProductId,
                 unitPrice: value.unionPrice,
                 productCode: value.productCode,
                 unit: value.unitId,
-                productType: value.productType
+                productType: value.productType,
+                instoragePrice: value.instoragePrice,
+                outstoragePrice: value.outstoragePrice
               });
             });
           } else {
+            this.totalSizedity = 0;
+            this.storageshoppng = [];
             this.$message({
-              message: res.data.responseStatusType.error.errorMsg,
+              message: "商品未找到",
               type: "warning"
             });
           }
         })
-        .catch(err => {});
+        .catch(err => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        });
     },
     //请求仓库
     requestwarehouse() {
@@ -1538,7 +1617,16 @@ export default {
         background-color: #525351;
       }
     }
-
+    .addputs {
+      font-size: 16px;
+      padding: 8px;
+      margin-left: 5px;
+      cursor: pointer;
+      color: #fff;
+      border-radius: 4px;
+      background-color: #31b816;
+      display: inline;
+    }
     .el-input {
       width: 230px;
       border-radius: 5px;
@@ -1617,6 +1705,53 @@ export default {
       .el-input {
         width: 200px;
       }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//商品
+.storageblockshipping {
+  .stgblcktop {
+    font-size: 22px;
+    font-weight: 550;
+    display: flex;
+    justify-content: space-around;
+    .search {
+      position: relative;
+      .el-input {
+        width: 400px;
+        height: 40px;
+        padding: 0 15px;
+        font-size: 15px;
+        border-radius: 5px;
+        text-align: center;
+        border: 1px;
+      }
+
+      .userName-boxs {
+        right: 15px;
+        height: 40px;
+        width: 40px;
+        text-align: center;
+        line-height: 40px;
+        top: 0px;
+        position: absolute;
+        i {
+          font-size: 20px;
+          color: #f7cb06;
+        }
+      }
+      .userName-boxs:hover {
+        cursor: pointer;
+      }
+    }
+  }
+  .stgblcktopmain {
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .block {
+      text-align: center;
     }
   }
   .stgblckbottom {

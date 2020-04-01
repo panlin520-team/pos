@@ -402,7 +402,6 @@ export default {
         .then(res => {
           if (res.data) {
             this.storedvalue = res.data.result;
-            console.log(this.storedvalue);
           } else {
             this.$message({
               // message: res.data.responseStatusType.error.errorMsg,

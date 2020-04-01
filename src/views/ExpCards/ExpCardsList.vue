@@ -99,7 +99,7 @@
         ></el-pagination>
       </div>
     </div>
-    <MemberFrame></MemberFrame>
+    <MemberFrame ref="moduleName"></MemberFrame>
   </div>
 </template>
 
@@ -131,7 +131,7 @@ export default {
       //当前页
       currentPage4: 1,
       //总页数
-      pageSize: 20,
+      pageSize: 10,
       // 浏览器可视高度
       virtualHeight: window.innerHeight,
       //搜索手机号
@@ -212,6 +212,8 @@ export default {
       this.$https.fetchPost(url, params).then(res => {
         if (res.data.responseStatusType.message == "Success") {
           this.connectorCarlist();
+          //刷新等级
+          this.$refs.moduleName.staCardxins();
           this.$message({
             message: "退货成功",
             type: "success"

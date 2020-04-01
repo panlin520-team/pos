@@ -77,11 +77,11 @@
                     <div slot="reference" class="name-wrapper">{{ scope.row.storageType }}</div>
                   </template>
                 </el-table-column>
-                <el-table-column label="操作人">
+                <!-- <el-table-column label="操作人">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.operator }}</div>
                   </template>
-                </el-table-column>
+                </el-table-column> -->
                 <el-table-column label="编号">
                   <template slot-scope="scope">
                     <div slot="reference" class="name-wrapper">{{ scope.row.storageNumber }}</div>
@@ -540,8 +540,8 @@ export default {
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
         companyId: localStorage.getItem("storeId"),
-        page: this.currentPage2,
-        limit: this.pagesize2,
+        pageNum: this.currentPage2,
+        pageSize: this.pagesize2,
         type: this.value_project,
         productStatus: this.value_online,
         keyWord: "",
@@ -553,7 +553,6 @@ export default {
         .then(res => {
           if (res.data.result !== null) {
             this.pagetotal2 = res.data.result.total;
-            this.pagesize2 = res.data.result.size;
             var resList = res.data.result.list;
             if (this.value_project == 1) {
               resList.forEach(value => {

@@ -267,8 +267,8 @@ export default {
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
         companyId: localStorage.getItem("storeId"),
-        page: this.currentPage2,
-        limit: this.pagesize2,
+        pageNum: this.currentPage2,
+        pageSize: this.pagesize2,
         type: this.value_project,
         productStatus: this.value_online,
         keyWord: "",

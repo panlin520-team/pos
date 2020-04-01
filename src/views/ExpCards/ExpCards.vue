@@ -118,7 +118,7 @@
         <el-button type="success" @click="purchase">确认购买</el-button>
       </div>
     </PopOver>
-    <MemberFrame></MemberFrame>
+    <MemberFrame ref="moduleName"></MemberFrame>
   </div>
 </template>
 
@@ -248,21 +248,32 @@ export default {
     },
     //确认购买
     purchase() {
-      if (!localStorage.getItem("memberName")) {
-        this.$message.error("错了哦，请先选择下方会员姓名...");
-      }
       if (this.value_payment == "") {
         this.$message.error("请选择支付方式");
       } else if (this.value_employees == "") {
         this.$message.error("请选择出售员工");
       } else if (this.woterMemo == "") {
         this.$message.error("请选择水单号");
+      } else if (!localStorage.getItem("memberName")) {
+        this.$confirm("确定是否为散客购买吗？", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+             //请求
+        this.addOrderform();
+        this.visible_examine = false;
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "取消购买"
+            });
+          });
       } else {
         //请求
-        this.addOrderform();
-        setTimeout(() => {
-          this.expcardCars();
-        }, 500);
+        this.addOrderforms();
         this.visible_examine = false;
       }
     },
@@ -366,7 +377,6 @@ export default {
           payType: this.value_payment
         }
       ];
-
       var url =
         this.$https.storeHost + "/manage/experienceCard/addExpCardOrder";
       var params = {
@@ -384,12 +394,60 @@ export default {
       };
       this.$https.fetchPost(url, params).then(
         res => {
-          if (res.data.result) {
+          if (res.data.responseStatusType.message == "Success") {
             this.$message({
               message: res.data.result,
               type: "success",
               duration: 5000
             });
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //添加体验卡订单
+    addOrderforms() {
+      this.paymentTylp = [
+        {
+          amount: this.account,
+          payType: this.value_payment
+        }
+      ];
+      var url =
+        this.$https.storeHost + "/manage/experienceCard/addExpCardOrder";
+      var params = {
+        account: this.account,
+        cardName: this.cardName,
+        cardNum: this.cardNum,
+        memoNum: this.woterMemo,
+        createOperator: localStorage.getItem("trueName"),
+        linkPhone: localStorage.getItem("memberNumber"),
+        purchaserName: localStorage.getItem("memberName"),
+        storeId: localStorage.getItem("storeId"),
+        memberNum: localStorage.getItem("membership"),
+        beauticians: JSON.stringify(this.paymentPeople),
+        payTypeAndAmount: JSON.stringify(this.paymentTylp)
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: res.data.result,
+              type: "success",
+              duration: 5000
+            });
+            //刷新等级
+            this.$refs.moduleName.staCardxins();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -625,7 +683,6 @@ export default {
   .stgblcktopmain {
     padding: 20px 0 0 40px;
     border-top: 0.5px solid rgba(220, 220, 220, 0.7);
-  
   }
 }
 </style>

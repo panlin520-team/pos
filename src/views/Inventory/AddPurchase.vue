@@ -108,7 +108,7 @@
               <template slot-scope="scope">
                 <div
                   class="inventsome4"
-                  :class="scope.row.inventoryWay == '' ? 'active' : 'acc'"
+                  :class="scope.row.inventoryWay == '' && scope.row.afterAuditInStorageId !== null? 'active' : 'acc'"
                   @click="salesretrun(scope.row)"
                 >退货</div>
               </template>
@@ -139,8 +139,8 @@
           </div>
         </div>
         <div class="stgblckbottom" slot="bottom">
-          <el-button @click="confirm_true" size="small" type="success">确定</el-button>
           <el-button @click="confirm_false" size="small" type="info">取消</el-button>
+          <el-button @click="confirm_true" size="small" type="success">确定</el-button>
         </div>
       </PopOver>
     </div>
@@ -220,9 +220,12 @@
             >
               <div class="stgblcktop" slot="top">
                 <div class="search">
-                  <el-input type="text" v-model="keyword" 
-                  v-on:keyup.13.native="show_stgbcar"
-                  placeholder="请输入商品名称" />
+                  <el-input
+                    type="text"
+                    v-model="keyword"
+                    v-on:keyup.13.native="show_stgbcar"
+                    placeholder="请输入商品名称"
+                  />
                   <div class="userName-boxs">
                     <i class="el-icon-search" @click="show_stgbcar"></i>
                   </div>
@@ -841,7 +844,6 @@ export default {
       this.visible_ordershapping = true;
       this.keyword = "";
       this.requestcommodity();
-      
     },
     //点击修改入库订单
     modiforder(res, index) {
@@ -902,13 +904,26 @@ export default {
     //退货按钮
     salesretrun(res) {
       this.inStorageProductID = res.inStorageProductID;
-      if (res.inventoryWay == "" && res.afterAuditInStorageId !== null) {
-        this.visible_times = true;
-      } else {
+      // if (res.inventoryWay == "" && res.afterAuditInStorageId !== null) {
+      //   this.visible_times = true;
+      // } else {
+      //   this.$message({
+      //     type: "warning",
+      //     message: "该商品已退货!"
+      //   });
+      // }
+      if (res.inventoryWay !== "") {
         this.$message({
           type: "warning",
           message: "该商品已退货!"
         });
+      } else if (res.afterAuditInStorageId == null) {
+        this.$message({
+          type: "warning",
+          message: "该商品待审核"
+        });
+      } else {
+        this.visible_times = true;
       }
     },
     //作废

@@ -281,7 +281,6 @@ export default {
           if (res.data.result !== null) {
             this.storageList = res.data.result.list;
             this.pagetotal2 = res.data.result.total;
-            this.pagesize2 = res.data.result.size;
           } else {
             this.storageList = [];
             this.pagetotal2 = 0;

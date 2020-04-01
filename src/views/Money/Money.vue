@@ -191,7 +191,7 @@
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
                 v-model="searchKey"
-                @keyup.enter.native="findResult"
+                @blur="findResult"
               ></el-input>
             </div>
           </div>
@@ -1435,7 +1435,7 @@ export default {
                         message: res.data.result,
                         // 关闭自动关闭
                         duration: 0,
-                        title: "成功",
+                        title: "结算成功",
                         type: "success"
                       });
                     } else {
@@ -1483,17 +1483,24 @@ export default {
         };
         this.$https.fetchPost(path, info).then(
           res => {
-            this.accountPopver = false;
-            this.emptyData();
-            this.fetchOrder();
-            this.$notify({
-              // 信息
-              message: res.data.result,
-              // 关闭自动关闭
-              duration: 0,
-              title: "结算成功",
-              type: "success"
-            });
+            if (res.data.responseStatusType.message == "Success") {
+              this.accountPopver = false;
+              this.emptyData();
+              this.fetchOrder();
+              this.$notify({
+                // 信息
+                message: res.data.result,
+                // 关闭自动关闭
+                duration: 0,
+                title: "结算成功",
+                type: "success"
+              });
+            } else {
+              this.$message({
+                message: res.data.responseStatusType.error.errorMsg,
+                type: "error"
+              });
+            }
           },
           error => {
             this.$message({
@@ -2270,33 +2277,35 @@ export default {
     findResult() {
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
-        keyWordProductName: this.searchKey,
+        keyWord: this.searchKey,
         companyType: 3,
         companyId: localStorage.getItem("storeId"),
         productStatus: 1,
-        isHoutai: 0
+        isHoutai: 0,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize2
       };
-      if (this.searchKey != "") {
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result) {
-              this.commodityItem = res.data.result.list;
-            } else {
-              this.commodityItem = [];
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.commodityItem = res.data.result.list;
+            this.pageTotal2 = res.data.result.total;
+          } else {
+            this.commodityItem = [];
+            this.pageTotal2 = 0;
             this.$message({
-              type: "error",
-              message: error
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
             });
           }
-        );
-      }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
 
     // 清空data必要对象和数组
@@ -2310,32 +2319,31 @@ export default {
       this.menuItem = [];
       this.currentMenuItemId = "";
       this.commodityItem = [
-        { 
-          productName: "护理", 
+        {
+          productName: "护理",
           retailPrice: "12",
-           stockNum: "123" 
-          },
-           { 
-          productName: "护理", 
+          stockNum: "123"
+        },
+        {
+          productName: "护理",
           retailPrice: "12",
-           stockNum: "123" 
-          },
-           { 
-          productName: "护理", 
+          stockNum: "123"
+        },
+        {
+          productName: "护理",
           retailPrice: "12",
-           stockNum: "123" 
-          },
-           { 
-          productName: "护理", 
+          stockNum: "123"
+        },
+        {
+          productName: "护理",
           retailPrice: "12",
-           stockNum: "123" 
-          },
-           { 
-          productName: "护理", 
+          stockNum: "123"
+        },
+        {
+          productName: "护理",
           retailPrice: "12",
-           stockNum: "123" 
-          },
-
+          stockNum: "123"
+        }
       ];
       // 清空订单内项目、产品
       this.serviceList = [];
@@ -2853,7 +2861,6 @@ export default {
     handleCurrentChange(val) {},
     // 订单退货
     rebackOrder(item) {
-
       this.outstorageId = item.outStorageIdQiTa;
       this.outStorageIdXiaoShou = item.outStorageIdXiaoShou;
       // if (item.outStorageIdXiaoShou == null) {

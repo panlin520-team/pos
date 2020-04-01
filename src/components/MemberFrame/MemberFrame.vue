@@ -700,7 +700,7 @@
           <div class="recharge_main" slot="main">
             <el-form ref="form" :model="form" status-icon label-width="80px">
               <el-form-item label="账户类型" prop="regions">
-                <el-select v-model="value_tregion" @focus="wwww" placeholder="请选择账户类型">
+                <el-select v-model="value_tregion" placeholder="请选择账户类型">
                   <el-option
                     v-for="item in interestTple"
                     :key="item.accountTypeId"
@@ -1239,6 +1239,7 @@ export default {
       this.form.desc = "";
       if (this.input_name) {
         this.visible_recharge = true;
+        this.accounttypeData();
       } else {
         this.$message.error("请先选择会员");
       }
@@ -1526,6 +1527,7 @@ export default {
       this.experiencecardProductType = res.experiencecardProductType;
       this.useTimes = res.useTimes;
       this.totalTimes = res.totalTimes;
+      
       if (this.experiencecardProductType == 1) {
         this.$confirm("您确定划卡吗?", {
           confirmButtonText: "确定",
@@ -1649,7 +1651,6 @@ export default {
       this.salseshop[0].productCode = res.productCode;
       this.salseshop[0].productName = res.productName;
       this.outstorageId = res.outStorageId;
-      console.log(this.outstorageId);
       if (res.recordStatus == "未退货") {
         this.$confirm("是否确认退货", {
           confirmButtonText: "确定",
@@ -2120,10 +2121,6 @@ export default {
         }
       );
     },
-    wwww() {
-      this.accounttypeData();
-      console.log(123);
-    },
     //账户类型
     accounttypeData() {
       var url =
@@ -2263,7 +2260,6 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          console.log(res.data.result);
           this.grade = res.data.result;
           localStorage.setItem("grade", this.grade);
         })

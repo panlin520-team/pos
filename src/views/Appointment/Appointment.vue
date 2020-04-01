@@ -96,7 +96,7 @@
                 placeholder="搜索"
                 prefix-icon="el-icon-search"
                 v-model="searchKey"
-                @keyup.enter.native="findResult"
+                @blur="findResult"
               ></el-input>
             </div>
           </div>
@@ -113,7 +113,7 @@
           </div>
 
           <!-- 商品 -->
-          <div class="box scrollY" :style="{'height': (virtualHeight-135)+'px'}">
+          <div class="box scrollY" :style="{'height': (virtualHeight-400)+'px'}">
             <div
               class="boxItem btn-pointer"
               v-for="(item,index) in commodityItem"
@@ -132,6 +132,17 @@
               </div>
             </div>
           </div>
+          <div class="elpage">
+            <el-pagination
+              @size-change="handleSizeChange"
+              @current-change="handleCurrentChange"
+              :current-page.sync="currentPage3"
+              :page-size="pageSize2"
+              background
+              layout="total, prev, pager, next"
+              :total="pageTotal2"
+            ></el-pagination>
+          </div>
         </div>
 
         <div class="right orderView">
@@ -141,16 +152,6 @@
               <div class="switch">
                 <div class="name" :class="this.$store.state.member == null ? 'active' : ''">散客</div>
                 <div class="name" :class="this.$store.state.member != null ? 'active' : ''">会员</div>
-              </div>
-            </div>
-            <div class="customer" v-if="this.$store.state.member == null">
-              <div class="label">
-                <label>顾客电话</label>
-                <el-input placeholder="联系电话" v-model="member.mobile" clearable class="info"></el-input>
-              </div>
-              <div class="label">
-                <label>顾客姓名</label>
-                <el-input placeholder="顾客姓名" v-model="member.orderLink" clearable class="info"></el-input>
               </div>
             </div>
             <div class="customer" v-if="this.$store.state.member != null">
@@ -581,7 +582,10 @@ export default {
       appointmentOrder: {},
       // 预约时长设定
       durations: this.setDurations(),
-
+      //分页
+      currentPage3: 1,
+      pageSize2: 12,
+      pageTotal2: 0,
       // 预约弹层所需数据
       // 会员查询默认可选项
       employeeOptions: [
@@ -745,6 +749,10 @@ export default {
       };
       this.memberPopver = false;
     },
+    //分页
+    //分页
+    handleSizeChange(val) {},
+    handleCurrentChange(val) {},
 
     // 门店大类
     fetchMenu() {
@@ -822,13 +830,20 @@ export default {
         subClassId: id,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize2
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.commodityItem = res.data.result.list;
+            this.pageTotal2 = res.data.result.total;
           } else {
+            this.commodityItem = [];
+
+            this.pageTotal2 = 0;
+
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -843,24 +858,26 @@ export default {
         }
       );
     },
-
     // 搜索项目下商品
     findResult() {
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
-        keyWordProductName: this.searchKey,
+        keyWord: this.searchKey,
         companyType: 3,
         companyId: localStorage.getItem("storeId"),
         productStatus: 1,
-        isHoutai: 0
+        isHoutai: 0,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize2
       };
-      if (this.searchKey != "") {
         this.$https.fetchPost(url, params).then(
           res => {
             if (res.data.result) {
               this.commodityItem = res.data.result.list;
+              this.pageTotal2 = res.data.result.total;
             } else {
               this.commodityItem = [];
+              this.pageTotal2 = 0;
               this.$message({
                 message: res.data.responseStatusType.error.errorMsg,
                 type: "warning"
@@ -874,7 +891,6 @@ export default {
             });
           }
         );
-      }
     },
 
     // 根据姓名或电话获取会员信息
@@ -1169,24 +1185,6 @@ export default {
         payTypeAndAmount = [];
 
       productIds = this.serviceList;
-
-      if (this.$store.state.member == null) {
-        if (this.member.orderLink == undefined) {
-          this.$message({
-            type: "warning",
-            message: "请输入顾客姓名"
-          });
-          return;
-        }
-
-        if (!/^1[34578]\d{9}$/.test(this.member.mobile)) {
-          this.$message({
-            message: "请输入正确手机号码",
-            type: "warning"
-          });
-          return;
-        }
-      }
 
       if (this.serviceList.length == 0) {
         this.$message({
@@ -2156,7 +2154,9 @@ export default {
       background-color: #f8f8f8;
       border-radius: 6px;
       text-align: center;
-      margin: 0 15px 15px 0;
+      transition: 0.5s;
+      bottom: 0;
+      margin: 10px 15px 15px 0;
       box-shadow: 0 2px 2px 1px #dddddd;
 
       .name {
@@ -2208,6 +2208,15 @@ export default {
         }
       }
     }
+    .boxItem:hover {
+      cursor: pointer;
+      bottom: 10px;
+      box-shadow: 0px 0px 11px 2px #cfcfcf;
+    }
+  }
+  .elpage {
+    width: 100%;
+    text-align: center;
   }
 
   // 订单内容

@@ -102,7 +102,7 @@
               <template slot-scope="scope">
                 <div
                   class="inventsome4"
-                  :class="scope.row.afterAuditInStorageId !== null ? 'active' : 'acc'"
+                  :class="scope.row.afterAuditInStorageId !== null && scope.row.afterAuditInStorageId !== null? 'active' : 'acc'"
                   @click="salesretrun(scope.row)"
                 >退货</div>
               </template>
@@ -770,13 +770,26 @@ export default {
     salesretrun(res) {
       this.inStorageProductID = res.inStorageProductID;
 
-      if (res.inventoryWay == "GENERAL" && res.afterAuditInStorageId !== null) {
-        this.visible_times = true;
-      } else {
+      // if (res.inventoryWay == "GENERAL" && res.afterAuditInStorageId !== null) {
+      //   this.visible_times = true;
+      // } else {
+      //   this.$message({
+      //     type: "warning",
+      //     message: "该商品已退货!"
+      //   });
+      // }
+      if (res.inventoryWay !== "GENERAL") {
         this.$message({
           type: "warning",
           message: "该商品已退货!"
         });
+      } else if (res.afterAuditInStorageId == null) {
+        this.$message({
+          type: "warning",
+          message: "该商品待审核"
+        });
+      } else {
+        this.visible_times = true;
       }
     },
     //作废

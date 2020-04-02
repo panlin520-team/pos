@@ -426,7 +426,7 @@ export default {
   width: 90%;
   border-radius: 3px;
   border: 2px solid rgba(254, 176, 25, 1);
-  margin: 63px auto;
+  margin: 63px 63px 20px 63px;
   .shopsmap {
     width: 100%;
     height: 250px;

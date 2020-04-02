@@ -24,6 +24,7 @@
         <div class="headerItem">计算底薪</div>
         <!-- <div class="headerItem">级别</div> -->
         <div class="headerItem">目前状态</div>
+        <div class="headerItem">是否为销售员</div>
         <div class="headerItem">操作</div>
       </div>
       <div class="list scrollY">
@@ -40,25 +41,27 @@
           >{{item.gender == 0 ? '女' : ''}}{{item.gender == 1 ? '男' : ''}}{{item.gender == null ? '未知' : ''}}</div>
           <!-- <div style="flex:1">{{item.groupName}}</div> -->
           <div style="flex:1">{{item.postName}}</div>
-          <!-- <div style="flex:1">{{item.postLevelName}}</div> -->
           <div
             style="flex:1"
           >{{item.isBasicSalarer == 0 ? '否' : ''}}{{item.isBasicSalarer == 1 ? '是' : ''}}{{item.isBasicSalarer == null ? '未知' : ''}}</div>
           <div
             style="flex:1"
           >{{item.workingState == 0 ? '离职' : ''}}{{item.workingState == 1 ? '在职' : ''}}{{item.workingState == null ? '未知' : ''}}</div>
-          <!-- <div style="flex:1">
+          <div style="flex:1">
             <el-switch
               active-value="1"
               inactive-value="0"
-              v-model="item.isSkipTurn"
+              v-model="item.isSaleMan"
               active-color="#13ce66"
               inactive-color="#ff4949"
-              disabled
+              @change="changeswith(item)"
             ></el-switch>
+          </div>
+          <!-- <div style="flex:1">
+            <el-switch v-model="value_switch" active-color="#13ce66" inactive-color="#646464"></el-switch>
           </div>-->
           <div style="flex:1">
-            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item.staffNumber)">编辑</el-button>
+            <el-button type="primary" size="mini" @click="fetchEmployeesDet(item)">编辑</el-button>
             <el-button type="warning" size="mini" @click="delEmployees(item.beauticianId)">删除</el-button>
           </div>
         </div>
@@ -177,9 +180,22 @@
                 </div>
           </div>-->
           <div class="item">
+            <label class="label-left">所属部门</label>
+            <div class="value">
+              <el-select v-model="part_department" @change="changedepartment" placeholder="请选择所属部门">
+                <el-option
+                  v-for="item in part_partment"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </div>
+          </div>
+          <div class="item">
             <label class="label-left">职务</label>
             <div class="value">
-              <el-select v-model="employeesDetails.postId" placeholder="请选择职务">
+              <el-select v-model="employeepostName" @change="changedeptails" placeholder="请选择职务">
                 <el-option
                   v-for="item in postNames"
                   :key="item.postId"
@@ -202,6 +218,7 @@
               </el-select>
             </div>
           </div>
+
           <div class="item">
             <label class="label-left">是否兼职</label>
             <div class="value">
@@ -593,9 +610,11 @@ export default {
       postId: 0,
       // 分组详细(组id，组名，组长id)
       groupId: "",
+      swithnumber: "",
       groupName: "",
       leaderId: "",
       groupObject: "",
+      groupObjectfsdfasdf: "1",
       // 门店分组
       groups: [],
       // 员工级别
@@ -604,6 +623,7 @@ export default {
       isBasicSalarer: 1,
       // 门店职务
       postNames: [],
+      employeepostName: "",
       //是否兼职
       part_trueNames: [
         {
@@ -654,7 +674,19 @@ export default {
       // 某些元素的显示
       selectStatus: null,
       workingState: 1,
-
+      //部门
+      part_department: "",
+      part_partment: [],
+      //开关
+      value_switch: "",
+      //快关数据
+      companyId: "",
+      companyType: "",
+      beauticianId: "",
+      yeWuYuanK3Id: "",
+      k3Number: "",
+      isSaleMan: "",
+      modifyOperator: "",
       // 弹出层
       // 分组列表
       groupOpen: false,
@@ -708,12 +740,32 @@ export default {
       this.employeesDetails.introduction = this.content;
       this.editorPop = false;
     },
+    //改变快关
+    changeswith(res) {
+      this.companyId = res.companyId;
+      this.companyType = res.companyType;
+      this.beauticianId = res.beauticianId;
+      this.k3Number = res.k3Number;
+      this.isSaleMan = res.isSaleMan;
+      if (res.isSaleMan == 0) {
+        this.yeWuYuanK3Id = res.yeWuYuanK3Id;
+      } else {
+        res.yeWuYuanK3Id = "";
+      }
+      this.modifyOperator = res.modifyOperator;
+      //开关接口
+      this.chanegeswigath();
+    },
 
     // 取消富文本编辑
     cancelEditor() {
       this.editorPop = false;
     },
-
+    //部门
+    changedepartment(res) {
+      this.part_department = res;
+    },
+    changedeptails(res) {},
     // 富文本编辑监听
     changeEditor(val) {
       this.content = val;
@@ -734,7 +786,7 @@ export default {
         }
       });
     },
-    //是否兼职 
+    //是否兼职
     changetrueJobe(res) {
       this.part_trueJobe = res;
     },
@@ -751,8 +803,75 @@ export default {
       this.employeesOpen = true;
       this.employeesDetails = {};
       this.selectStatus = 1;
-      this.parteNames();
+      this.part_partment = [];
+      this.part_department = "";
       this.part_timeJobe = "";
+      this.parteNames();
+      this.chanegdepartment();
+      this.part_timeJobe = "";
+    },
+    // 部门
+    chanegdepartment() {
+      var url =
+        this.$https.storeHost + "/manage/department/listDepartmentNoPage";
+      var params = {
+        companyType: 3,
+        companyId: localStorage.getItem("storeId")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.part_partment = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    // 改变开关
+    chanegeswigath() {
+      var url = this.$https.storeHost + "/manage/beautician/updateBeautician";
+      var params = {
+        companyId: this.companyId,
+        companyType: this.companyType,
+        beauticianId: this.beauticianId,
+        yeWuYuanK3Id: this.yeWuYuanK3Id,
+        k3Number: this.k3Number,
+        isSaleMan: this.isSaleMan,
+        modifyOperator: this.modifyOperator
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.editStatus = false;
+            this.$message({
+              message: "修改成功",
+              type: "success"
+            });
+            this.fetchEmployees();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
 
     // 删除成员
@@ -810,6 +929,8 @@ export default {
         postId: this.employeesDetails.postId,
         isBasicSalary: this.isBasicSalarer,
         workingState: this.workingState,
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
@@ -926,14 +1047,18 @@ export default {
         name: this.employeesDetails.name,
         mobile: this.employeesDetails.mobile,
         gender: this.employeesDetails.gender,
-        storeId: localStorage.getItem("storeId"),
-        postId: this.employeesDetails.postId,
+        postId: this.employeepostName,
         isBasicSalary: this.isBasicSalarer,
+        companyType: 3,
+        companyId: localStorage.getItem("storeId"),
         workingState: this.workingState,
+        departmentId: this.part_department,
         entryTime: this.employeesDetails.entryTime,
         // postLevel: this.employeesDetails.postLevel,
         sort: this.employeesDetails.sort,
         isPartTime: this.part_trueJobe,
+        FCreateOrgId: localStorage.getItem("orgK3Number"),
+        FUseOrgId: localStorage.getItem("orgK3Number"),
         partTimePostId: this.postId,
         partTimePostCategoryId: this.postCategoryId,
         introduction: this.employeesDetails.introduction,
@@ -965,6 +1090,14 @@ export default {
         return false;
       }
 
+      if (this.part_department == "") {
+        this.$message({
+          message: "请选择所属部门",
+          type: "warning"
+        });
+        return false;
+      }
+
       // if (params.openid == "") {
       //   this.$message({
       //     message: "请输入openid",
@@ -981,7 +1114,7 @@ export default {
       //   return false;
       // }
 
-      if (params.postId == undefined) {
+      if (this.employeepostName == "") {
         this.$message({
           message: "请选择职务",
           type: "warning"
@@ -1025,10 +1158,14 @@ export default {
 
     // 员工详细信息
     fetchEmployeesDet(i) {
+      this.employeepostName = i.postName;
+      this.part_department = i.departmentName;
+      this.chanegdepartment();
+      this.employeesOpen = true;
       this.employeesDetails = {};
       this.selectStatus = 0;
       var params = {
-        beauticianId: i
+        beauticianId: i.staffNumber
       };
       var url =
         this.$https.storeHost + "/manage/beautician/selectBeauticianById";
@@ -1036,8 +1173,8 @@ export default {
         res => {
           if (res.data.result) {
             this.employeesOpen = true;
-
             this.employeesDetails = res.data.result;
+            this.fetchEmployees();
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
@@ -1056,18 +1193,39 @@ export default {
 
     // 获取门店员工
     fetchEmployees() {
+      this.emlpoyeesData = [];
       var url =
         this.$https.storeHost + "/manage/beautician/selectBeauticianList";
       var params = {
-        storeId: localStorage.getItem("storeId"),
+        companyId: localStorage.getItem("storeId"),
         pageNum: this.currentPage,
+        companyType: 3,
         pageSize: this.pageSize1
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.dataTotal1 = res.data.result.total;
-            this.emlpoyeesData = res.data.result.list;
+            res.data.result.list.forEach(value => {
+              this.emlpoyeesData.push({
+                headUrl: value.headUrl,
+                name: value.name,
+                mobile: value.mobile,
+                gender: value.gender,
+                postName: value.postName,
+                isBasicSalarer: value.isBasicSalarer,
+                workingState: value.workingState,
+                beauticianId: value.beauticianId,
+                companyId: value.companyId,
+                companyType: value.companyType,
+                yeWuYuanK3Id: value.yeWuYuanK3Id,
+                k3Number: value.k3Number,
+                swithnumber: this.swithnumber,
+                isSaleMan: value.isSaleMan + "",
+                staffNumber: value.staffNumber,
+                departmentName: value.departmentName
+              });
+            });
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

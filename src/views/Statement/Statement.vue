@@ -29,27 +29,44 @@
         </div>
       </div>
       <div class="sousxcTime">
-        <div class="cursxzTimes">
+        <!-- <div class="cursxzTimes">
           <el-date-picker
             v-model="value_titleTime"
             type="daterange"
             range-separator="至"
             start-placeholder="开始日期"
             end-placeholder="结束日期"
+            @change="changeTime"
           ></el-date-picker>
-        </div>
+        </div>-->
       </div>
       <div class="cursmain">
         <div class="curstable">
           <el-table :data="savingsRecordFilter" style="width: 100%">
-            <el-table-column label="金额">
+            <el-table-column label="门店">
               <template slot-scope="scope">
-                <div slot="reference" class="name-wrapper">{{ scope.row.orderNumber }}</div>
+                <div slot="reference" class="name-wrapper">{{ scope.row.storeName }}</div>
               </template>
             </el-table-column>
-            <el-table-column label="时间">
+            <el-table-column label="支付类型">
               <template slot-scope="scope">
-                <div slot="reference" class="name-wrapper">{{ scope.row.orderTime }}</div>
+                <div slot="reference" class="name-wrapper">{{ scope.row.payTypeName }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="支付金额">
+              <template slot-scope="scope">
+                <div slot="reference" class="name-wrapper">{{ scope.row.amount }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="支付时间">
+              <template slot-scope="scope">
+                <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+              </template>
+            </el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button size="mini" @click="vipexamine(scope.row)">划出</el-button>
+                <el-button size="mini" @click="examineout(scope.row)">划入</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -65,6 +82,74 @@
             :total="pageTotal"
           ></el-pagination>
         </div>
+        <!-- 划出 -->
+        <PopOver
+          custom-class="storageblockshipping"
+          :visible.sync="visible_ordershapping"
+          @close="closeordershapping"
+          width="800px"
+        >
+          <div class="stgblcktop" slot="top"></div>
+          <div class="stgblcktopmain" slot="main">
+            <el-table :data="shoppingdataout" style="width: 100%">
+              <el-table-column label="划出门店">
+                <template slot-scope="scope">
+                  <div slot="reference" class="name-wrapper">{{ scope.row.transferToStoreName }}</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="金额">
+                <template slot-scope="scope">
+                  <div slot="reference" class="name-wrapper">{{ scope.row.amount }}</div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-pagination
+              @size-change="handleSizeChangs"
+              @current-change="handleCurrentChangs"
+              :current-page.sync="currentPage2"
+              :page-size="pageSizeout"
+              background
+              layout="total, prev, pager, next"
+              :total="pageTotalout"
+            ></el-pagination>
+          </div>
+        </PopOver>
+        <!-- 划入 -->
+        <PopOver
+          custom-class="storageblockdar"
+          :visible.sync="visible_orderdata"
+          @close="closeorderdara"
+          width="800px"
+        >
+          <div class="stgblcktop" slot="top"></div>
+          <div class="stgblcktopmain" slot="main">
+            <el-table :data="shoppingdatadown" style="width: 100%">
+              <el-table-column label="划入门店">
+                <template slot-scope="scope">
+                  <div slot="reference" class="name-wrapper">{{ scope.row.transferFromStoreName }}</div>
+                </template>
+              </el-table-column>
+              <el-table-column label="支付类型">
+                <template slot-scope="scope">
+                  <div slot="reference" class="name-wrapper">{{ scope.row.amount }}</div>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-pagination
+              @size-change="handleSizeChango"
+              @current-change="handleCurrentChango"
+              :current-page.sync="currentPage3"
+              :page-size="pageSizedown"
+              background
+              layout="total, prev, pager, next"
+              :total="pageTotaldown"
+            ></el-pagination>
+          </div>
+        </PopOver>
       </div>
     </div>
     <!-- 品项销售统计分页 -->
@@ -124,44 +209,45 @@ export default {
       visible_member: false,
       //会员剩余品项
       visible_condition: false,
+      //资金池查看控制开关
+      visible_ordershapping: false,
+      visible_orderdata: false,
       //搜索时间段
-      value_titleTime: "",
+      // value_titleTime: "",
       //当前页
       currentPage1: 1,
       //每页
       pageSize: 10,
       //总页数
-      pageTotal: 100,
+      pageTotal: 0,
+      //划出页
+      currentPage2: 1,
+      //每页
+      pageSizeout: 10,
+      //总页数
+      pageTotalout: 0,
+      //划入页
+      currentPage3: 1,
+      //每页
+      pageSizedown: 10,
+      //总页数
+      pageTotaldown: 0,
+      capitalPoolIdout: "",
+      capitalPoolIddown: "",
       //分页
-      handleSizeChange(val) {
-        console.log(`每页 ${val} 条`);
-      },
-      handleCurrentChange(val) {
-        console.log(`当前页: ${val}`);
-      },
+      handleSizeChange(val) {},
+      handleCurrentChange(val) {},
+      //划出分页
+      handleSizeChangs(val) {},
+      handleCurrentChangs(val) {},
+      //划入分页
+      handleSizeChango(val) {},
+      handleCurrentChango(val) {},
       //资金池数据
-      savingsRecordFilter: [
-        {
-          orderNumber: "2312312",
-          orderTime: "2020.11.11"
-        },
-        {
-          orderNumber: "2312312",
-          orderTime: "2020.11.11"
-        },
-        {
-          orderNumber: "2312312",
-          orderTime: "2020.11.11"
-        },
-        {
-          orderNumber: "2312312",
-          orderTime: "2020.11.11"
-        },
-        {
-          orderNumber: "2312312",
-          orderTime: "2020.11.11"
-        }
-      ]
+      savingsRecordFilter: [],
+      //划入划出数据
+      shoppingdataout: [],
+      shoppingdatadown: []
     };
   },
   computed: {},
@@ -170,11 +256,36 @@ export default {
     //会员应收统计
     show_Financs() {
       this.visible_Financs = true;
+      this.requestwarehouse();
     },
     //资金池返回
     getBack() {
       this.visible_Financs = false;
     },
+    //关闭资金池开关
+    closeordershapping() {
+      this.visible_ordershapping = false;
+    },
+    //查看划出
+    vipexamine(res) {
+      console.log(res);
+      this.capitalPoolIdout = res.id;
+      this.requestuot();
+      this.visible_ordershapping = true;
+    },
+    closeorderdara() {
+      this.visible_orderdata = false;
+    },
+    //划入
+    examineout(res) {
+      this.capitalPoolIddown = res.id;
+      this.requestdown();
+      this.visible_orderdata = true;
+    },
+    //资金池搜索时间
+    // changeTime() {
+    //   this.requestwarehouse();
+    // },
     //品项销售统计
     show_marketnancs() {
       // this.visible_marketnancs = true;
@@ -190,6 +301,86 @@ export default {
     //会员剩余品项
     show_condition() {
       // this.visible_condition = true;
+    },
+    //资金池数据
+    requestwarehouse() {
+      var url = this.$https.walletHost + "/manage/wallet/listCapPool";
+      var params = {
+        pageNum: this.currentPage1,
+        pageSize: this.pageSize,
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result.list) {
+            this.savingsRecordFilter = res.data.result.list;
+            this.pageTotal = res.data.result.total;
+          } else {
+            this.pageTotal = 0;
+            this.savingsRecordFilter = [];
+          }
+        })
+        .catch(err => {
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
+        });
+    },
+    //资金池划出
+    requestuot() {
+      var url = this.$https.walletHost + "/manage/wallet/selectTransferOut";
+      var params = {
+        page: this.currentPage2,
+        limit: this.pageSizeout,
+        capitalPoolId: this.capitalPoolIdout,
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result.list) {
+            this.shoppingdataout = res.data.result.list;
+            this.pageTotalout = res.data.result.total;
+          } else {
+            this.pageTotalout = 0;
+            this.shoppingdataout = [];
+          }
+        })
+        .catch(err => {
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
+        });
+    },
+    //资金池划入
+    requestdown() {
+      var url = this.$https.walletHost + "/manage/wallet/selectTransferIn";
+      var params = {
+        pageNum: this.currentPage3,
+        pageSize: this.pageSizedown,
+        capitalPoolId: this.capitalPoolIddown,
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result.list) {
+            this.shoppingdatadown = res.data.result.list;
+            this.pageTotaldown = res.data.result.total;
+          } else {
+            this.pageTotaldown = 0;
+            this.shoppingdatadown = [];
+          }
+        })
+        .catch(err => {
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
+        });
     }
   },
   created() {},
@@ -347,6 +538,34 @@ export default {
     left: 0;
     z-index: 100;
     background-color: #eaeaea;
+  }
+}
+.storageblockshipping {
+  .stgblcktop {
+    font-size: 22px;
+    font-weight: 550;
+    display: flex;
+    justify-content: space-around;
+  }
+  .stgblcktopmain {
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+.storageblockdar {
+  .stgblcktop {
+    font-size: 22px;
+    font-weight: 550;
+    display: flex;
+    justify-content: space-around;
+  }
+  .stgblcktopmain {
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+  }
+  .stgblckbottom {
+    text-align: center;
   }
 }
 </style>

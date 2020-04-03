@@ -311,15 +311,15 @@
                         </template>
                       </el-table-column>
                     </el-table>
-                    <!-- <el-pagination
-                      @size-change="handleSizeChange2"
-                      @current-change="handleCurrentChange2"
-                      :current-page.sync="currentPage2"
-                      :page-size="pageSize2"
+                    <el-pagination
+                      @size-change="handleSizeChangexiang"
+                      @current-change="handleCurrentChangexiang"
+                      :current-page.sync="currentPage4"
+                      :page-size="pageSize4"
                       layout="total, prev, pager, next"
-                      :total="totalPasz2"
+                      :total="totalPasz4"
                       background
-                    ></el-pagination>-->
+                    ></el-pagination>
                   </div>
                 </pop-over>
                 <!-- 体验卡退货详情 -->
@@ -346,18 +346,73 @@
                         </template>
                       </el-table-column>
                     </el-table>
-                    <!-- <el-pagination
-                      @size-change="handleSizeChange2"
-                      @current-change="handleCurrentChange2"
-                      :current-page.sync="currentPage2"
-                      :page-size="pageSize2"
+                    <el-pagination
+                      @size-change="handleSizeChangecar"
+                      @current-change="handleCurrentChangecar"
+                      :current-page.sync="currentPage3"
+                      :page-size="pageSize3"
                       layout="total, prev, pager, next"
-                      :total="totalPasz2"
+                      :total="totalPasz3"
                       background
-                    ></el-pagination>-->
+                    ></el-pagination>
                   </div>
                 </pop-over>
-
+                <!-- 定制项目直接划卡 -->
+                <pop-over
+                  :visible.sync="salesPepels"
+                  @close="salesPepels = false"
+                  width="500px"
+                  custom-class="storageblocks"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目划卡</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <div class="optionDate">
+                      <label>销售员：</label>
+                      <el-select v-model="value_invenT" placeholder="请选择销售员">
+                        <el-option
+                          v-for="item in options_invenT"
+                          :key="item.staffNumber"
+                          :label="item.name"
+                          :value="item.staffNumber"
+                        ></el-option>
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="stgblckbottom" slot="bottom">
+                    <el-button @click="confirmwes_true" size="small" type="success">确定</el-button>
+                    <el-button @click="confirmwes_false" size="small" type="info">取消</el-button>
+                  </div>
+                </pop-over>
+                <!-- 体验卡直接划卡 -->
+                <pop-over
+                  :visible.sync="salesPepeCareare"
+                  @close="salesPepeCareare = false"
+                  width="500px"
+                  custom-class="storageblocks"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">体验卡划卡</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <div class="optionDate">
+                      <label>销售员：</label>
+                      <el-select v-model="value_invcare" placeholder="请选择销售员">
+                        <el-option
+                          v-for="item in options_incare"
+                          :key="item.staffNumber"
+                          :label="item.name"
+                          :value="item.staffNumber"
+                        ></el-option>
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="stgblckbottom" slot="bottom">
+                    <el-button @click="confirmwes_tcare" size="small" type="success">确定</el-button>
+                    <el-button @click="confirmwes_facare" size="small" type="info">取消</el-button>
+                  </div>
+                </pop-over>
                 <!-- 体验卡详情 -->
                 <pop-over
                   :visible.sync="suserPopover"
@@ -822,9 +877,10 @@ export default {
       visible_care: false,
       visible_carLise: false,
       // visible_details: false,
-      // visible_vipexd: false,
+      salesPepels: false,
       servicePopover: false,
       visible_recharge: false,
+      salesPepeCareare: false,
       visible_CustomiCares: false,
       visible_customs: false,
       suserPopover: false,
@@ -866,6 +922,7 @@ export default {
           name: "定制项目"
         }
       ],
+      value_invenT: "",
       //退货ID
       recordId: "",
       recordIds: "",
@@ -880,6 +937,12 @@ export default {
       currentPage2: 1,
       pageSize2: 10,
       totalPasz2: 0,
+      currentPage3: 1,
+      pageSize3: 10,
+      totalPasz3: 0,
+      currentPage4: 1,
+      pageSize4: 10,
+      totalPasz4: 0,
       //划卡退货商品
       salseshop: [
         {
@@ -895,6 +958,9 @@ export default {
         }
       ],
       gradeed: "",
+      options_invenT: [],
+      options_incare: [],
+      value_invcare: "",
       //账户信息余额
       accounBalance: [],
       //查看体验卡详情
@@ -1099,7 +1165,6 @@ export default {
       var list = this.empsetlist;
       var arr = [];
       var str = [];
-      this.servicePopover = false;
       if (this.empsetlist.length == 1) {
         arr.push({
           beauticianName: this.proNmar,
@@ -1124,7 +1189,7 @@ export default {
         } else {
           this.$message({
             type: "warning",
-            message: "请选择完员工时间"
+            message: "请选择完员工和时间"
           });
         }
       } else {
@@ -1164,13 +1229,13 @@ export default {
           } else {
             this.$message({
               type: "warning",
-              message: "请选择完员工时间"
+              message: "请选择完员工和时间"
             });
           }
         } else {
           this.$message({
             type: "warning",
-            message: "请选择完员工时间"
+            message: "请选择完员工和时间"
           });
         }
       }
@@ -1377,20 +1442,23 @@ export default {
       this.cardid = res.id;
       this.subClassId = res.subClassId;
       if (res.productType == 1) {
-        this.$confirm("您确定划卡吗?", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            this.pojectCared();
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消划卡"
-            });
-          });
+        this.value_invenT = "";
+        this.salesPepels = true;
+        this.getpeple();
+        // this.$confirm("您确定划卡吗?", {
+        //   confirmButtonText: "确定",
+        //   cancelButtonText: "取消",
+        //   type: "warning"
+        // })
+        //   .then(() => {
+        //     this.pojectCared();
+        //   })
+        //   .catch(() => {
+        //     this.$message({
+        //       type: "info",
+        //       message: "已取消划卡"
+        //     });
+        //   });
       } else {
         if (res.useTimes < res.totalTimes) {
           this.employeels();
@@ -1405,6 +1473,36 @@ export default {
         // this.serviceList = [];
         // this.visible_vipexd = true;
       }
+    },
+    //定制项目直接划卡
+    confirmwes_true() {
+      if (this.value_invenT) {
+        this.pojectCared();
+        this.salesPepels = false;
+      } else {
+        this.$message({
+          message: "请选择销售员",
+          type: "warning"
+        });
+      }
+    },
+    confirmwes_false() {
+      this.salesPepels = false;
+    },
+    //体验卡直接划卡
+    confirmwes_tcare() {
+      if (this.value_invcare) {
+        this.stampCard();
+        this.salesPepeCareare = false;
+      } else {
+        this.$message({
+          message: "请选择销售员",
+          type: "warning"
+        });
+      }
+    },
+    confirmwes_facare() {
+      this.salesPepeCareare = false;
     },
     //项目定制详情
     rienizauss(res) {
@@ -1428,11 +1526,15 @@ export default {
     //详情分页
     handleSizeChange(val) {},
     handleSizeChange2(val) {},
+    handleSizeChangecar(val) {},
+    handleCurrentChangecar() {},
+    handleSizeChangexiang(val) {},
+    handleCurrentChangexiang() {},
     handleCurrentChange2(val) {
-      this.particulpovepo();
+      // this.particulpovepo();
     },
     handleCurrentChange(val) {
-      this.particularsList();
+      // this.particularsList();
     },
     //定制项目弹框消失
     closeCustomization() {
@@ -1509,7 +1611,7 @@ export default {
       this.cardOrderDetailId = res.id;
       this.particularsList();
     },
-    //确定划卡
+    //确定体验卡划卡
     vipexdetails(res) {
       this.differentiate = 2;
       this.valuexuaTime = "";
@@ -1527,22 +1629,25 @@ export default {
       this.experiencecardProductType = res.experiencecardProductType;
       this.useTimes = res.useTimes;
       this.totalTimes = res.totalTimes;
-      
       if (this.experiencecardProductType == 1) {
-        this.$confirm("您确定划卡吗?", {
-          confirmButtonText: "确定",
-          cancelButtonText: "取消",
-          type: "warning"
-        })
-          .then(() => {
-            this.stampCard();
-          })
-          .catch(() => {
-            this.$message({
-              type: "info",
-              message: "已取消划卡"
-            });
-          });
+        this.value_invcare = "";
+        this.salesPepeCareare = true;
+        //请求销售员
+        this.getpeple();
+        // this.$confirm("您确定划卡吗?", {
+        //   confirmButtonText: "确定",
+        //   cancelButtonText: "取消",
+        //   type: "warning"
+        // })
+        //   .then(() => {
+        //     this.stampCard();
+        //   })
+        //   .catch(() => {
+        //     this.$message({
+        //       type: "info",
+        //       message: "已取消划卡"
+        //     });
+        //   });
       } else {
         if (res.useTimes < res.totalTimes) {
           this.employeels();
@@ -1816,18 +1921,54 @@ export default {
         this.$https.storeHost +
         "/manage/experienceCard/selectExperiencecardProductUserRefuseList";
       var params = {
-        id: this.caresongre
+        id: this.caresongre,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize3
       };
       this.$https.fetchPost(url, params).then(res => {
-        if (res.data.result) {
+        if (res.data.result.length !== 0) {
           this.salesdarta = res.data.result;
+          this.totalPasz3 = res.data.result.total;
         } else {
+          this.totalPasz3 = 0;
+          this.salesdarta = [];
           this.$message({
             type: "warning",
             message: res.data.responseStatusType.error.errorMsg
           });
         }
       });
+    },
+    // 获取销售员
+    getpeple() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+      var params = {
+        companyType: 3,
+        companyId: [localStorage.getItem("storeId")],
+        isSaleMan: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.options_invenT = res.data.result;
+            this.options_incare = res.data.result;
+          } else {
+            this.options_invenT = [];
+            this.options_incare = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
     //定制项目退货详情
     salescaengd() {
@@ -1837,8 +1978,16 @@ export default {
         id: this.caresongresss
       };
       this.$https.fetchPost(url, params).then(res => {
-        if (res.data.result) {
+        if (res.data.result.length !== 0) {
           this.salesdartas = res.data.result;
+          this.totalPasz4 = res.data.result.total;
+        } else {
+          this.salesdartas = [];
+          this.totalPasz4 = 0;
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
         }
       });
     },
@@ -2386,6 +2535,7 @@ export default {
         memberNum: this.$store.state.member.userNumber,
         // experiencecardNum: this.cardNum,
         id: this.cardid,
+        staffNumber: this.value_invcare,
         productCode: this.experiencecardProductCode,
         storeId: localStorage.getItem("storeId"),
         storeName: localStorage.getItem("storeName"),
@@ -2440,6 +2590,7 @@ export default {
               type: "success",
               duration: 2000
             });
+            this.servicePopover = false;
             this.projectturnData();
           } else {
             this.$message({
@@ -2478,6 +2629,7 @@ export default {
               type: "success",
               duration: 2000
             });
+            this.servicePopover = false;
             this.memberdcarUser();
           } else {
             this.$message({
@@ -3212,6 +3364,28 @@ export default {
     }
   }
   .stgblcktopbottom {
+    text-align: center;
+  }
+}
+//定制项目直接划卡
+.storageblocks {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      label {
+        font-weight: 550;
+        font-size: 19px;
+      }
+    }
+  }
+  .stgblckbottom {
     text-align: center;
   }
 }

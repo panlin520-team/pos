@@ -523,6 +523,17 @@
             </div>
           </div>
           <div class="label">
+            <label>销售员</label>
+            <el-select v-model="memoxiaosnamen" placeholder="请选择销售员">
+              <el-option
+                v-for="item in optionsnamen"
+                :key="item.staffNumber"
+                :label="item.name"
+                :value="item.staffNumber"
+              ></el-option>
+            </el-select>
+          </div>
+          <div class="label">
             <label>水单号</label>
             <input placeholder="水单号" v-model="memoNum" class="inputModel" />
           </div>
@@ -602,6 +613,17 @@
               </div>
             </div>
           </div>
+        </div>
+        <div class="labelss">
+          <label>销售员</label>
+          <el-select v-model="memoxiaosnawomen" placeholder="请选择销售员">
+            <el-option
+              v-for="item in optionsnwoamen"
+              :key="item.beauticianId"
+              :label="item.name"
+              :value="item.beauticianId"
+            ></el-option>
+          </el-select>
         </div>
       </div>
       <div class="bottom" slot="bottom">
@@ -687,11 +709,11 @@
             <div
               v-for="(item,index) in empList"
               :key="index"
-              :class="['item',currentEmpId==item.beauticianId ?'active':'']"
+              :class="['item',currentEmpId==item.postId ?'active':'']"
               @click="fetchServiceEmp(currentServiceId,item)"
             >
               <div class="name">{{item.name}}</div>
-              <div class="id">工号：{{item.beauticianId}}</div>
+              <div class="id">工号：{{item.postId}}</div>
             </div>
           </div>
         </div>
@@ -959,6 +981,7 @@ export default {
       selectProEmp: [],
       // 已选择产品销售员索引
       selectProEmpIndex: [],
+      //默认销售员
       // 选择项目的详细
       serviceData: {},
       // 选择产品的详细
@@ -1007,6 +1030,12 @@ export default {
       discountPrice: 0,
       // 折扣
       discount: 1,
+      //默认销售员
+      memoxiaosnamen: "",
+      optionsnamen: [],
+      //外面支付
+      memoxiaosnawomen: "",
+      optionsnwoamen: [],
       // 折扣度
       disountLevel: 1,
       // 正修改的服务项目数据
@@ -1264,6 +1293,14 @@ export default {
         return;
       }
 
+      if (this.memoxiaosnamen == "") {
+        this.$message({
+          type: "error",
+          message: "请选择销售员!"
+        });
+        return;
+      }
+
       if (this.cashValue == "") {
         this.cashValue = 0;
       }
@@ -1376,6 +1413,7 @@ export default {
         params = {
           orderType: 2,
           channel: 2,
+          staffNumber: this.memoxiaosnamen,
           storeId: localStorage.getItem("storeId"),
           cardNum: this.$store.state.member.userNumber,
           orderLink: this.$store.state.member.userName,
@@ -1391,6 +1429,8 @@ export default {
         params = {
           orderType: 2,
           channel: 2,
+          staffNumber: this.memoxiaosnamen,
+
           storeId: localStorage.getItem("storeId"),
           cardNum: null,
           orderLink: null,
@@ -1415,6 +1455,8 @@ export default {
                 var info = {
                   orderNumber: res.data.result,
                   payPrice: this.realPrice,
+                  staffNumber: this.memoxiaosnamen,
+
                   // 订单列表
                   productIds: JSON.stringify(productIds),
                   // 支付方式
@@ -1553,7 +1595,10 @@ export default {
 
     // 打开结算框
     openAccount() {
+      //获取销售员
+      this.getpeple();
       var memberNum = "";
+      this.memoxiaosnamen = "";
       if (this.serviceList.length == 0 && this.productList.length == 0) {
         this.$message({
           type: "warning",
@@ -2078,15 +2123,15 @@ export default {
         return item.postCategoryId == id;
       });
 
-      if (item.beauticianId != this.currentEmpId) {
+      if (item.postId != this.currentEmpId) {
         // 若存在，对该条数据增加属性
         if (res) {
           this.$set(res, "setEmpName", item.name);
-          this.$set(res, "setEmpId", item.beauticianId);
+          this.$set(res, "setEmpId", item.postId);
           this.$set(res, "setStaffNumber", item.staffNumber);
           this.$set(res, "setEmpJob", this.currentServiceTitle);
           // 绑定当前已选员工id，方便右侧员工列表渲染
-          this.currentEmpId = item.beauticianId;
+          this.currentEmpId = item.postId;
         }
       } else {
         this.$set(res, "setEmpName", "");
@@ -2124,6 +2169,7 @@ export default {
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
         subclassID: item.subClassId,
+        companyType: 3,
         storeId: localStorage.getItem("storeId")
       };
 
@@ -2167,7 +2213,10 @@ export default {
     fetchEmployees() {
       var url =
         this.$https.storeHost + "/manage/beautician/selectBeauticianByStoreId";
-      var params = { storeId: localStorage.getItem("storeId") };
+      var params = {
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
+      };
 
       this.$https.fetchPost(url, params).then(
         res => {
@@ -2762,6 +2811,7 @@ export default {
       var info = {
         orderNumber: params.orderNumber,
         payPrice: payPrice,
+        staffNumber: this.memoxiaosnawomen,
         // 订单列表
         productIds: JSON.stringify(params.productOrderList),
         // 支付方式
@@ -2961,7 +3011,10 @@ export default {
         this.visible_examine = true;
         this.morepayment();
       } else {
+        //获取销售员
+        this.getpeple();
         this.orderpayPopver = true;
+        this.memoxiaosnawomen = "";
         this.payTypes = null;
         var list = item.productOrderList;
         var totalPrice = item.totalPrice;
@@ -3013,6 +3066,38 @@ export default {
             this.orderDetailsPage = true;
             this.orderDetails = res.data.result[0];
           } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    // 获取销售员
+    getpeple() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+      var params = {
+        companyType: 3,
+        companyId: [localStorage.getItem("storeId")],
+        isSaleMan: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.optionsnamen = res.data.result;
+            this.optionsnwoamen = res.data.result;
+            // this.orderDetails = res.data.result;
+          } else {
+            this.optionsnamen = [];
+            this.optionsnwoamen = [];
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -4475,6 +4560,9 @@ export default {
       label {
         width: 100px;
       }
+      .el-select {
+        width: 234px;
+      }
 
       .inputModel {
         flex: 1;
@@ -4496,6 +4584,16 @@ export default {
         font-size: 13px;
         line-height: 22px;
       }
+    }
+  }
+  .labelss {
+    padding: 0 25px;
+    label {
+      width: 100px;
+    }
+    .el-select {
+      margin-left: 58px;
+      width: 234px;
     }
   }
 

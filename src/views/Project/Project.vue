@@ -665,10 +665,10 @@ export default {
 
     //分页
     handleSizeChange(val) {
-        this.projectsubsmall();
+      this.projectsubsmall();
     },
     handleCurrentChange(val) {
-        this.projectsubsmall();
+      this.projectsubsmall();
     },
     //改变数量
     changeNumer(res) {

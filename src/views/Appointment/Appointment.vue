@@ -870,27 +870,27 @@ export default {
         pageNum: this.currentPage3,
         pageSize: this.pageSize2
       };
-        this.$https.fetchPost(url, params).then(
-          res => {
-            if (res.data.result) {
-              this.commodityItem = res.data.result.list;
-              this.pageTotal2 = res.data.result.total;
-            } else {
-              this.commodityItem = [];
-              this.pageTotal2 = 0;
-              this.$message({
-                message: res.data.responseStatusType.error.errorMsg,
-                type: "warning"
-              });
-            }
-          },
-          error => {
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.commodityItem = res.data.result.list;
+            this.pageTotal2 = res.data.result.total;
+          } else {
+            this.commodityItem = [];
+            this.pageTotal2 = 0;
             this.$message({
-              type: "error",
-              message: error
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
             });
           }
-        );
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
     },
 
     // 根据姓名或电话获取会员信息
@@ -1663,7 +1663,9 @@ export default {
         this.$https.storeHost + "/manage/beautician/selectBeauticianList";
       var params = {
         nursingDate: this.currentDate,
-        storeId: localStorage.getItem("storeId")
+        companyId: localStorage.getItem("storeId"),
+        storeId: localStorage.getItem("storeId"),
+        companyType: 3
       };
       this.$https.fetchPost(url, params).then(
         res => {

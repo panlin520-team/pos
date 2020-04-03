@@ -803,6 +803,7 @@ export default {
       this.employeesOpen = true;
       this.employeesDetails = {};
       this.selectStatus = 1;
+      this.employeepostName = "";
       this.part_partment = [];
       this.part_department = "";
       this.part_timeJobe = "";
@@ -1297,6 +1298,7 @@ export default {
     },
     // 门店员工兼职职务
     parteNames() {
+      // this.part_timeNames = [];
       var url = this.$https.storeHost + "/manage/beautician/selectPost";
       var params = {
         postIndustryIDSearch: localStorage.getItem("industryID"),
@@ -1306,6 +1308,18 @@ export default {
         res => {
           if (res.data.result) {
             this.part_timeNames = res.data.result.list;
+            // res.data.result.list.forEach(value => {
+            //   this.part_timeNames.push({
+            //     name: value.name,
+            //     postId: value.postId,
+            //     postCategoryId: value.postCategoryId
+            //   });
+            // });
+            this.part_timeNames.unshift({
+              postId: "",
+              name: "请选择",
+              postCategoryId: ""
+            });
           } else {
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,

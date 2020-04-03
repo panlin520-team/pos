@@ -261,9 +261,9 @@ export default {
           type: "warning"
         })
           .then(() => {
-             //请求
-        this.addOrderform();
-        this.visible_examine = false;
+            //请求
+            this.addOrderform();
+            this.visible_examine = false;
           })
           .catch(() => {
             this.$message({
@@ -502,7 +502,8 @@ export default {
       var url =
         this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
       var params = {
-        storeId: localStorage.getItem("storeId")
+        companyId: localStorage.getItem("storeId"),
+        companyType: 3
       };
       this.$https.fetchPost(url, params).then(
         res => {

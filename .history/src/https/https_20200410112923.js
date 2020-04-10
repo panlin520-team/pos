@@ -42,8 +42,8 @@ axios.defaults.baseURL = process.env.VUE_APP_BASE_API;
 // 请求头            
 axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8';
 
-// 响应时长30秒
-axios.defaults.timeout = 30000;
+// 响应时长10秒
+axios.defaults.timeout = 1000;
 
 // 请求地址与端口
 const authHost = process.env.VUE_APP_BASE_API + ":83";

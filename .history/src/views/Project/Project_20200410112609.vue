@@ -28,8 +28,8 @@
             </div>
           </div>
           <div class="stgblckbottom" slot="bottom">
-            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
             <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
           </div>
         </PopOver>
         <!-- </div> -->
@@ -171,7 +171,7 @@
           </div>
         </div>-->
 
-        <!-- <el-pagination
+        <el-pagination
           @size-change="handleSizeChange"
           @current-change="handleCurrentChange"
           :current-page.sync="currentPage3"
@@ -179,7 +179,7 @@
           background
           layout="total, prev, pager, next"
           :total="pageTotal"
-        ></el-pagination>-->
+        ></el-pagination>
       </div>
       <!-- 右边内容 -->
       <div class="elright">
@@ -361,6 +361,7 @@ export default {
       //密码
       secret: "",
       prodtCdList: [],
+      //计算原价
       retailPrespoe: "0",
       //计算总价
       totalPrice: "0",
@@ -434,7 +435,7 @@ export default {
   watch: {},
   methods: {
     // 门店大类
-    fetchMenu() {
+    fetchMenus() {
       var url = this.$https.dataHost + "/commodityType/selectCommodityTypeList";
       var params = {
         isDingzhi: 1,
@@ -463,7 +464,7 @@ export default {
     },
 
     // 门店小类
-    fetchMenuItem(id) {
+    fetchMenuItems(id) {
       this.currentMenuId = id;
       this.menuItem = [];
       this.commodityItem = [];
@@ -497,7 +498,7 @@ export default {
     },
 
     // 门店小类商品
-    fetchCommodity(id) {
+    fetchCommoditys(id) {
       this.currentMenuItemId = id;
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
@@ -505,13 +506,18 @@ export default {
         subClassId: id,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize
       };
       this.$https.fetchPost(url, params).then(
         res => {
           if (res.data.result) {
             this.commodityItem = res.data.result.list;
+            this.pageTotal = res.data.result.total;
           } else {
+            this.productmodel = [];
+            this.pageTotal = 0;
             this.$message({
               message: res.data.responseStatusType.error.errorMsg,
               type: "warning"
@@ -529,7 +535,7 @@ export default {
     },
 
     //选择时间后添加
-    confirm_true() {
+    confirm_trues() {
       let res = this.resList;
       var object = {
         useLimit: this.value_invenT
@@ -573,9 +579,9 @@ export default {
     },
     calcTotalPrice: function() {
       this.totalPrice = 0; //总金额进行清零
+      this.retailPrespoe = 0; //原价清零
       this.tableDataList.forEach((item, index) => {
         if (item) {
-          this.retailPrespoe = "";
           this.totalPrice += item.amount * item.discountPrice; //累加的
           this.retailPrespoe += item.amount * item.retailPricess;
         }
@@ -658,31 +664,24 @@ export default {
     },
 
     //分页
-    // handleSizeChange(val) {
-    //   setTimeout(() => {
-    //     this.projectsubsmall();
-    //   }, 300);
-    // },
-    // handleCurrentChange(val) {
-    //   setTimeout(() => {
-    //     this.projectsubsmall();
-    //   }, 300);
-    // },
+    handleSizeChange(val) {
+      this.projectsubsmall();
+    },
+    handleCurrentChange(val) {
+      this.projectsubsmall();
+    },
     //改变数量
     changeNumer(res) {
       res.productNum = res.amount;
-      console.log(res);
       res.originalPrice = res.amount * res.discountPrice;
       if (res.amount < 1) {
         res.amount = 1;
       }
-      console.log(res);
       //计算
       this.calcTotalPrice();
     },
     //改变总价
     changeNumes(res) {
-      console.log(res);
       res.discountPrice = res.originalPrice / res.amount;
       this.calcTotalPrice();
     },
@@ -700,7 +699,8 @@ export default {
     },
     //点击删除订单
     removeBtn(res, index) {
-      this.amount = res.amount;
+      this.amount = 1;
+      this.retailPrespoe = this.retailPrespoe - res.amount * res.retailPrice;
       this.stockNum = parseInt(this.stockNum) + parseInt(this.amount);
       this.tableDataList.splice(index, 1);
 
@@ -727,7 +727,7 @@ export default {
         this.endOrder();
         this.options = [];
         setTimeout(() => {
-          this.projectsubsmall();
+          // this.projectsubsmall();
           this.$refs.moduleName.memberbalance();
         }, 600);
         this.input_woreter = "";
@@ -788,8 +788,6 @@ export default {
       this.$https
         .fetchPost(url, params)
         .then(res => {
-          console.log(12312333333333);
-
           if (res.data.result) {
             res.data.result.forEach(value => {
               if (value.payTypeCategory == 2) {
@@ -875,7 +873,9 @@ export default {
         subClassId: this.subclassID,
         isHoutai: 0,
         companyType: 3,
-        productStatus: 1
+        productStatus: 1,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize
       };
       this.$https
         .fetchPost(url, params)
@@ -1260,12 +1260,14 @@ export default {
         height: 16px;
         font-size: 16px;
         padding: 10px 0;
-
         span {
           font-size: 18px;
           color: #ecab1e;
         }
       }
+    }
+    .el-select {
+      width: 215px;
     }
     .catalysis {
       width: 400px;
@@ -1283,7 +1285,7 @@ export default {
       }
       .el-input {
         margin-top: 10px;
-        width: 210px;
+        width: 217px;
         border-radius: 5px;
       }
       .el-radio {
@@ -1401,7 +1403,6 @@ export default {
     bottom: 0;
     margin: 15px 15px 20px 0;
     box-shadow: 0 2px 2px 1px #dddddd;
-
     .name {
       height: 100px;
       font-size: 15px;

@@ -1,0 +1,3486 @@
+<!-- 弹框Modal组件 -->
+<template>
+  <div class="fixed">
+    <div class="concealVIP" @click="clickconceal">
+      <img
+        :class="[this.$store.state.fold==false ?'fa fa-arrow-down go':'fa fa-arrow-down aa']"
+        src="../../assets/images/icon_cbl.png"
+        alt
+      />
+    </div>
+    <transition name="fade">
+      <div class="floatBox" v-if="$route.meta.menubar" v-show="this.$store.state.fold">
+        <div class="memberBox">
+          <div class="content">
+            <div class="userPhoto">
+              <img :src="imageUrl" />
+              <div
+                v-if="this.$store.state.member != null"
+                @click="clearMember"
+                class="clear btn-pointer"
+              >X</div>
+            </div>
+            <div class="usermessage">
+              <div class="userNamePoto">
+                <div class="userName-box">
+                  <label>姓名：</label>
+                  <el-input
+                    v-model="input_name"
+                    v-on:keyup.13.native="show_stgbcar"
+                    placeholder="请输入姓名"
+                  ></el-input>
+                  <div class="userName-boxs">
+                    <i class="el-icon-search" @click="show_stgbcar"></i>
+                  </div>
+                </div>
+                <PopOver
+                  custom-class="storageblock"
+                  :visible.sync="visible_care"
+                  @close="close_stgbcar"
+                  width="600px"
+                >
+                  <div class="stgblcktop" slot="top">会员信息</div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="tableData_vippeple" style="width: 100%">
+                      <el-table-column label="姓名">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.name }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="手机号">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.mobile }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="操作">
+                        <template slot-scope="scope">
+                          <el-button size="mini" @click="vipexamine(scope.row)">确定</el-button>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <div class="pagination" v-if="memberDataTotal != 0">
+                      <el-pagination
+                        @current-change="memberPageHandleChange"
+                        :current-page.sync="memberCurrentPage"
+                        :page-size="memberPageSize"
+                        layout="total, prev, pager, next"
+                        :total="memberDataTotal"
+                        background
+                      ></el-pagination>
+                    </div>
+                  </div>
+                </PopOver>
+
+                <div class="userName-box">
+                  <label>联系电话：</label>
+                  <el-input
+                    v-model="input_number"
+                    v-on:keyup.13.native="show_stgbcar2"
+                    placeholder="请输入手机号"
+                  ></el-input>
+                  <div class="userName-boxs">
+                    <i class="el-icon-search" @click="show_stgbcar2"></i>
+                  </div>
+                </div>
+                <div class="gradevip">
+                  会员等级：
+                  <span>{{grade}}</span>
+                </div>
+              </div>
+              <div class="remarkVip">
+                <label>备注：</label>
+                <el-input v-model="remark" @blur="unfocused" placeholder="请输入内容"></el-input>
+              </div>
+            </div>
+            <div class="experienCard">
+              <el-button type="warning" @click="show_carLise">客户项目</el-button>
+            </div>
+            <!-- <div class="experienCards">
+              <el-button type="warning" @click="show_customization">项目定制</el-button>
+            </div>-->
+            <!-- 体验卡 -->
+            <PopOver
+              custom-class="storageblock2"
+              :visible.sync="visible_carLise"
+              @close="close_carLise"
+              width="1000px"
+            >
+              <div class="stgblcktop" slot="top">客户项目信息</div>
+              <div class="stgblcktopmain" slot="main">
+                <div class="projcttop">
+                  <div class="projtright">
+                    <div
+                      class="someprojts"
+                      @click="closeClick(item)"
+                      v-for="item in someData"
+                      :class="item.index == someIndex ? 'active' : ''"
+                      :key="item.index"
+                    >{{item.name}}</div>
+                  </div>
+                  <!-- <div class="projectcar">
+                    <el-button size="mini" type="warning" @click="experienceCard">体验卡</el-button>
+                  </div>
+                  <div class="projectcars">
+                    <el-button size="mini" type="success" @click="experienization">项目定制</el-button>
+                  </div>-->
+                </div>
+                <div class="projctbottom" v-show="experiencehaha">
+                  <el-table :data="tableData_details" style="width: 100%">
+                    <el-table-column label="项目名称" min-width="100">
+                      <template slot-scope="scope">
+                        <div
+                          slot="reference"
+                          class="name-wrapper"
+                        >{{ scope.row.experiencecardProductName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="商品小类" width="120">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.subClassName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="项目类型">
+                      <template slot-scope="scope">
+                        <div
+                          slot="reference"
+                          class="name-wrapper"
+                        >{{ scope.row.experiencecardProductTypeName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用总数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.totalTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用次数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="有效期" width="180">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="320">
+                      <template slot-scope="scope">
+                        <el-button size="mini" type="warning" @click="vipexdetails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="success" @click="userdetails(scope.row)">使用详情</el-button>
+                        <div class="inbotton">
+                          <div
+                            class="inventsome6"
+                            :class="scope.row.totalTimes > scope.row.useTimes? 'active' : 'acc'"
+                            @click="salesreCare(scope.row)"
+                          >退货</div>
+                          <el-button
+                            size="mini"
+                            type="success"
+                            @click="Careticulars(scope.row)"
+                          >退货详情</el-button>
+                        </div>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <!-- 定制项目 -->
+                <div class="projctbottom" v-show="experienceheihei">
+                  <el-table :data="tableData_rieniza" style="width: 100%">
+                    <el-table-column label="项目名称">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="项目类型">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.productTypeName }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用总数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.totalTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="使用次数" width="80">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useTimes }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="有效期" width="180">
+                      <template slot-scope="scope">
+                        <div slot="reference" class="name-wrapper">{{ scope.row.useLimit }}</div>
+                      </template>
+                    </el-table-column>
+                    <el-table-column label="操作" width="320">
+                      <template slot-scope="scope">
+                        <el-button size="mini" type="warning" @click="rienizatails(scope.row)">划卡</el-button>
+                        <el-button size="mini" type="success" @click="rienizauss(scope.row)">使用详情</el-button>
+                        <div class="inbottons">
+                          <div
+                            class="inventsome5"
+                            :class="scope.row.totalTimes > scope.row.useTimes? 'active' : 'acc'"
+                            @click="salesretrun(scope.row)"
+                          >退货</div>
+                          <el-button
+                            size="mini"
+                            type="success"
+                            @click="salesparticulars(scope.row)"
+                          >退货详情</el-button>
+                        </div>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </div>
+                <!-- 定制项目详情 -->
+                <pop-over
+                  :visible.sync="suserPopovepo"
+                  @close="suserPopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="User_custopention" style="width: 100%">
+                      <el-table-column label="姓名" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品名称" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用日期" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用状态" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="操作" width="172">
+                        <template slot-scope="scope">
+                          <div
+                            class="inventsome2"
+                            :class="scope.row.recordStatus == '未退货' ? 'active' : 'acc'"
+                            @click="salesReturnal(scope.row)"
+                          >退货</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChange2"
+                      @current-change="handleCurrentChange2"
+                      :current-page.sync="currentPage2"
+                      :page-size="pageSize2"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz2"
+                      background
+                    ></el-pagination>
+                  </div>
+                  <div class="stgblcktopbottom" slot="bottom">
+                    <el-button size="mini" type="success" @click="pushUseropovepo">确定</el-button>
+                  </div>
+                </pop-over>
+                <!-- 定制项目退货详情 -->
+                <pop-over
+                  :visible.sync="salesPopovepo"
+                  @close="salesPopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目退货详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="salesdartas" style="width: 100%">
+                      <el-table-column label="退货次数" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.refuseTimes }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="退货日期" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChangexiang"
+                      @current-change="handleCurrentChangexiang"
+                      :current-page.sync="currentPage4"
+                      :page-size="pageSize4"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz4"
+                      background
+                    ></el-pagination>
+                  </div>
+                </pop-over>
+                <!-- 体验卡退货详情 -->
+                <pop-over
+                  :visible.sync="CarePopovepo"
+                  @close="CarePopovepo = false"
+                  width="960px"
+                  custom-class="serviceUserpo"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">体验卡退货详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="salesdarta" style="width: 100%">
+                      <el-table-column label="退货次数" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.refuseTimes }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="退货日期" width="400">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.createTime }}</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChangecar"
+                      @current-change="handleCurrentChangecar"
+                      :current-page.sync="currentPage3"
+                      :page-size="pageSize3"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz3"
+                      background
+                    ></el-pagination>
+                  </div>
+                </pop-over>
+                <!-- 定制项目直接划卡 -->
+                <pop-over
+                  :visible.sync="salesPepels"
+                  @close="salesPepels = false"
+                  width="500px"
+                  custom-class="storageblocks"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">定制项目划卡</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <div class="optionDate">
+                      <label>销售员：</label>
+                      <el-select v-model="value_invenT" placeholder="请选择销售员">
+                        <el-option
+                          v-for="item in options_invenT"
+                          :key="item.staffNumber"
+                          :label="item.name"
+                          :value="item.staffNumber"
+                        ></el-option>
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="stgblckbottom" slot="bottom">
+                    <el-button @click="confirmwes_true" size="small" type="success">确定</el-button>
+                    <el-button @click="confirmwes_false" size="small" type="info">取消</el-button>
+                  </div>
+                </pop-over>
+                <!-- 体验卡直接划卡 -->
+                <pop-over
+                  :visible.sync="salesPepeCareare"
+                  @close="salesPepeCareare = false"
+                  width="500px"
+                  custom-class="storageblocks"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">体验卡划卡</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <div class="optionDate">
+                      <label>销售员：</label>
+                      <el-select v-model="value_invcare" placeholder="请选择销售员">
+                        <el-option
+                          v-for="item in options_incare"
+                          :key="item.staffNumber"
+                          :label="item.name"
+                          :value="item.staffNumber"
+                        ></el-option>
+                      </el-select>
+                    </div>
+                  </div>
+                  <div class="stgblckbottom" slot="bottom">
+                    <el-button @click="confirmwes_tcare" size="small" type="success">确定</el-button>
+                    <el-button @click="confirmwes_facare" size="small" type="info">取消</el-button>
+                  </div>
+                </pop-over>
+                <!-- 体验卡详情 -->
+                <pop-over
+                  :visible.sync="suserPopover"
+                  @close="suserPopover = false"
+                  width="960px"
+                  custom-class="serviceUser"
+                  id="pop"
+                >
+                  <div class="stgblcktop" slot="top">
+                    <div class="title">体验卡使用详情</div>
+                  </div>
+                  <div class="stgblcktopmain" slot="main">
+                    <el-table :data="User_customization" style="width: 100%">
+                      <el-table-column label="姓名" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.linkName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="商品名称" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.productName }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用日期" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.useDate }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="使用状态" width="172">
+                        <template slot-scope="scope">
+                          <div slot="reference" class="name-wrapper">{{ scope.row.recordStatus }}</div>
+                        </template>
+                      </el-table-column>
+                      <el-table-column label="操作" width="172">
+                        <template slot-scope="scope">
+                          <div
+                            class="inventsome1"
+                            :class="scope.row.recordStatus == '未退货' ? 'active' : 'acc'"
+                            @click="salesReturnails(scope.row)"
+                          >退货</div>
+                        </template>
+                      </el-table-column>
+                    </el-table>
+                    <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page.sync="currentPage1"
+                      :page-size="pageSize"
+                      layout="total, prev, pager, next"
+                      :total="totalPasz"
+                      background
+                    ></el-pagination>
+                  </div>
+                  <div class="stgblcktopbottom" slot="bottom">
+                    <el-button size="mini" type="success" @click="pushUser">确定</el-button>
+                  </div>
+                </pop-over>
+                <!-- //选择员工划卡 -->
+                <pop-over
+                  :visible.sync="servicePopover"
+                  @close="servicePopovepop"
+                  width="1200px"
+                  custom-class="servicePop"
+                  id="pop"
+                >
+                  <div class="top" slot="top">
+                    <div class="title">选择员工划卡</div>
+                  </div>
+                  <div class="main" slot="main">
+                    <!-- 右边 -->
+                    <div class="empSelect">
+                      <div class="tit">{{currentServiceTitle}}</div>
+                      <div class="empList scrollY">
+                        <!-- <div
+                          class="item"
+                          v-for="(item,index) in empList"
+                          :key="index"
+                          :class="['item',currentEmpId==item.beauticianId ?'active':'']"
+                          @click="fetchServiceEmp(currentServiceId,item)"
+                        >
+                          <div class="name">{{item.name}}</div>
+                          <div class="id">工号：{{item.beauticianId}}</div>
+                        </div>-->
+                        <div class="empLtleft">
+                          <div class="namelefse">
+                            <div
+                              class="name"
+                              v-for="item in empsetlist"
+                              :key="item.postCategoryId"
+                            >{{item.postCategoryName}}：</div>
+                          </div>
+                          <div>
+                            <!-- 上面 -->
+                            <div style="padding-left: 20px;">
+                              <el-select
+                                v-model="value_personal"
+                                @change="valubs"
+                                placeholder="请选择员员工"
+                              >
+                                <el-option
+                                  v-for="item in optionpersonal"
+                                  :key="item.staffNumber"
+                                  :label="item.name"
+                                  :value="item"
+                                ></el-option>
+                              </el-select>
+                              <el-date-picker
+                                v-model="valuexuaTime"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                type="date"
+                                :picker-options="pickerOptions1"
+                                placeholder="选择日期"
+                                @change="judgeTime(valuexuaTime)"
+                              ></el-date-picker>
+                              <!-- <el-time-select
+                                v-model="value_minute"
+                                :picker-options="{
+                              start: '09:30',
+                              step: '00:30',
+                              end: '22:30'
+                            }"
+                                placeholder="选择时间"
+                              ></el-time-select>-->
+                              <el-select
+                                v-model="value_minute"
+                                placeholder="请选择时间"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in judgeTimeList"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                  :disabled="item.disabled"
+                                ></el-option>
+                              </el-select>
+                              <el-select
+                                v-model="duration"
+                                placeholder="请选择时长"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in durations"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                ></el-option>
+                              </el-select>
+                            </div>
+                            <!-- 下面 -->
+                            <div class="empLtlefts" v-if="values_truwes">
+                              <el-select
+                                v-model="value_personals"
+                                @change="valubss"
+                                placeholder="请选择员员工"
+                              >
+                                <el-option
+                                  v-for="item in optionpersonals"
+                                  :key="item.staffNumber"
+                                  :label="item.name"
+                                  :value="item"
+                                ></el-option>
+                              </el-select>
+                              <el-date-picker
+                                v-model="valuexuaTimes"
+                                format="yyyy-MM-dd"
+                                value-format="yyyy-MM-dd"
+                                type="date"
+                                placeholder="选择日期"
+                                :picker-options="pickerOptions0"
+                                @change="judgeTimes(valuexuaTimes)"
+                              ></el-date-picker>
+                              <!-- <el-time-select
+                                v-model="value_minutes"
+                                :picker-options="{
+                              start: '10:00',
+                              step: '00:30',
+                              end: '22:30'
+                            }"
+                                placeholder="选择时间"
+                              ></el-time-select>-->
+                              <el-select
+                                v-model="value_minutes"
+                                placeholder="请选择时间"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in judgeTimeLists"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                  :disabled="item.disabled"
+                                ></el-option>
+                              </el-select>
+                              <el-select
+                                v-model="duratiot"
+                                placeholder="请选择时长"
+                                class="setEmpPicker"
+                              >
+                                <el-option
+                                  v-for="item in durationss"
+                                  :key="item.value"
+                                  :label="item.label"
+                                  :value="item.value"
+                                ></el-option>
+                              </el-select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="bottom" slot="bottom">
+                    <div class="btn btn-submit" @click="pushService">确认</div>
+                  </div>
+                </pop-over>
+              </div>
+            </PopOver>
+          </div>
+          <!-- <pop-over
+            :visible.sync="visible_customization"
+            @close="visible_customization = false"
+            width="600px"
+            custom-class="servicecust"
+          >
+            <div class="top" slot="top">
+              <div class="title">定制项目</div>
+            </div>
+            <div class="main" slot="main">
+              <el-table :data="tableData_customization" style="width: 100%">
+                <el-table-column label="姓名" v-model="cardName">
+                  <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ scope.row.cardName }}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="卡号">
+                  <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ scope.row.cardNum }}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button size="mini" type="success" @click="vipecustomization(scope.row)">查看详情</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div class="bottom" slot="bottom"></div>
+          </pop-over>-->
+          <!-- <pop-over
+            :visible.sync="visible_customs"
+            @close="visible_customs = false"
+            width="700px"
+            custom-class="servicecutbs"
+          >
+            <div class="top" slot="top">
+              <div class="title">定制项目</div>
+            </div>
+            <div class="main" slot="main">
+              <el-table :data="tableData_customs" style="width: 100%">
+                <el-table-column label="姓名" v-model="cardName">
+                  <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ scope.row.cardName }}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="卡号">
+                  <template slot-scope="scope">
+                    <div slot="reference" class="name-wrapper">{{ scope.row.cardNum }}</div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button size="mini" @click="vipecucustoms(scope.row)">划卡</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </div>
+            <div class="bottom" slot="bottom"></div>
+          </pop-over>-->
+          <div class="accountBalance">
+            <span class="spans">账户信息：</span>
+            <div class="accountCenter">
+              <div class="savingBale" v-for="item in accounBalance" :key="item.index">
+                <label>{{item.accountType}}：</label>
+                <span>{{item.amount}}</span>元
+              </div>
+            </div>
+
+            <div style="margin: 8px 0 0 50px">
+              <el-button size="small" @click="immediaimmediately" type="warning">立即充值</el-button>
+            </div>
+          </div>
+        </div>
+        <!-- 定制项目退货次数 -->
+        <PopOver
+          custom-class="storageCustomization"
+          :visible.sync="visible_Customization"
+          @close="closeCustomization"
+          width="450px"
+        >
+          <div class="stgblcktop" slot="top">退货</div>
+          <div class="stgblcktopmain" slot="main">
+            <div class="optionDate">
+              <label>退货次数：</label>
+              <el-input v-model="input_Customization" clearable placeholder="请输入退货次数"></el-input>
+            </div>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-button @click="confirm_true" size="small" type="success">确定</el-button>
+            <el-button @click="confirm_false" size="small" type="info">取消</el-button>
+          </div>
+        </PopOver>
+        <!-- 体验卡退货次数 -->
+        <PopOver
+          custom-class="storageCare"
+          :visible.sync="visible_CustomiCares"
+          @close="closeCustoCare"
+          width="450px"
+        >
+          <div class="stgblcktop" slot="top">退货</div>
+          <div class="stgblcktopmain" slot="main">
+            <div class="optionDate">
+              <label>退货次数：</label>
+              <el-input v-model="input_Customization" clearable placeholder="请输入退货次数"></el-input>
+            </div>
+          </div>
+          <div class="stgblckbottom" slot="bottom">
+            <el-button @click="conCare_true" size="small" type="success">确定</el-button>
+            <el-button @click="conCare_false" size="small" type="info">取消</el-button>
+          </div>
+        </PopOver>
+        <PopOver
+          custom-class="storageblockk"
+          :visible.sync="visible_recharge"
+          @close="close_recharge"
+          width="400px"
+        >
+          <div class="recharge_top" slot="top">充值管理</div>
+          <div class="recharge_main" slot="main">
+            <el-form ref="form" :model="form" status-icon label-width="80px">
+              <el-form-item label="账户类型" prop="regions">
+                <el-select v-model="value_tregion" placeholder="请选择账户类型">
+                  <el-option
+                    v-for="item in interestTple"
+                    :key="item.accountTypeId"
+                    :label="item.accountType"
+                    :value="item.accountTypeId"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="充值金额" prop="moneeys">
+                <el-input v-model="form.money" @blur="changemoney" placeholder="请输入充值金额"></el-input>
+              </el-form-item>
+              <el-form-item label="录单人" prop="collectoneeys">
+                <el-input v-model="form.input_people" placeholder="请输入录单人"></el-input>
+              </el-form-item>
+              <el-form-item label="业务员" prop="employee">
+                <el-select v-model="value_tpeple" @change="changepeople" placeholder="请选择充值员工">
+                  <el-option
+                    v-for="item in optionpeple"
+                    :key="item.staffNumber"
+                    :label="item.name"
+                    :value="item.staffNumber"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="支付类型" prop="payTalp">
+                <el-select v-model="value_accounTelp" @change="changeTylp" placeholder="请选择支付类型">
+                  <el-option
+                    v-for="item in optionpeTylp"
+                    :key="item.payTypeId"
+                    :label="item.payTypeName"
+                    :value="item.payTypeId"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="支付状态" prop="paystate">
+                <el-select v-model="value_accountstate" placeholder="请选择支付状态">
+                  <el-option
+                    v-for="item in paymentTelp"
+                    :key="item.payTypeId"
+                    :label="item.payTypeName"
+                    :value="item.payTypeId"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+
+              <el-form-item label="备注：" prop="sportsshape">
+                <textarea rows="10" v-model="form.desc" class="textarea" cols="30"></textarea>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="onSubmit">立即充值</el-button>
+                <el-button @click="visible_recharge = false">取消</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="recharge_bottom" slot="bottom"></div>
+        </PopOver>
+      </div>
+    </transition>
+  </div>
+</template>
+
+<script>
+export default {
+  components: {},
+  data() {
+    return {
+      logo: require("@/assets/images/logo.png"), // 浏览器可视高度
+      virtualHeight: window.innerHeight,
+      //显示与隐藏
+      show_box: true,
+      message: "显示会员",
+      //输入姓名
+      input_name: "",
+      //输入手机号
+      input_number: "",
+      accountType: "",
+      //员工编号
+      subClassId: "",
+      staffNumber: "",
+      //会员卡号
+      memberNum: "",
+      cardName: "哈哈哈哈",
+      //使用次数
+      useTimes: "",
+      //总数
+      totalTimes: "",
+      siYuan: [],
+      changeRed: -1,
+      //体验卡编码
+      cardNum: "",
+      // 项目或产品默认初始数量
+      productNum: 1,
+      outStorageIdQiTa: "",
+      outStorageIdXiaoShou: "",
+      outStorageIdQiTass: "",
+      outStorageIdXiaoShouss: "",
+      // 项目或产品默认名称
+      productName: null,
+      // 项目或产品可选工位与可选员工
+      empSet: [],
+      empList: [],
+      // 项目当前工种id
+      currentServiceId: null,
+      cardid: "",
+      //会员备注
+      remark: "",
+      cardOrderDetailId: "",
+      //已选项目
+      serviceList: [],
+      // 项目当前工种title
+      currentServiceTitle: null,
+      //商品编码
+      experiencecardProductCode: "",
+      //商品名称
+      experiencecardProductName: "",
+      //tylp
+      experiencecardProductType: "",
+      //弹出框控制
+      visible_care: false,
+      visible_carLise: false,
+      // visible_details: false,
+      salesPepels: false,
+      servicePopover: false,
+      visible_recharge: false,
+      salesPepeCareare: false,
+      visible_CustomiCares: false,
+      visible_customs: false,
+      suserPopover: false,
+      visible_Customization: false,
+      suserPopovepo: false,
+      values_truwes: false,
+      experiencehaha: true,
+      experienceheihei: false,
+      salesPopovepo: false,
+      CarePopovepo: false,
+      //会员等级
+      grade: "",
+      rotate: false,
+      rienizauID: "",
+      salasIdtow: "",
+      //搜索数据
+      tableData_vippeple: [],
+      empsetlist: [],
+      //退货参数
+      productCodenal: "",
+      productNamenal: "",
+      productCodenal2: "",
+      productNamenal2: "",
+      outstorageId: "",
+      outstoragetwoId: "",
+      //查看体验卡
+      tableData_carLise: [],
+      optionpersonals: [],
+      salesdarta: [],
+      salesdartas: [],
+      //体验卡定制项目按钮
+      someData: [
+        {
+          index: 1,
+          name: "体验卡"
+        },
+        {
+          index: 2,
+          name: "定制项目"
+        }
+      ],
+      value_invenT: "",
+      //退货ID
+      recordId: "",
+      recordIds: "",
+      //区分体验卡和定制项目
+      differentiate: "",
+      //详情列表
+      User_customization: [],
+      User_custopention: [],
+      currentPage1: 1,
+      pageSize: 10,
+      totalPasz: 0,
+      currentPage2: 1,
+      pageSize2: 10,
+      totalPasz2: 0,
+      currentPage3: 1,
+      pageSize3: 10,
+      totalPasz3: 0,
+      currentPage4: 1,
+      pageSize4: 10,
+      totalPasz4: 0,
+      //划卡退货商品
+      salseshop: [
+        {
+          productCode: "",
+          productName: ""
+        }
+      ],
+      //定制项目退货商品
+      projectsuder: [
+        {
+          productCode: "",
+          productName: ""
+        }
+      ],
+      gradeed: "",
+      options_invenT: [],
+      options_incare: [],
+      value_invcare: "",
+      //账户信息余额
+      accounBalance: [],
+      //查看体验卡详情
+      tableData_details: [
+        // experiencecardProductName: "",
+        // subClassName: "",
+        // experiencecardProductTypeName: "",
+        // totalTimes: "",
+        // useTimes: "",
+        // useLimit: "",
+      ],
+      tableData_rieniza: [],
+
+      // 项目当前工种下已选员工id
+      currentEmpId: null,
+      //退货输入框
+      input_Customization: "",
+      salasId: "",
+      //充值
+      //选择员工
+      beauticianIds: [
+        {
+          beauticianId: ""
+        }
+      ],
+      otp: [],
+      //充值中价格
+      payTypeAndAmount: [
+        {
+          payType: "",
+          amount: ""
+        }
+      ],
+      //上传图片
+      imageUrl: "",
+      imageUrls: require("../../assets/images/user.png"),
+      //产品有效期验证
+      pickerOptions0: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7; //如果没有后面的-8.64e7就是不可以选择今天的
+        }
+      },
+      //产品有效期验证
+      pickerOptions1: {
+        disabledDate(time) {
+          return time.getTime() < Date.now() - 8.64e7; //如果没有后面的-8.64e7就是不可以选择今天的
+        }
+      },
+      //充值里数据
+      form: {
+        money: "",
+        accountstate: "",
+        region: "",
+        gatheringp: "",
+        desc: "",
+        input_people: "",
+        moneeys: "",
+        collectoneeys: "",
+        employee: "",
+        payTalp: "",
+        paystate: "",
+        sportsshape: ""
+      },
+      //充值类型
+      value_tregion: "",
+      //时长
+      duration: "",
+      duratiot: "",
+      durations: this.setDurations(),
+      durationss: this.setDurationss(),
+      //员工划卡选择
+      value_personal: "",
+      value_personals: "",
+      judgeTimeList: [],
+      judgeTimeLists: [],
+      //员工日期
+      valuexuaTime: "",
+      valuexuaTimes: "",
+      //员工分秒
+      value_minute: "",
+      value_minutes: "",
+      //员工划卡多
+      optionpersonal: [
+        {
+          value: "选项1",
+          label: "黄金糕"
+        },
+        {
+          value: "选项2",
+          label: "双皮奶"
+        },
+        {
+          value: "选项3",
+          label: "蚵仔煎"
+        },
+        {
+          value: "选项4",
+          label: "龙须面"
+        },
+        {
+          value: "选项5",
+          label: "北京烤鸭"
+        }
+      ],
+      proNmar: "",
+      personal: "",
+      proNmars: "",
+      personals: "",
+      //体验卡定制项目切换
+      someIndex: "",
+      //充值员工
+      value_tpeple: "",
+      //支付类型
+      value_accounTelp: "",
+      //支付状态
+      value_accountstate: "",
+      caresongre: "",
+      caresongresss: "",
+      //充值账户类型下拉选项
+      interestTple: [],
+      optionpeTylp: [],
+      //数组
+      strstrList: [],
+      //充值
+      paymentTelp: [
+        {
+          payTypeId: 1,
+          payTypeName: "已支付"
+        }
+        // {
+        //   payTypeId: 2,
+        //   payTypeName: "未支付"
+        // }
+      ],
+      //充值账户类型x选项
+      options_account: [],
+      //充值员工下拉下拉框
+      optionpeple: [],
+      orderNumber: "",
+      //时间段
+      startTime: 9,
+      endTime: 22,
+      storeTimes: [],
+
+      // 会员列表页码参数
+      // 当前页码
+      memberCurrentPage: 1,
+      // 每页显示个数
+      memberPageSize: 10,
+      // 总个数
+      memberDataTotal: null
+    };
+  },
+  computed: {},
+  watch: {},
+  methods: {
+    memberPageHandleChange(val) {
+      this.memberCurrentPage = val;
+      // this.fetchOrder();
+      this.memberinformation();
+    },
+    //切换体验卡定制项目
+    closeClick(res) {
+      this.someIndex = res.index;
+      if (res.index == 1) {
+        this.differentiate = 2;
+        this.memberdcarUser();
+        this.experiencehaha = true;
+        this.experienceheihei = false;
+      } else {
+        this.differentiate = 1;
+        this.projectturnData();
+        this.experiencehaha = false;
+        this.experienceheihei = true;
+      }
+    },
+    // 时长数组
+    setDurations() {
+      var res = [];
+      for (var i = 0; i < 300; i + 30) {
+        i += 30;
+        res.push({
+          label: `${i}分钟`,
+          value: i
+        });
+      }
+      return res;
+    },
+    setDurationss() {
+      var res = [];
+      for (var i = 0; i < 300; i + 30) {
+        i += 30;
+        res.push({
+          label: `${i}分钟`,
+          value: i
+        });
+      }
+      return res;
+    },
+    // push已选择项目
+    pushService() {
+      var list = this.empsetlist;
+      var arr = [];
+      var str = [];
+      if (this.empsetlist.length == 1) {
+        arr.push({
+          beauticianName: this.proNmar,
+          beauticianId: this.personal,
+          nursingDate: this.valuexuaTime + " " + this.value_minute,
+          duration: this.duration
+          // value_minute: this.value_minute
+        });
+        this.otp = arr.concat(str);
+
+        if (
+          this.value_personal &&
+          this.valuexuaTime &&
+          this.value_minute &&
+          this.duration
+        ) {
+          if (this.differentiate == 2) {
+            this.staffstampCard();
+          } else {
+            if (this.value_invenT) {
+              this.staffstampCardss();
+            }
+          }
+        } else {
+          this.$message({
+            type: "warning",
+            message: "请选择完员工和时间"
+          });
+        }
+      } else {
+        arr.push({
+          beauticianName: this.proNmar,
+          beauticianId: this.personal,
+          nursingDate: this.valuexuaTime + " " + this.value_minute,
+          duration: this.duration
+          // value_minute: this.value_minute
+        });
+        str.push({
+          beauticianName: this.proNmars,
+          beauticianId: this.personals,
+          nursingDate: this.valuexuaTimes + " " + this.value_minutes,
+          duration: this.duratiot
+          // value_minute: this.value_minute
+        });
+        this.otp = arr.concat(str);
+        if (
+          this.value_personal &&
+          this.valuexuaTime &&
+          this.value_minute &&
+          this.duration
+        ) {
+          if (
+            this.value_personals &&
+            this.valuexuaTimes &&
+            this.value_minutes &&
+            this.durations
+          ) {
+            // this.servicePopover = false;
+            if (this.differentiate == 2) {
+              this.staffstampCard();
+            } else {
+              if (condition) {
+                
+              }
+              this.staffstampCardss();
+            }
+          } else {
+            this.$message({
+              type: "warning",
+              message: "请选择完员工和时间"
+            });
+          }
+        } else {
+          this.$message({
+            type: "warning",
+            message: "请选择完员工和时间"
+          });
+        }
+      }
+    },
+    //定制项目退货
+    salesretrun(res) {
+      this.salasIdtow = res.id;
+      if (res.totalTimes > res.useTimes) {
+        this.visible_Customization = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "该订单已退完"
+        });
+      }
+    },
+    //体验卡退货
+    salesreCare(res) {
+      this.salasId = res.id;
+      if (res.totalTimes > res.useTimes) {
+        this.visible_Customization = true;
+      } else {
+        this.$message({
+          type: "warning",
+          message: "该订单已退完"
+        });
+      }
+    },
+    //使用详情
+    pushUser() {
+      this.suserPopover = false;
+    },
+    //定制项目确定
+    pushUseropovepo() {
+      this.suserPopovepo = false;
+    },
+    //定制项目列表选择
+    vipecustomization() {
+      this.visible_customs = true;
+    },
+    vipecucustoms() {},
+    //充值
+    //充值获取员工
+    changepeople() {
+      this.beauticianIds[0].beauticianId = this.value_tpeple;
+    },
+    //充值选择类型
+    changeTylp() {
+      this.payTypeAndAmount[0].payType = this.value_accounTelp;
+    },
+    //充值选择金额
+    changemoney() {
+      this.payTypeAndAmount[0].amount = this.form.money;
+    },
+    //立即充值
+    immediaimmediately() {
+      this.value_tregion = "";
+      this.form.money = "";
+      this.form.gatheringp = "";
+      this.value_tpeple = "";
+      this.delivery = "0";
+      this.rebate = "0";
+      this.form.input_people = "";
+      this.value_accounTelp = "";
+      this.value_accountstate = "";
+      this.form.desc = "";
+      if (this.input_name) {
+        this.visible_recharge = true;
+        this.accounttypeData();
+      } else {
+        this.$message.error("请先选择会员");
+      }
+    },
+    //充值点击提交
+    onSubmit() {
+      // this.accounBalance = [];
+      if (this.value_tregion == "") {
+        this.$message.error("请选择账户类型");
+      } else if (this.form.money == "") {
+        this.$message.error("请输入充值金额");
+      } else if (this.form.input_people == "") {
+        this.$message.error("请输入录单人");
+      } else if (this.value_tpeple == "") {
+        this.$message.error("请选择业务员");
+      } else if (this.value_accounTelp == "") {
+        this.$message.error("请选择支付类型");
+      } else if (this.value_accountstate == "") {
+        this.$message.error("请选择支付状态");
+      } else if (this.value_accounTelp == 13) {
+        if (this.form.desc !== "") {
+          this.visible_recharge = false;
+          this.rechargeList();
+        } else {
+          this.$message.error("请填写备注");
+        }
+      } else {
+        this.visible_recharge = false;
+        this.rechargeList();
+      }
+    },
+    close_recharge() {
+      this.beauticianIds[0].amount = "";
+      this.payTypeAndAmount[0].payType = "";
+      this.payTypeAndAmount[0].amount = "";
+      this.visible_recharge = false;
+    },
+    // 对应选择项目工种下员工并修改对应服务项目工种菜单
+    fetchServiceEmp(id, item) {
+      this.staffNumber = item.staffNumber;
+      // 遍历寻找含指定id的某条数据
+      var res = this.empSet.find(item => {
+        return item.postCategoryId == id;
+      });
+      if (item.beauticianId != this.currentEmpId) {
+        // 若存在，对该条数据增加属性
+        if (res) {
+          this.$set(res, "setEmpName", item.name);
+          this.$set(res, "setEmpId", item.beauticianId);
+          this.$set(res, "setEmpJob", this.currentServiceTitle);
+          // 绑定当前已选员工id，方便右侧员工列表渲染
+          this.currentEmpId = item.beauticianId;
+        }
+      } else {
+        this.$set(res, "setEmpName", "");
+        this.$set(res, "setEmpId", "");
+        this.$set(res, "setEmpJob", "");
+        // 绑定当前已选员工id，方便右侧员工列表渲染
+        this.currentEmpId = null;
+      }
+    },
+    //填写备注
+    unfocused() {
+      localStorage.setItem("remark", this.remark);
+      if (localStorage.getItem("membership")) {
+        this.rmarkMember();
+      } else {
+        this.$message({
+          message: "请先选择会员",
+          type: "warning"
+        });
+      }
+    },
+    //查看项目定制详情
+    // experienization() {
+    //   this.differentiate = 1;
+    //   this.visible_rieniza = true;
+    //   this.experiencehaha = false;
+    //   this.experienceheihei = true;
+    //   this.projectturnData();
+    // },
+    // close_rieniza() {
+    //   this.visible_rieniza = false;
+    // },
+    valubs(res) {
+      this.proNmar = res.name;
+      this.personal = res.staffNumber;
+    },
+    valubss(res) {
+      this.proNmars = res.name;
+      this.personals = res.staffNumber;
+    },
+    //项目定制划卡
+    show_customization() {
+      this.visible_customization = true;
+    },
+    //点击显示与隐藏
+    clickconceal() {
+      this.$store.state.fold = !this.$store.state.fold;
+    },
+    //搜索姓名
+    show_stgbcar() {
+      this.input_number = "";
+      this.memberinformation();
+      this.visible_care = true;
+    },
+    servicePopovepop() {
+      this.value_personal = "";
+      this.value_personals = "";
+      this.valuexuaTime = "";
+      this.value_minute = "";
+      this.proNmars = "";
+      this.personals = "";
+      this.duratiot = "";
+      this.duration = "";
+      this.valuexuaTimes = "";
+      this.value_minutes = "";
+      this.servicePopover = false;
+    },
+    //项目定制划卡
+    rienizatails(res) {
+      this.differentiate = 1;
+      this.value_personal = "";
+      this.value_personals = "";
+      this.valuexuaTime = "";
+      this.proNmars = "";
+      this.personals = "";
+      this.duration = "";
+      this.duratiot = "";
+      this.value_minute = "";
+      this.value_minutes = "";
+      this.valuexuaTimes = "";
+      this.experiencecardProductCode = res.productCode;
+      this.experiencecardProductName = res.productName;
+      this.cardid = res.id;
+      this.subClassId = res.subClassId;
+      if (res.productType == 1) {
+        this.value_invenT = "";
+        this.salesPepels = true;
+        this.getpeple();
+        // this.$confirm("您确定划卡吗?", {
+        //   confirmButtonText: "确定",
+        //   cancelButtonText: "取消",
+        //   type: "warning"
+        // })
+        //   .then(() => {
+        //     this.pojectCared();
+        //   })
+        //   .catch(() => {
+        //     this.$message({
+        //       type: "info",
+        //       message: "已取消划卡"
+        //     });
+        //   });
+      } else {
+        if (res.useTimes < res.totalTimes) {
+          this.employeels();
+          this.servicePopover = true;
+        } else {
+          res.useTimes = res.totalTimes;
+          this.$message({
+            message: "警告哦，不能划卡了哟...",
+            type: "warning"
+          });
+        }
+        // this.serviceList = [];
+        // this.visible_vipexd = true;
+      }
+    },
+    //定制项目直接划卡
+    confirmwes_true() {
+      if (this.value_invenT) {
+        this.pojectCared();
+        this.salesPepels = false;
+      } else {
+        this.$message({
+          message: "请选择销售员",
+          type: "warning"
+        });
+      }
+    },
+    confirmwes_false() {
+      this.salesPepels = false;
+    },
+    //体验卡直接划卡
+    confirmwes_tcare() {
+      if (this.value_invcare) {
+        this.stampCard();
+        this.salesPepeCareare = false;
+      } else {
+        this.$message({
+          message: "请选择销售员",
+          type: "warning"
+        });
+      }
+    },
+    confirmwes_facare() {
+      this.salesPepeCareare = false;
+    },
+    //项目定制详情
+    rienizauss(res) {
+      this.suserPopovepo = true;
+      this.rienizauID = res.id;
+      this.orderNumber = res.orderNum;
+      this.particulpovepo();
+    },
+    //体验卡退货详情
+    Careticulars(res) {
+      this.caresongre = res.id;
+      this.CarePopovepo = true;
+      this.salesCared();
+    },
+    //定制项目退货详情
+    salesparticulars(res) {
+      this.caresongresss = res.id;
+      this.salesPopovepo = true;
+      this.salescaengd();
+    },
+    //详情分页
+    handleSizeChange(val) {},
+    handleSizeChange2(val) {},
+    handleSizeChangecar(val) {},
+    handleCurrentChangecar() {},
+    handleSizeChangexiang(val) {},
+    handleCurrentChangexiang() {},
+    handleCurrentChange2(val) {
+      // this.particulpovepo();
+    },
+    handleCurrentChange(val) {
+      // this.particularsList();
+    },
+    //定制项目弹框消失
+    closeCustomization() {
+      this.visible_Customization = false;
+    },
+    //确定定制项目退货
+    confirm_true() {
+      if (this.input_Customization == "") {
+        this.$message({
+          type: "warning",
+          message: "请输入退货数量"
+        });
+      } else {
+        this.salestweTumoney();
+      }
+    },
+    confirm_false() {
+      this.input_Customization = "";
+
+      this.visible_Customization = false;
+    },
+    //体验卡弹框消失
+    closeCustoCare() {
+      this.input_Customization = "";
+
+      this.visible_CustomiCares = false;
+    },
+    //体验卡退货确定
+    conCare_true() {
+      if (this.input_Customization == "") {
+        this.$message({
+          type: "warning",
+          message: "请输入退货数量"
+        });
+      } else {
+        this.salesCareTumoney();
+      }
+    },
+    //体验卡退货取消
+    conCare_false() {
+      this.input_Customization = "";
+      this.visible_CustomiCares = false;
+    },
+    //搜索电话
+    show_stgbcar2() {
+      this.memberinformation2();
+      this.visible_care = true;
+    },
+    close_stgbcar(itemcar) {
+      this.visible_care = false;
+    },
+    //搜索客户项目
+    show_carLise() {
+      this.someIndex = 1;
+      if (this.input_name) {
+        this.memberdetails();
+        this.experiencehaha = true;
+        this.experienceheihei = false;
+        this.visible_carLise = true;
+        this.memberdcarUser();
+      } else {
+        this.$message({
+          type: "warning",
+          message: "请先选择会员"
+        });
+      }
+    },
+    close_carLise(itemcar) {
+      this.visible_carLise = false;
+    },
+    //定制项目划卡详情
+    userdetails(res) {
+      this.suserPopover = true;
+      this.cardOrderDetailId = res.id;
+      this.particularsList();
+    },
+    //确定体验卡划卡
+    vipexdetails(res) {
+      this.differentiate = 2;
+      this.valuexuaTime = "";
+      this.value_personal = "";
+      this.value_personals = "";
+      this.valuexuaTimes = "";
+      this.value_minute = "";
+      this.value_minutes = "";
+      this.duratiot = "";
+      this.duration = "";
+      this.cardid = res.id;
+      this.subClassId = res.subClassId;
+      this.experiencecardProductCode = res.experiencecardProductCode;
+      this.experiencecardProductName = res.experiencecardProductName;
+      this.experiencecardProductType = res.experiencecardProductType;
+      this.useTimes = res.useTimes;
+      this.totalTimes = res.totalTimes;
+      if (this.experiencecardProductType == 1) {
+        this.value_invcare = "";
+        this.salesPepeCareare = true;
+        //请求销售员
+        this.getpeple();
+        // this.$confirm("您确定划卡吗?", {
+        //   confirmButtonText: "确定",
+        //   cancelButtonText: "取消",
+        //   type: "warning"
+        // })
+        //   .then(() => {
+        //     this.stampCard();
+        //   })
+        //   .catch(() => {
+        //     this.$message({
+        //       type: "info",
+        //       message: "已取消划卡"
+        //     });
+        //   });
+      } else {
+        if (res.useTimes < res.totalTimes) {
+          this.employeels();
+          this.servicePopover = true;
+        } else {
+          res.useTimes = res.totalTimes;
+          this.$message({
+            message: "警告哦，不能划卡了哟...",
+            type: "warning"
+          });
+        }
+        this.serviceList = [];
+        // this.visible_vipexd = true;
+      }
+    },
+
+    //选中会员
+    vipexamine(res) {
+      // this.imageUrl = res.headImgUrl;
+      if (res.headImgUrl) {
+        this.imageUrl = res.headImgUrl;
+        localStorage.setItem("headImgUrl", res.headImgUrl);
+      } else {
+        this.imageUrl = this.imageUrls;
+        localStorage.setItem("headImgUrl", this.imageUrls);
+      }
+      this.remark = res.remark;
+      this.cardNum = res.cardNum;
+      this.memberNum = res.memberNum;
+      this.grade = res.membershipLevelName;
+      this.input_name = res.name;
+      this.input_number = res.mobile;
+      // 设置本地存储
+      localStorage.setItem("remark", this.remark);
+      // localStorage.setItem("headImgUrl", this.imageUrl);
+      localStorage.setItem("memberName", this.input_name);
+      localStorage.setItem("memberNumber", this.input_number);
+      localStorage.setItem("membership", this.memberNum);
+      localStorage.setItem("grade", this.grade);
+      localStorage.setItem("membershipLevelId", res.membershipLevelId);
+      var params = {
+        // 会员名称
+        userName: res.name,
+        // 会员手机号
+        userMobile: res.mobile,
+        // 会员编号及卡号
+        userNumber: res.memberNum,
+        // 会员等级
+        userGrade: res.membershipLevelName
+      };
+      localStorage.setItem("member", JSON.stringify(params));
+      this.$store.commit("setMember", JSON.stringify(params));
+      this.accounBalance = [];
+      this.memberbalance();
+      this.visible_care = false;
+    },
+    // 清空会员信息
+    clearMember() {
+      this.$confirm("确认清空会员信息吗", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          this.$store.commit("setMember", null);
+          localStorage.removeItem("member");
+          this.cardNum = "";
+          this.memberNum = "";
+          this.grade = "";
+          this.remark = "";
+          this.input_name = "";
+          this.input_number = "";
+          this.imageUrl = this.imageUrls;
+          localStorage.removeItem("remark");
+          localStorage.removeItem("memberName");
+          localStorage.removeItem("memberNumber");
+          localStorage.removeItem("membership");
+          localStorage.removeItem("grade");
+          localStorage.removeItem("list");
+          localStorage.removeItem("membershipLevelId");
+          localStorage.removeItem("headImgUrl");
+          this.accounBalance = [];
+        })
+        .catch(() => {});
+    },
+    //查看体验卡详情vipecarLise
+    // experienceCard(res) {
+    // this.differentiate = 2;
+    // this.memberdcarUser();
+    // this.cardNum = res.cardNum;
+    // this.visible_details = true;
+    // this.experiencehaha = true;
+    // this.experienceheihei = false;
+    // },
+    // close_details() {
+    //   this.visible_details = false;
+    // },
+    //划卡退货
+    salesReturnails(res) {
+      this.input_Customization = "";
+      this.recordId = res.recordId;
+      this.productCodenal2 = res.productCode;
+      this.productNamenal2 = res.productName;
+      this.outStorageIdQiTass = res.outStorageIdQiTa;
+      this.outStorageIdXiaoShouss = res.outStorageIdXiaoShou;
+      this.salseshop[0].productCode = res.productCode;
+      this.salseshop[0].productName = res.productName;
+      this.outstorageId = res.outStorageId;
+      if (res.recordStatus == "未退货") {
+        this.$confirm("是否确认退货", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.salesReturnData();
+            this.suserPopover = false;
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消退货"
+            });
+          });
+      } else {
+        this.$message({
+          message: "该商品已退货",
+          type: "warning"
+        });
+      }
+    },
+    // 可选时间判断
+    judgeTime(date) {
+      var setTime = this.storeTimes;
+      var arr = [];
+      for (var i = 0; i < setTime.length; i++) {
+        var setting = Date.parse(date + " " + setTime[i]);
+        var nowTime = Date.parse(new Date());
+        if (setting < nowTime) {
+          arr.push({
+            value: setTime[i],
+            label: setTime[i],
+            disabled: true
+          });
+        } else {
+          arr.push({
+            value: setTime[i],
+            label: setTime[i],
+            disabled: false
+          });
+        }
+      }
+      this.judgeTimeList = arr;
+    },
+    // 可选时间判断
+    judgeTimes(date) {
+      var setTime = this.storeTimes;
+      var arr = [];
+      for (var i = 0; i < setTime.length; i++) {
+        var setting = Date.parse(date + " " + setTime[i]);
+        var nowTime = Date.parse(new Date());
+        if (setting < nowTime) {
+          arr.push({
+            value: setTime[i],
+            label: setTime[i],
+            disabled: true
+          });
+        } else {
+          arr.push({
+            value: setTime[i],
+            label: setTime[i],
+            disabled: false
+          });
+        }
+      }
+      this.judgeTimeLists = arr;
+    },
+    // 显示截止时间线位置
+    deadLinePos(start, end) {
+      var date = new Date();
+      var hours = date.getHours();
+      var minu = date.getMinutes();
+      // 若当前小时小于门店经营开始小时
+      if (hours < start) {
+        this.deadPos = 0;
+      }
+      // 若当前小时大于等于门店经营开始小时且小于门店经营结束小时
+      if (hours >= start && hours < end) {
+        this.deadPos = (hours - start) * 270 + minu * 4.5;
+      }
+      // 若当前小时大于等于门店经营结束小时且分钟大于0
+      if (hours >= end && minu > 0) {
+        this.deadPos = (end - start) * 270 + 30 * 4.5;
+      }
+    },
+    //定制项目划卡退货
+    salesReturnal(res) {
+      this.projectsuder[0].productCode = res.productCode;
+      this.projectsuder[0].productName = res.productName;
+      this.recordIds = res.recordId;
+      this.outStorageIdQiTa = res.outStorageIdQiTa;
+      this.outStorageIdXiaoShou = res.outStorageIdXiaoShou;
+      this.productCodenal = res.productCode;
+      this.productNamenal = res.productName;
+      this.outstoragetwoId = res.outStorageId;
+      if (res.recordStatus == "未退货") {
+        this.$confirm("是否确认退货", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(() => {
+            this.salesReturnDatas();
+            this.suserPopovepo = false;
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消退货"
+            });
+          });
+      } else {
+        this.$message({
+          message: "该商品已退货",
+          type: "warning"
+        });
+      }
+    },
+    // //选择员工
+    // close_vipexd() {
+    //   this.visible_vipexd = false;
+    // },
+    //获取门店营业时间
+    // 获取门店经营时间段
+    fetchStoreTimes() {
+      var url = this.$https.storeHost + "/manage/store/selectStoreById";
+      var params = { storeId: localStorage.getItem("storeId") };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            var times = res.data.result.shopBusinessTime;
+            this.startTime = parseInt(times.split("-")[0]);
+            this.endTime = parseInt(times.split("-")[1]);
+            // 执行截止时间线位置方法
+            this.deadLinePos(this.startTime, this.endTime);
+            // 半小时间隔
+            for (var i = this.startTime; i < this.endTime; i++) {
+              this.storeTimes.push((i > 9 ? i : "0" + i) + ":" + "30");
+            }
+            //  整点间隔
+            for (let i = this.startTime; i <= this.endTime; i++) {
+              this.storeTimes.push((i > 9 ? i : "0" + i) + ":" + "00");
+            }
+            // 排序 00 ~ 30 ~ 00
+            this.storeTimes.sort();
+            // 判断可选时间
+            this.judgeTime(this.currentDate);
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //体验卡退货详情
+    salesCared() {
+      var url =
+        this.$https.storeHost +
+        "/manage/experienceCard/selectExperiencecardProductUserRefuseList";
+      var params = {
+        id: this.caresongre,
+        pageNum: this.currentPage3,
+        pageSize: this.pageSize3
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result.length !== 0) {
+          this.salesdarta = res.data.result;
+          this.totalPasz3 = res.data.result.total;
+        } else {
+          this.totalPasz3 = 0;
+          this.salesdarta = [];
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    // 获取销售员
+    getpeple() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+      var params = {
+        companyType: 3,
+        companyId: [localStorage.getItem("storeId")],
+        isSaleMan: 1
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            this.options_invenT = res.data.result;
+            this.options_incare = res.data.result;
+          } else {
+            this.options_invenT = [];
+            this.options_incare = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //定制项目退货详情
+    salescaengd() {
+      var url =
+        this.$https.orderHost + "/order/selectCustomProjectUserRefuseList";
+      var params = {
+        id: this.caresongresss
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result.length !== 0) {
+          this.salesdartas = res.data.result;
+          this.totalPasz4 = res.data.result.total;
+        } else {
+          this.salesdartas = [];
+          this.totalPasz4 = 0;
+          this.$message({
+            message: "定制项目退货列表不存在",
+            type: "warning"
+          });
+        }
+      });
+    },
+    //体验卡退货
+    salesCareTumoney() {
+      var url =
+        this.$https.storeHost +
+        "/manage/experienceCard/experiencecardProductUserRefuse";
+      var params = {
+        refuseTimes: this.input_Customization,
+        id: this.salasId
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.visible_CustomiCares = false;
+          this.input_Customization = "";
+          this.memberdcarUser();
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //定制项目退货
+    salestweTumoney() {
+      var url = this.$https.orderHost + "/order/customProjectUserRefuse";
+      var params = {
+        refuseTimes: this.input_Customization,
+        id: this.salasIdtow
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.visible_Customization = false;
+          this.input_Customization = "";
+          this.projectturnData();
+        } else {
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //定制项目详情列表
+    particulpovepo() {
+      var url = this.$https.orderHost + "/order/selectUseRecordList";
+      var params = {
+        pageNum: this.currentPage2,
+        pageSize: this.pageSize2,
+        id: this.rienizauID
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.User_custopention = res.data.result.list;
+          this.totalPasz2 = res.data.result.total;
+          res.data.result.list.forEach(function(value) {
+            if (value.recordStatus == 1) {
+              value.recordStatus = "未退货";
+            } else {
+              value.recordStatus = "已退货";
+            }
+          });
+        } else {
+          this.User_custopention = [];
+          this.totalPasz2 = 0;
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //详情列表
+    particularsList() {
+      var url =
+        this.$https.storeHost + "/manage/experienceCard/selectUseRecord";
+      var params = {
+        pageNum: this.currentPage1,
+        pageSize: this.pageSize,
+        cardOrderDetailId: this.cardOrderDetailId
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.User_customization = res.data.result.list;
+          this.totalPasz = res.data.result.total;
+          res.data.result.list.forEach(function(value) {
+            if (value.recordStatus == 1) {
+              value.recordStatus = "未退货";
+            } else {
+              value.recordStatus = "已退货";
+            }
+          });
+        } else {
+          this.User_customization = [];
+          this.totalPasz = 0;
+          this.$message({
+            type: "warning",
+            message: res.data.responseStatusType.error.errorMsg
+          });
+        }
+      });
+    },
+    //项目定制列表
+    projectturnData() {
+      var url = this.$https.orderHost + "/order/selectCustomProjectByMember";
+      var params = {
+        memberNum: localStorage.getItem("membership")
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.tableData_rieniza = res.data.result;
+        } else {
+          this.tableData_rieniza = [];
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
+        }
+      });
+    },
+    //退货请求
+    salesReturnData() {
+      var url = this.$https.orderHost + "/order/payOrderRefund";
+      var params = {
+        isTiYanKa: 1,
+        isHuaKa: 1,
+        expUseRecordId: this.recordId,
+        stockCode: localStorage.getItem("stockCode"),
+        storeName: localStorage.getItem("storeName"),
+        productCode: this.productCodenal2,
+        productName: this.productNamenal2,
+        outStorageIdQiTa: this.outStorageIdQiTass,
+        outStorageIdXiaoShou: this.outStorageIdXiaoShouss,
+        storeId: localStorage.getItem("storeId"),
+        products: JSON.stringify(this.salseshop),
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
+        experiencecardProductUserId: this.cardOrderDetailId,
+        modifyOperator: localStorage.getItem("trueName"),
+        orderNumber: this.orderNumber,
+        outstorageId: this.outstorageId
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.memberdcarUser();
+        } else {
+          this.$notify({
+            message: res.data.responseStatusType.error.errorMsg,
+            position: "bottom-right",
+            type: "warning"
+          });
+        }
+      });
+    },
+    //定制项目退货请求
+    salesReturnDatas() {
+      var url = this.$https.orderHost + "/order/payOrderRefund";
+      var params = {
+        isTiYanKaOrDingzhi: 1,
+        isTiYanKa: 0,
+        isHuaKa: 2,
+        stockCode: localStorage.getItem("stockCode"),
+        storeName: localStorage.getItem("storeName"),
+        productCode: this.productCodenal,
+        productName: this.productNamenal,
+        outStorageIdQiTa: this.outStorageIdQiTa,
+        outStorageIdXiaoShou: this.outStorageIdXiaoShou,
+        orgK3Number: localStorage.getItem("orgK3Number"),
+        stockId: localStorage.getItem("stockId"),
+        storeId: localStorage.getItem("storeId"),
+        expUseRecordId: this.recordIds,
+
+        products: JSON.stringify(this.projectsuder),
+        experiencecardProductUserId: this.rienizauID,
+        modifyOperator: localStorage.getItem("trueName"),
+        orderNumber: this.orderNumber,
+        outstorageId: this.outstoragetwoId
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Success") {
+          this.$message({
+            type: "success",
+            message: "退货成功"
+          });
+          this.projectturnData();
+        } else {
+          this.$notify({
+            message: res.data.responseStatusType.error.errorMsg,
+            position: "bottom-right",
+            type: "warning"
+          });
+        }
+      });
+    },
+    //充值员工
+    rechargepeople() {
+      var url =
+        this.$https.storeHost + "/manage/beautician/selectBeauticianListNoPage";
+      var params = {
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.result) {
+          this.optionpeple = res.data.result;
+        } else {
+          this.$notify({
+            message: res.data.responseStatusType.error.errorMsg,
+            position: "bottom-right",
+            type: "warning"
+          });
+        }
+      });
+    },
+    //修改备注
+    rmarkMember() {
+      var url =
+        this.$https.accountHost + "/manage/memberUser/updateStoreMember";
+      var params = {
+        remark: this.remark,
+        memberNum: localStorage.getItem("membership")
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data) {
+          this.$message({
+            message: "修改备注成功...",
+            type: "success"
+          });
+        } else {
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "warning"
+          });
+        }
+      });
+    },
+    //支付类型
+    paymentTalp() {
+      var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
+      var params = {
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.result) {
+            res.data.result.forEach(value => {
+              if (value.payTypeCategory == 1) {
+                this.optionpeTylp.push({
+                  payTypeCategory: value.payTypeCategory,
+                  payTypeId: value.payTypeId,
+                  payTypeName: value.payTypeName
+                });
+              }
+            });
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //账户类型
+    accounttypeData() {
+      var url =
+        this.$https.walletHost + "/manage/wallet/selectWalletAccountList";
+      this.$https.fetchPost(url).then(
+        res => {
+          if (res.data.result) {
+            this.interestTple = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //获取会员
+    memberinformation() {
+      var url =
+        this.$https.accountHost +
+        "/manage/memberUser/selectStoreMemberByPhoneOrName";
+      var params = {
+        storeId: localStorage.getItem("storeId"),
+        name: this.input_name,
+        mobile: this.input_number,
+        pageNum: this.memberCurrentPage,
+        pageSize: this.memberPageSize
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            this.memberDataTotal = res.data.result.total;
+            this.tableData_vippeple = res.data.result.list;
+            // this.grade = res.data.result.list[0].membershipLevelName;
+          } else {
+            this.memberDataTotal = null;
+            this.tableData_vippeple = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //获取会员电话
+    memberinformation2() {
+      var url =
+        this.$https.accountHost +
+        "/manage/memberUser/selectStoreMemberByPhoneOrName";
+      var params = {
+        storeId: localStorage.getItem("storeId"),
+        mobile: this.input_number,
+        pageNum: this.memberCurrentPage,
+        pageSize: this.memberPageSize
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            this.memberDataTotal = res.data.result.total;
+            this.tableData_vippeple = res.data.result.list;
+          } else {
+            this.memberDataTotal = null;
+            this.tableData_vippeple = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //点击查看详情
+    memberdcarUser() {
+      var url =
+        this.$https.storeHost +
+        "/manage/experienceCard/selectExpCardUserProduct";
+      var params = {
+        memberNum: this.$store.state.member.userNumber
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            this.tableData_details = res.data.result;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {});
+    },
+    //获取会员卡详情
+    memberdetails() {
+      var url =
+        this.$https.storeHost + "/manage/experienceCard/selectExpCardUser";
+      var params = {
+        memberNum: this.$store.state.member.userNumber
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result.userExperiencecardList) {
+            this.tableData_carLise = res.data.result.userExperiencecardList;
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //充值星级
+    staCardxins() {
+      var url = this.$https.accountHost + "/manage/member/memberUserUpdate";
+      var params = {
+        memberNumber: localStorage.getItem("membership")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          this.grade = res.data.result;
+          localStorage.setItem("grade", this.grade);
+        })
+        .catch(err => {});
+    },
+
+    //充值
+    rechargeList() {
+      var url =
+        this.$https.walletHost +
+        "/manage/wallet/insertStoreRechargeAuditRecord";
+      var params = {
+        storeId: localStorage.getItem("storeId"),
+        accountTypeId: this.value_tregion,
+        cardNumber: localStorage.getItem("membership"),
+        amount: this.form.money,
+        payTypeAndAmount: JSON.stringify(this.payTypeAndAmount),
+        beauticianId: JSON.stringify(this.beauticianIds),
+        name: this.form.input_people,
+        isRoyalty: this.delivery,
+        isintegral: this.rebate,
+        rechargeChannel: 3,
+        industryId: localStorage.getItem("industryID"),
+        mobile: this.input_number,
+        payStatus: this.value_accountstate,
+        payee: this.form.input_people,
+        isAbatementLadderDetailed: 1,
+        remarks: this.form.desc
+      };
+      this.$https.fetchPost(url, params).then(
+        res => {
+          if (res.data.responseStatusType.message == "Success") {
+            this.$message({
+              message: res.data.result,
+              type: "success",
+              duration: 5000
+            });
+            this.memberbalance();
+            this.staCardxins();
+            setTimeout(() => {
+              this.memberinformation();
+            }, 300);
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        },
+        error => {
+          this.$message({
+            type: "error",
+            message: error
+          });
+        }
+      );
+    },
+    //获取账户余额
+    memberbalance() {
+      this.accounBalance = [];
+      var url =
+        this.$https.accountHost + "/manage/memberUser/listMemberAccount";
+      var params = {
+        memberNum: this.$store.state.member.userNumber,
+        industry: localStorage.getItem("industryID")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          res.data.result.list.forEach(value => {
+            if (value.isQingKe == 0) {
+              this.accounBalance.push({
+                accountType: value.accountType,
+                accountTypeId: value.accountTypeId,
+                amount: value.amount,
+                isQingKe: value.isQingKe
+              });
+              var arr = this.accounBalance;
+              localStorage.setItem("list", JSON.stringify(arr));
+            }
+          });
+          //刷新星级
+          this.staCardxins();
+        })
+        .catch(err => {
+          this.$message.error("获取账户余额请求错误...");
+        });
+    },
+    //项目定制直接划卡
+    pojectCared() {
+      var url = this.$https.orderHost + "/order/updateCustomProjectTimes";
+      var params = {
+        memberNum: this.$store.state.member.userNumber,
+        id: this.cardid,
+        productCode: this.experiencecardProductCode,
+        storeId: localStorage.getItem("storeId"),
+        storeName: localStorage.getItem("storeName"),
+        productName: this.experiencecardProductName,
+        postAndBeautician: "",
+        createOperator: localStorage.getItem("trueName"),
+        memberName: this.input_name,
+        memberMobile: this.input_number
+      };
+      this.$https.fetchPost(url, params).then(res => {
+        if (res.data.responseStatusType.message == "Failure") {
+          this.$message({
+            message: res.data.responseStatusType.error.errorMsg,
+            type: "error"
+          });
+        } else {
+          this.projectturnData();
+          this.$message({
+            message: "划卡成功",
+            type: "success"
+          });
+        }
+      });
+    },
+    //划卡
+    stampCard() {
+      var url =
+        this.$https.storeHost + "/manage/experienceCard/updateUserExpUseTimes";
+      var params = {
+        memberNum: this.$store.state.member.userNumber,
+        // experiencecardNum: this.cardNum,
+        id: this.cardid,
+        staffNumber: this.value_invcare,
+        productCode: this.experiencecardProductCode,
+        storeId: localStorage.getItem("storeId"),
+        storeName: localStorage.getItem("storeName"),
+        productName: this.experiencecardProductName,
+        postAndBeautician: "",
+        createOperator: localStorage.getItem("trueName"),
+        memberName: this.input_name,
+        memberMobile: this.input_number
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.responseStatusType.message == "Failure") {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
+            });
+          } else {
+            this.$message({
+              message: "划卡成功",
+              type: "success"
+            });
+            this.memberdcarUser();
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //选择员工定制项目划卡
+    staffstampCardss() {
+      var url = this.$https.orderHost + "/order/updateCustomProjectTimes";
+      var params = {
+        memberNum: this.$store.state.member.userNumber,
+        staffNumber: this.value_invenT,
+        id: this.cardid,
+        productCode: this.experiencecardProductCode,
+        storeId: localStorage.getItem("storeId"),
+        storeName: localStorage.getItem("storeName"),
+        productName: this.experiencecardProductName,
+        postAndBeautician: JSON.stringify(this.otp),
+        createOperator: localStorage.getItem("trueName"),
+        memberName: this.input_name,
+        memberMobile: this.input_number
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result !== null) {
+            this.$message({
+              message: res.data.result,
+              type: "success",
+              duration: 2000
+            });
+            this.servicePopover = false;
+            this.projectturnData();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //选择员工体验卡划卡
+    staffstampCard() {
+      var url =
+        this.$https.storeHost + "/manage/experienceCard/updateUserExpUseTimes";
+      var params = {
+        memberNum: this.$store.state.member.userNumber,
+        // experiencecardNum: this.cardNum,
+        id: this.cardid,
+        productCode: this.experiencecardProductCode,
+        storeId: localStorage.getItem("storeId"),
+        storeName: localStorage.getItem("storeName"),
+        productName: this.experiencecardProductName,
+        postAndBeautician: JSON.stringify(this.otp),
+        createOperator: localStorage.getItem("trueName"),
+        memberName: this.input_name,
+        memberMobile: this.input_number
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result !== null) {
+            this.$message({
+              message: res.data.result,
+              type: "success",
+              duration: 2000
+            });
+            this.servicePopover = false;
+            this.memberdcarUser();
+          } else {
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "error"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    },
+    //获取员工信息
+    employeels() {
+      this.currentEmpId = null;
+      var url =
+        this.$https.dataHost + "/commodityType/selectSubclassByCondition";
+      var params = {
+        subclassID: this.subClassId,
+        storeId: localStorage.getItem("storeId")
+      };
+      this.$https
+        .fetchPost(url, params)
+        .then(res => {
+          if (res.data.result) {
+            this.empsetlist = res.data.result.list[0].postCategoryVOList;
+            if (this.empsetlist.length == 1) {
+              this.empsetlist.forEach(value => {
+                this.optionpersonal = value.beauticianList;
+              });
+            } else {
+              this.values_truwes = true;
+              this.empsetlist.forEach(value => {
+                if (value.postCategoryName == "美发师") {
+                  this.optionpersonal = value.beauticianList;
+                }
+                this.optionpersonals = value.beauticianList;
+              });
+            }
+          } else {
+            // this.empSet = [];
+            this.$message({
+              message: res.data.responseStatusType.error.errorMsg,
+              type: "warning"
+            });
+          }
+        })
+        .catch(err => {
+          //   this.$message.error("体验卡列表提交请求错误...");
+        });
+    }
+  },
+  created() {
+    this.input_name = localStorage.getItem("memberName");
+    this.input_number = localStorage.getItem("memberNumber");
+    this.grade = localStorage.getItem("grade");
+    this.remark = localStorage.getItem("remark");
+    if (localStorage.getItem("headImgUrl")) {
+      this.imageUrl = localStorage.getItem("headImgUrl");
+    } else {
+      this.imageUrl = this.imageUrls;
+    }
+    this.accounBalance = JSON.parse(localStorage.getItem("list"));
+    // store.commit("usernames",this.input_name)
+  },
+  mounted() {
+    //请求
+    this.staCardxins();
+    this.paymentTalp();
+    this.rechargepeople();
+    this.fetchStoreTimes();
+  }
+};
+</script>
+
+<style lang='scss' scoped>
+.fixed {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  height: 200px;
+  z-index: 160;
+  .concealVIP {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+    z-index: 160;
+  }
+  .aa {
+    transition: all 1s;
+  }
+  .go {
+    transform: rotate(-180deg);
+    transition: all 1s;
+  }
+}
+
+.floatBox {
+  width: 100%;
+  min-width: 1200px;
+  height: 200px;
+  transition: 1s;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+
+  .revealVIP {
+    position: absolute;
+    right: 10px;
+    top: -50px;
+  }
+  .memberBox {
+    border-top: 1px solid #23a547;
+    background: #fafff8;
+    width: 100%;
+    height: 220px;
+    .content {
+      width: 1330px;
+      height: 140px;
+      display: flex;
+      margin: 0 auto;
+      padding-top: 12px;
+      justify-content: space-around;
+
+      .userPhoto {
+        width: 100px;
+        height: 100px;
+        background-color: #eee;
+        border-radius: 5px;
+        position: relative;
+        img {
+          width: 100px;
+          height: 100px;
+        }
+        .clear {
+          width: 15px;
+          height: 15px;
+          line-height: 15px;
+          border-radius: 4px;
+          font-size: 13px;
+          position: absolute;
+          top: 2px;
+          right: 0;
+          background: #23a547;
+          color: #fff;
+          text-align: center;
+        }
+      }
+      .usermessage {
+        height: 120px;
+        flex: 1;
+        margin: 0 15px;
+        border-bottom: 1px solid #eee;
+        .userNamePoto {
+          display: flex;
+          .userName-box {
+            flex: 1;
+            position: relative;
+            display: flex;
+            label {
+              margin-left: 28px;
+              line-height: 40px;
+              font-size: 16px;
+              font-weight: bold;
+            }
+            .userName-boxs {
+              right: 0px;
+              height: 40px;
+              width: 40px;
+              text-align: center;
+              line-height: 40px;
+              top: 0px;
+              position: absolute;
+              i {
+                font-size: 16px;
+                color: #606266;
+              }
+            }
+            .userName-boxs:hover {
+              cursor: pointer;
+            }
+          }
+          .el-button {
+            width: 90px;
+            height: 45px;
+          }
+          .el-input {
+            width: 210px;
+            flex: 1;
+            border-radius: 4px;
+          }
+          .el-input:focus {
+            border: 1px solid #23a547 !important;
+          }
+          .gradevip {
+            width: 150px;
+            height: 40px;
+            line-height: 40px;
+            margin-left: 15px;
+            font-weight: bold;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            span {
+              color: #feb019;
+              font-size: 18px;
+            }
+          }
+        }
+        .remarkVip {
+          display: flex;
+          margin-top: 10px;
+          margin-left: 28px;
+          label {
+            line-height: 40px;
+            font-size: 16px;
+            font-family: PingFang SC;
+            font-weight: bold;
+            color: rgba(34, 34, 34, 1);
+          }
+          .el-input {
+            width: 800px;
+            height: 45px;
+            border-radius: 6px;
+          }
+        }
+      }
+      .experienCard {
+        width: 100px;
+        height: 40px;
+        margin: 50px 28px 0 0;
+      }
+      .experienCards {
+        width: 100px;
+        height: 40px;
+        margin: 50px 0 0 15px;
+      }
+    }
+    .accountBalance {
+      display: flex;
+      width: 1200px;
+      margin: 0 auto;
+      height: 50px;
+      clear: both;
+      .spans {
+        width: 100px;
+        height: 18px;
+        font-size: 18px;
+        line-height: 18px;
+        font-family: PingFang SC;
+        font-weight: bold;
+        padding: 10px;
+        color: rgba(0, 0, 0, 1);
+      }
+      .accountCenter {
+        width: 900px;
+        height: 50px;
+        overflow-y: hidden;
+        white-space: nowrap;
+        .savingBale {
+          height: 50px;
+          min-width: 150px;
+          display: inline-block;
+          margin: 10px 0 20px 10px;
+          label {
+            height: 16px;
+            font-size: 15px;
+            font-family: PingFang SC;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 1);
+          }
+          span {
+            height: 16px;
+            font-size: 18px;
+            font-family: PingFang SC;
+            font-weight: bold;
+            color: rgba(254, 176, 25, 1);
+          }
+        }
+      }
+      /* 滚动槽的样式设置 */
+      .accountCenter::-webkit-scrollbar-track {
+        -webkit-box-shadow: inset 0 0 6px rgb(116, 240, 68);
+      }
+      /* 滚动条滑块的样式设置 */
+      .accountCenter::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.1);
+        -webkit-box-shadow: inset 0 0 6px rgb(195, 247, 7);
+      }
+    }
+  }
+}
+//弹出框
+//出入库弹出框
+.storageblock {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 90%;
+    margin: 0 auto;
+    max-height: 500px;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    // box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    .el-table__header {
+      background-color: #23a547;
+    }
+    li {
+      padding: 18px 0 0 18px;
+      font-size: 16px;
+    }
+  }
+}
+//充值弹出框
+.storageblockk {
+  .recharge_top {
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    font-size: 16px;
+    border-bottom: 1px solid rgba(231, 228, 228, 0.5);
+  }
+  .recharge_main {
+    .el-input {
+      width: 217px;
+    }
+    .textarea {
+      width: 250px;
+      height: 100px;
+      border-radius: 5px;
+      padding: 10px;
+    }
+    .el-textarea__inner {
+      width: 217px;
+    }
+  }
+}
+.storageblock2 {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 100%;
+    max-height: 465px;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+
+    // .projcttop {
+    //   width: 100%;
+    //   height: 30px;
+    //   display: flex;
+    //   position: relative;
+    //   .projectcar {
+    //     margin: 0 20px;
+    //     position: absolute;
+    //     right: 100px;
+    //   }
+    //   .projectcars {
+    //     height: 30px;
+    //     position: absolute;
+    //     right: 10px;
+    //   }
+    // }
+    .projcttop {
+      width: 100%;
+      height: 30px;
+      .projtright {
+        width: 550px;
+        height: 30px;
+        display: flex;
+        .someprojts {
+          width: 76px;
+          height: 28px;
+          line-height: 28px;
+          text-align: center;
+          background-color: #23a547;
+          border-radius: 4px;
+          margin-left: 5px;
+          color: #fff;
+          cursor: pointer;
+          &.active {
+            background-color: rgb(252, 137, 7);
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .projctbottom {
+      width: 100%;
+      max-height: 500px;
+      overflow: auto;
+      .inbottons {
+        float: right;
+        display: flex;
+      }
+      .inventsome5 {
+        height: 28px;
+        width: 60px;
+        margin-right: 5px;
+        line-height: 28px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #cf0808;
+        }
+        &.acc {
+          background-color: #525351;
+        }
+      }
+      .inbotton {
+        float: right;
+        display: flex;
+      }
+      .inventsome6 {
+        height: 28px;
+        width: 60px;
+        margin-right: 5px;
+        line-height: 28px;
+        text-align: center;
+        border-radius: 4px;
+        color: #fff;
+        cursor: pointer;
+        &.active {
+          background-color: #cf0808;
+        }
+        &.acc {
+          background-color: #525351;
+        }
+      }
+    }
+  }
+}
+.storageblock3 {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 90%;
+    max-height: 500px;
+    margin: 0 auto;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    // box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    .el-table__header {
+      background-color: #23a547;
+    }
+    li {
+      padding: 18px 0 0 18px;
+      font-size: 16px;
+    }
+  }
+}
+//项目定制划卡
+.storagebl3 {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 90%;
+    max-height: 500px;
+    margin: 0 auto;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    // box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    .el-table__header {
+      background-color: #23a547;
+    }
+  }
+}
+.aa {
+  cursor: pointer;
+}
+.red {
+  background-color: #f4f4f4;
+}
+//弹框
+.servicePop {
+  .top {
+    padding: 5px 15px;
+  }
+  .main {
+    display: flex;
+    .empSet {
+      width: 200px;
+      .item {
+        font-size: 15px;
+        height: 60px;
+        line-height: 60px;
+        font-weight: 700;
+        overflow: hidden;
+        padding-left: 20px;
+        position: relative;
+        cursor: pointer;
+
+        &.active {
+          background: #f4f4f4;
+
+          &:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 4px;
+            background: #47bf7c;
+          }
+        }
+
+        .default {
+          color: #8a8a8a;
+          font-size: 13px;
+          span {
+            font-size: 15px;
+            font-weight: 700;
+            margin-right: 15px;
+            color: #333333;
+          }
+        }
+
+        .active {
+          color: #47bf7c;
+        }
+      }
+    }
+
+    .empSelect {
+      flex: 1;
+      height: 250px;
+      padding-top: 30px;
+      padding-left: 20px;
+      background: #f4f4f4;
+
+      .tit {
+        position: relative;
+        line-height: 40px;
+        padding: 0 10px;
+        font-size: 15px;
+        font-weight: 700;
+      }
+      .empList {
+        position: relative;
+        background: #f4f4f4;
+        .empLtleft {
+          width: 100%;
+          padding: 0 20px;
+          display: flex;
+          .namelefse {
+            width: 100px;
+            height: 200px;
+            text-align: right;
+            line-height: 3;
+            .name {
+              font-size: 18px;
+              font-weight: 600;
+              margin: -3px;
+            }
+          }
+          label {
+            margin-right: 38px;
+            font-size: 18px;
+            font-weight: 600;
+          }
+        }
+        .empLtlefts {
+          width: 100%;
+          height: 60px;
+          padding: 20px 20px;
+          label {
+            margin-right: 20px;
+            font-size: 18px;
+            font-weight: 600;
+          }
+        }
+        .el-select {
+          margin-right: 8px;
+        }
+        .el-date-editor.el-input,
+        .el-date-editor.el-input__inner {
+          margin-right: 8px;
+        }
+        .item {
+          cursor: pointer;
+          display: inline-block;
+          padding: 10px 40px 10px 20px;
+          border-radius: 6px;
+          width: 225px;
+          height: 70px;
+          line-height: 25px;
+          margin: 0 15px 15px 0;
+          background: #fff
+            url(https://static.bokao2o.com/wisdomDesk/images/Def_Icon_Check_N.png)
+            185px center / 28px no-repeat;
+
+          &.active {
+            background: #fff
+              url(https://static.bokao2o.com/wisdomDesk/images/Def_Icon_Check_S.png)
+              185px center / 28px no-repeat;
+          }
+
+          .id {
+            color: #8a8a8a;
+          }
+        }
+      }
+    }
+  }
+  .bottom {
+    @extend .top;
+    display: flex;
+    background: #ffffff;
+
+    .btn {
+      margin-left: 30px;
+      width: 130px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      line-height: 40px;
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: 700;
+      background: #47bf7c;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  }
+}
+//定制项目退货弹框
+.storageCustomization {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      .el-input {
+        width: 200px;
+      }
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 38px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//体验卡退货弹框
+.storageCare {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      display: flex;
+      .el-input {
+        width: 200px;
+      }
+      label {
+        font-weight: 550;
+        font-size: 19px;
+        line-height: 38px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//弹框
+.serviceUserpo {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 90%;
+    max-height: 500px;
+    margin: 0 auto;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    // box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    .el-pagination {
+      text-align: right;
+      margin-top: 10px;
+    }
+    .inventsome2 {
+      padding: 0 15px;
+      height: 28px;
+      width: 80px;
+      color: #fff;
+      line-height: 29px;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      &.active {
+        background-color: #fdc304;
+      }
+      &.acc {
+        background-color: #aca9a9;
+      }
+    }
+  }
+  .stgblcktopbottom {
+    text-align: center;
+  }
+}
+//定制项目直接划卡
+.storageblocks {
+  .stgblcktop {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 550;
+  }
+  .stgblcktopmain {
+    height: 200px;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    .optionDate {
+      padding: 50px 0 0 30px;
+      label {
+        font-weight: 550;
+        font-size: 19px;
+      }
+    }
+  }
+  .stgblckbottom {
+    text-align: center;
+  }
+}
+//弹框
+.serviceUser {
+  width: 100%;
+  .stgblcktop {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+  }
+  .stgblcktopmain {
+    width: 90%;
+    margin: 0 auto;
+    overflow: auto;
+    border-top: 0.5px solid rgba(220, 220, 220, 0.7);
+    // box-shadow: 0px 0px 11px 2px rgba(207, 207, 207, 1);
+    .el-pagination {
+      text-align: right;
+      margin-top: 10px;
+    }
+    .inventsome1 {
+      padding: 0 15px;
+      height: 28px;
+      width: 80px;
+      color: #fff;
+      line-height: 29px;
+      text-align: center;
+      border-radius: 4px;
+      cursor: pointer;
+      &.active {
+        background-color: #fdc304;
+      }
+      &.acc {
+        background-color: #aca9a9;
+      }
+    }
+  }
+  .stgblcktopbottom {
+    text-align: center;
+  }
+}
+//定制项目划卡弹框
+.servicecust {
+  .top {
+    width: 100%;
+    height: 30px;
+    font-weight: 550;
+    font-size: 20px;
+    text-align: center;
+  }
+  .main {
+    padding: 0 15px;
+  }
+}
+//项目定制详情里面划卡
+.servicecutbs {
+  .top {
+    width: 100%;
+    height: 30px;
+    font-weight: 550;
+    font-size: 20px;
+    text-align: center;
+  }
+  .main {
+    padding: 0 15px;
+  }
+}
+.fade-enter {
+  opacity: 0;
+}
+.fade-enter-active {
+  transition: opacity 1s;
+}
+
+.fade-leave-to {
+  opacity: 0;
+}
+.fade-leave-active {
+  transition: opacity 1s;
+}
+// 页码
+.pagination {
+  text-align: right;
+  margin: 5px;
+}
+</style>
+  <style >
+/* 公共的移入列表样式 */
+.el-table--enable-row-hover .el-table__body tr:hover > td {
+  background: #e3fbe6 !important;
+}
+</style>

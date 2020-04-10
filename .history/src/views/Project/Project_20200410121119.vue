@@ -464,7 +464,7 @@ export default {
     },
 
     // 门店小类
-    fetchMenuItems(id) {
+    fetchMenuItem(id) {
       this.currentMenuId = id;
       this.menuItem = [];
       this.commodityItem = [];
@@ -498,7 +498,7 @@ export default {
     },
 
     // 门店小类商品
-    fetchCommoditys(id) {
+    fetchCommodity(id) {
       this.currentMenuItemId = id;
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
@@ -778,7 +778,7 @@ export default {
       }
     },
     //支付方式
-    morepayments() {
+    morepayment() {
       var url = this.$https.payHost + "/manage/payment/selectPayTypeList";
       var params = {
         memberNum: localStorage.getItem("membership"),
@@ -805,7 +805,7 @@ export default {
         .catch(err => {});
     },
     //获取定制项目列表
-    PlacementPrivates() {
+    PlacementPrivate() {
       var url = this.$https.dataHost + "/commodityType/selectCommodityTypeList";
       var params = {
         isDingzhi: 1,
@@ -837,7 +837,7 @@ export default {
         .catch(err => {});
     },
     //项目小类
-    projectsubclasss() {
+    projectsubclass() {
       var url =
         this.$https.dataHost + "/commodityType/selectSubclassByCondition";
       var params = {
@@ -865,7 +865,7 @@ export default {
         .catch(err => {});
     },
     //项目小类中小项目
-    projectsubsmalls() {
+    projectsubsmall() {
       var url = this.$https.productHost + "/manage/product/selectProductList";
       var params = {
         // subClassId: this.subclassID,
@@ -896,7 +896,7 @@ export default {
     },
 
     //确认下单
-    affirmplOrders() {
+    affirmplOrder() {
       var url = this.$https.orderHost + "/order/createServiceOrder";
       var params = {
         orderType: 4,
@@ -932,7 +932,7 @@ export default {
         .catch(err => {});
     },
     //最后支付
-    endOrders() {
+    endOrder() {
       var arr = {
         payType: this.input_cataly,
         amount: this.input_present,

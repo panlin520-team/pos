@@ -932,7 +932,7 @@ export default {
         .catch(err => {});
     },
     //最后支付
-    endOrders() {
+    endOrder() {
       var arr = {
         payType: this.input_cataly,
         amount: this.input_present,
